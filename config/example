@@ -1,0 +1,24 @@
+// file format .json
+{
+  "salt": "salt",
+  "cookieSecret": "cooksec",
+  "app": {
+    "port": "8080",
+    "host": "localhost"
+  },
+  "socket": {
+    "port": "8081",
+    "host": "localhost"
+  },
+  "db": {
+    "client": "mongodb",
+    "connection": {
+      "host": "localhost",
+      "port": "27017",
+      "dbName": "dbname"
+    }
+  },
+  "hash": {
+    "encryptionType": "sha256"
+  }
+}

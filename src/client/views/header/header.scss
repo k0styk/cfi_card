@@ -1,0 +1,31 @@
+.header-wrapper {
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  flex-flow: row wrap;
+  min-height: 60px;
+}
+
+.header-block-icon {
+  margin-left: 10px;
+  align-self: center;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.block-buttons {
+  flex: 1 1 auto;
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: 50px;
+  user-select: none;
+
+  .block-element {
+    padding: 3px 5px;
+  }
+}

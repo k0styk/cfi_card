@@ -1,0 +1,9 @@
+node_modules
+.DS_Store
+dist
+config/*.json
+.logs
+src/migration/data*
+
+Coverage
+coverage

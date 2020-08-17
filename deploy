@@ -1,0 +1,18 @@
+echo -e "Runnig \033[32mdeploy\033[0m script..."
+echo -e "\033[31mYou should have installed PM2 global package, before runnig this script\033[0m"
+
+echo Run install packages
+npm install
+
+echo -e "\033[32mBuilding\033[0m project"
+npm run build:production
+
+echo -e "\033[33mRemove\033[0m waste packages, cleaning project modules"
+npm prune --production
+
+echo Run pm2 process
+npm run production
+
+echo -e "\033[33mDone baby!\033[0m"
+echo -e "\033[33mCheck status process\033[0m"
+pm2 status

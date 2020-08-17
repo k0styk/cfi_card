@@ -1,0 +1,52 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true,
+        "node": true
+    },
+    // "extends": "airbnb",
+    "globals": {
+        "Atomics": "readonly",
+        "SharedArrayBuffer": "readonly"
+    },
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 2018,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "indent"                                                                : ["error",2, { "SwitchCase": 1 }],
+        "camelcase"                                                             : ["error",{"properties": "never"}],
+        "semi"                                                                  : ["error", "always"],
+        "prefer-destructuring"                                                  : ["error",{"array": true, "object": true}],
+        "max-len"                                                               : ["error", {"code": 120, "tabWidth": 2}],
+        "switch-colon-spacing"                                                  : ["error", {"after": true, "before": false}],
+        "space-unary-ops"                                                       : ["error", { "words": true, "nonwords": false }],
+        "arrow-parens"                                                          : ["error", "as-needed"],
+        "arrow-body-style"                                                      : ["error", "as-needed"],
+        "template-curly-spacing"                                                : ["error","never"],
+        "eqeqeq"                                                                : ["error", "smart"],
+        "quotes"                                                                : [2, "single", { "allowTemplateLiterals": true }],
+        "newline-after-var"                                                     : [1, "always"],
+        "no-duplicate-imports"                                                  : ["error", { "includeExports": true }],
+        "no-trailing-spaces"                                                    : ["error", { "ignoreComments": true }],
+        // "curly"                                                                 : ["error", "multi-or-nest"],
+        "no-this-before-super"                                                  : "error",
+        "no-dupe-class-members"                                                 : "error",
+        "constructor-super"                                                     : "error",
+        "arrow-spacing"                                                         : "error",
+        "prefer-const"                                                          : "error",
+        "no-eval"                                                               : "error",
+        "array-callback-return"                                                 : "error",
+        "no-useless-escape"                                                     : "error",
+        "no-const-assign"                                                       : "error",
+        "no-new-object"                                                         : "error",
+        "block-scoped-var"                                                      : "error",
+        "no-var"                                                                : "warn"
+    }
+}

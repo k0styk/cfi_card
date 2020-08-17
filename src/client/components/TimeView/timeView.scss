@@ -1,0 +1,30 @@
+// @import '~components/constants/variables.scss';
+
+.time-view-component {
+  --borderWidth: 1px;
+  --borderRadius: 10px;
+  --width: 156px;
+  --height: 34px;
+  cursor: default;
+  user-select: none;
+  border-radius: var(--borderRadius);
+  width: var(--width);
+  height: var(--height);
+  font-size: 28px;
+  z-index: 0;
+  text-transform: uppercase;
+  overflow: hidden;
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  color: #1e2171;
+
+  & i {
+    margin-right: 5px;
+  }
+
+  .time-span {
+    font-size: 32px;
+  }
+}
