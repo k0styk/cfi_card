@@ -69,13 +69,8 @@ const common = merge([
     emitWarning: true,
   }}),
   images(),
-  fonts(),
+  // fonts(),
   babel(),
-  // copy({
-  //   paths: [
-  //     path.join(PATHS.source,'/public/js/moment.min.js')
-  //   ]
-  // })
 ]);
 
 module.exports = function(env, argv) {

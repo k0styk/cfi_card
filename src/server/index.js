@@ -5,7 +5,9 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import store from '../client/redux/store/store';
 import App from '../client/App';
 import './style.css';
-import '../public/html/styles/fontA/css/all.min.css';
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { far } from '@fortawesome/free-brands-svg-icons'
+import { faClock } from '@fortawesome/free-solid-svg-icons'
 
 ReactDOM.render(
   <Router>
