@@ -37,7 +37,7 @@ export function summary(state = initialState, action) {
 
   switch (action.type) {
     /* -----              SUMMARY START                                 ----- */
-    case SUMMARY.ADD: {
+    case SUMMARY.ADD:
       const newVal = {
         id: state.counter,
         counter: 1,
@@ -51,18 +51,16 @@ export function summary(state = initialState, action) {
         counter: state.counter+1,
         value: [...state.value, newVal]
       };
-    }
-    case SUMMARY.REMOVE: {
+    case SUMMARY.REMOVE:
       return {
         ...state,
-        value: state.value.filter(i => i.id !== action.payload.id)
+        value: state.value.filter(i => i.id !== p.id)
       };
-    }
-    case SUMMARY.ADD_Z2: {
+    case SUMMARY.ADD_Z2:
       return {
         ...state,
         value: state.value.map((v,i) => {
-          if(v.id === action.payload.id) {
+          if(v.id === p.id) {
             return {
               ...v,
               counter: v.counter + 1,
@@ -72,28 +70,26 @@ export function summary(state = initialState, action) {
           return v;
         })
       };
-    }
-    case SUMMARY.REMOVE_Z2: {
+    case SUMMARY.REMOVE_Z2:
       return {
         ...state,
         value: state.value.map((v,i) => {
-          if(v.id === action.payload.id) {
+          if(v.id === p.id) {
             return {
               ...v,
-              z2: v.z2.filter(i => i.id !== action.payload.z2id)
+              z2: v.z2.filter(i => i.id !== p.z2id)
             };
           }
           return v;
         })
       };
-    }
     /* -----              SUMMARY END                                   ----- */
     /* -----              Z1 START                                      ----- */
     case Z1.FLYDATE_SET:
       return {
         ...state,
         value: state.value.map((v,i) => {
-          if(v.id === action.payload.id) {
+          if(v.id === p.id) {
             return {
               ...v,
               z1: {
@@ -109,7 +105,7 @@ export function summary(state = initialState, action) {
       return {
         ...state,
         value: state.value.map((v,i) => {
-          if(v.id === action.payload.id) {
+          if(v.id === p.id) {
             return {
               ...v,
               z1: {
@@ -124,87 +120,759 @@ export function summary(state = initialState, action) {
     case Z1.ACFTIDENT_SET:
       return {
         ...state,
-        acftIdent: action.payload.acftIdent
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                acftIdent: p.acftIdent
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.ACFTIDENT_REMOVE:
       return {
         ...state,
-        acftIdent: z1State.acftIdent
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                acft: z1State.acftIdent
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.AIRCRAFTTYPE_SET:
       return {
         ...state,
-        aircraftType: action.payload.aircraftType
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                aircraftType: p.aircraftType
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.AIRCRAFTTYPE_REMOVE:
       return {
         ...state,
-        aircraftType: z1State.aircraftType
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                aircraftType: z1State.aircraftType
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.DEPAIRPORT_SET:
       return {
         ...state,
-        depAirport: action.payload.depAirport
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                depAirport: p.depAirport
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.DEPAIRPORT_REMOVE:
       return {
         ...state,
-        depAirport: z1State.depAirport
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                depAirport: z1State.depAirport
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.DESTAIRPORT_SET:
       return {
         ...state,
-        destAirport: action.payload.destAirport
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                destAirport: p.destAirport
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.DESTAIRPORT_REMOVE:
       return {
         ...state,
-        destAirport: z1State.destAirport
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                destAirport: z1State.destAirport
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.ENTRYPOINT_SET:
       return {
         ...state,
-        entryPoint: action.payload.entryPoint
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                entryPoint: p.entryPoint
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.ENTRYPOINT_REMOVE:
       return {
         ...state,
-        entryPoint: z1State.entryPoint
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                entryPoint: z1State.entryPoint
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.ENTRYTIME_SET:
       return {
         ...state,
-        entryTime: action.payload.entryTime
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                entryTime: p.entryTime
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.ENTRYTIME_REMOVE:
       return {
         ...state,
-        entryTime: z1State.entryTime
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                entryTime: z1State.entryTime
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.EXITPOINT_SET:
       return {
         ...state,
-        exitPoint: action.payload.exitPoint
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                exitPoint: p.exitPoint
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.EXITPOINT_REMOVE:
       return {
         ...state,
-        exitPoint: z1State.exitPoint
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                exitPoint: z1State.exitPoint
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.REGNO_SET:
       return {
         ...state,
-        regno: action.payload.regno
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                regno: p.regno
+              }
+            };
+          }
+          return v;
+        })
       };
     case Z1.REGNO_REMOVE:
       return {
         ...state,
-        regno: z1State.regno
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                regno: z1State.regno
+              }
+            };
+          }
+          return v;
+        })
       };
     /* -----              Z1 END                                        ----- */
     /* -----              Z2 START                                      ----- */
+    case Z2.CODE_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    code: p.code
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.CODE_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    code: z2State.code
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.ENTRYPOINT_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    entryPoint: p.entryPoint
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.ENTRYPOINT_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    entryPoint: z2State.entryPoint
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.ENTRYTIME_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    entryTime: p.entryTime
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.ENTRYTIME_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    entryTime: z2State.entryTime
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.EXITPOINT_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    exitPoint: p.exitPoint
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.EXITPOINT_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    exitPoint: z2State.exitPoint
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.EXITTIME_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    exitTime: p.exitTime
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.EXITTIME_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    exitTime: z2State.exitTime
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.FLYCTG_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    flyCtg: p.flyCtg
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.FLYCTG_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    flyCtg: z2State.flyCtg
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.COUNTOFDEP_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    countOfDep: p.countOfDep
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.COUNTOFDEP_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    countOfDep: z2State.countOfDep
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.COUNTOFAPP_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    countOfApp: p.countOfApp
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.COUNTOFAPP_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    countOfApp: z2State.countOfApp
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
     /* -----              Z2 END                                        ----- */
     /* -----              Z3 START                                      ----- */
+    case Z3.AIRSPACETYPE_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                airspaceType: p.airspaceType
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.AIRSPACETYPE_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                airspaceType: z3State.airspaceType
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.AIRCRAFTTYPENAME_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                aircraftTypeName: p.aircraftTypeName
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.AIRCRAFTTYPENAME_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                aircraftTypeName: z3State.aircraftTypeName
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.DEPAIRPORTCOORD_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                depAirportCoord: p.depAirportCoord
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.DEPAIRPORTCOORD_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                depAirportCoord: z3State.depAirportCoord
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.DESTAIRPORTCOORD_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                destAirportCoord: p.destAirportCoord
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.DESTAIRPORTCOORD_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                destAirportCoord: z3State.destAirportCoord
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.AIRSPACETYPEGTIME_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                airspaceTypeGTime: p.airspaceTypeGTime
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.AIRSPACETYPEGTIME_REMOVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                airspaceTypeGTime: z3State.airspaceTypeGTime
+              }
+            };
+          }
+          return v;
+        })
+      };
     /* -----              Z3 END                                        ----- */
     default: return state;
   }

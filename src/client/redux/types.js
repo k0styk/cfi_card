@@ -32,11 +32,35 @@ module.exports.Z1 = {
 };
 
 module.exports.Z2 = {
-
+  CODE_SET:                                             'Z2_CODE_SET',
+  CODE_REMOVE:                                          'Z2_CODE_REMOVE',
+  ENTRYPOINT_SET:                                       'Z2_ENTRYPOINT_SET',
+  ENTRYPOINT_REMOVE:                                    'Z2_ENTRYPOINT_REMOVE',
+  ENTRYTIME_SET:                                        'Z2_ENTRYTIME_SET',
+  ENTRYTIME_REMOVE:                                     'Z2_ENTRYTIME_REMOVE',
+  EXITPOINT_SET:                                        'Z2_EXITPOINT_SET',
+  EXITPOINT_REMOVE:                                     'Z2_EXITPOINT_REMOVE',
+  EXITTIME_SET:                                         'Z2_EXITTIME_SET',
+  EXITTIME_REMOVE:                                      'Z2_EXITTIME_REMOVE',
+  FLYCTG_SET:                                           'Z2_FLYCTG_SET',
+  FLYCTG_REMOVE:                                        'Z2_FLYCTG_REMOVE',
+  COUNTOFDEP_SET:                                       'Z2_COUNTOFDEP_SET',
+  COUNTOFDEP_REMOVE:                                    'Z2_COUNTOFDEP_REMOVE',
+  COUNTOFAPP_SET:                                       'Z2_COUNTOFAPP_SET',
+  COUNTOFAPP_REMOVE:                                    'Z2_COUNTOFAPP_REMOVE',
 };
 
 module.exports.Z3 = {
-
+  AIRSPACETYPE_SET:                                      'Z3_AIRSPACETYPE_SET',
+  AIRSPACETYPE_REMOVE:                                   'Z3_AIRSPACETYPE_REMOVE',
+  AIRCRAFTTYPENAME_SET:                                  'Z3_AIRCRAFTTYPENAME_SET',
+  AIRCRAFTTYPENAME_REMOVE:                               'Z3_AIRCRAFTTYPENAME_REMOVE',
+  DEPAIRPORTCOORD_SET:                                   'Z3_DEPAIRPORTCOORD_SET',
+  DEPAIRPORTCOORD_REMOVE:                                'Z3_DEPAIRPORTCOORD_REMOVE',
+  DESTAIRPORTCOORD_SET:                                  'Z3_DESTAIRPORTCOORD_SET',
+  DESTAIRPORTCOORD_REMOVE:                               'Z3_DESTAIRPORTCOORD_REMOVE',
+  AIRSPACETYPEGTIME_SET:                                 'Z3_AIRSPACETYPEGTIME_SET',
+  AIRSPACETYPEGTIME_REMOVE:                              'Z3_AIRSPACETYPEGTIME_REMOVE',
 };
 
 module.exports.UI = {};
