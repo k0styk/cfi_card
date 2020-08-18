@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import './timeView.scss';
 import cx from 'classnames';
 import moment from 'moment';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClock } from '@fortawesome/free-solid-svg-icons';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faClock } from '@fortawesome/free-regular-svg-icons';
 
 const TimeView = ({date,...elementProps}) => {
   const css = cx('time-view-component');
@@ -30,8 +30,7 @@ const TimeView = ({date,...elementProps}) => {
   }, [time]);
 
   return (<div className={css} {...elementProps}>
-    {/* <i className="far fa-clock"></i>*/}
-    <FontAwesomeIcon icon={['far', 'clock']} />
+    <FontAwesomeIcon icon={faClock} mask={['far', 'circle']}/>
     <span className="time-span">{time}</span>
   </div>);
 };

@@ -11,12 +11,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import Divider from '@material-ui/core/Divider';
 import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
-import Icon from '@material-ui/core/Icon';
 import { Send } from '@material-ui/icons';
-
+import CancelIcon from '@material-ui/icons/Cancel';
 import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
-
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -54,7 +52,7 @@ const useStyles = makeStyles(theme => ({
 const summaryView = ({ id, summary, removeSummary, addZ2 }) => {
   const DeleteButton = ({...elementProps}) =>
     (<div className="summary-button-delete" {...elementProps}>
-      <i className="fas fa-times"></i>
+      <CancelIcon />
     </div>);
   const classes = useStyles();
   const curSummary = summary.value.filter(v => v.id === id);
@@ -82,9 +80,9 @@ const summaryView = ({ id, summary, removeSummary, addZ2 }) => {
         </div>
         <Divider />
         <div className="summary-content">
-          <Z1View />
+          <Z1View id={id} />
           {curSummary[0].z2.map((v,idx) => <Z2View key={idx} id={id} z2id={v.id} />)}
-          <Z3View />
+          <Z3View id={id} />
         </div>
         <Divider />
         <div className="summary-footer">
@@ -92,7 +90,6 @@ const summaryView = ({ id, summary, removeSummary, addZ2 }) => {
             variant="contained"
             color="primary"
             className={classes.greenBtn}
-            // endIcon={<Icon>send</Icon>}
             endIcon={<Send />}
             disabled
           >

@@ -48,7 +48,7 @@ const header = ({addSummary}) => {
 
 const mstp = state => ({});
 const mdtp = dispatch => ({
-  addSummary: () => { console.log(summaryAction.addSummary()); dispatch(summaryAction.addSummary()); }
+  addSummary: () =>  dispatch(summaryAction.addSummary())
 });
 
 export default connect(mstp, mdtp)(header);

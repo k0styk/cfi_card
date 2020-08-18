@@ -5,9 +5,12 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import store from '../client/redux/store/store';
 import App from '../client/App';
 import './style.css';
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { far } from '@fortawesome/free-brands-svg-icons'
-import { faClock } from '@fortawesome/free-solid-svg-icons'
+// import { library } from '@fortawesome/fontawesome-svg-core';
+// import { fab } from '@fortawesome/free-brands-svg-icons';
+// import { faClock } from '@fortawesome/free-solid-svg-icons';
+// import { faClock } from '@fortawesome/free-regular-svg-icons';
+
+// library.add(faClock);
 
 ReactDOM.render(
   <Router>

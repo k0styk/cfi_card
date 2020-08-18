@@ -91,69 +91,69 @@ export default {
   },
   z2: {
     /**
-     * @param {{ id: number, flyDate: string}} payload
+     * @param {{ id: number, z2id: number, code: string}} payload
      */
-    FLYDATE_SET: payload => ({type: Z1.FLYDATE_SET, payload}),
+    CODE_SET: payload => ({ type: Z2.CODE_SET, payload }),
     /**
-   * @param {{ id: number }} payload
+   * @param {{ id: number, z2id: number }} payload
    */
-    FLYDATE_REMOVE: () => ({type: Z1.FLYDATE_REMOVE}),
+    CODE_REMOVE: payload => ({ type: Z2.CODE_REMOVE, payload }),
     /**
-   * @param {{ id: number, acftIdent: string}} payload
+   * @param {{ id: number, z2id: number, entryPoint: string}} payload
    */
-    ACFTIDENT_SET: payload => ({type: Z1.ACFTIDENT_SET, payload}),
+    ENTRYPOINT_SET: payload => ({ type: Z2.ENTRYPOINT_SET, payload }),
     /**
-   * @param {{ id: number}} payload
+   * @param {{ id: number, z2id: number}} payload
    */
-    ACFTIDENT_REMOVE: () => ({type: Z1.ACFTIDENT_REMOVE}),
+    ENTRYPOINT_REMOVE: payload => ({ type: Z2.ENTRYPOINT_REMOVE }),
     /**
-   * @param {{ id: number, aircraftType: string}} payload
+   * @param {{ id: number, z2id:number, entryTime: string}} payload
    */
-    AIRCRAFTTYPE_SET: payload => ({type: Z1.AIRCRAFTTYPE_SET, payload}),
+    ENTRYTIME_SET: payload => ({ type: Z2.ENTRYTIME_SET, payload }),
     /**
-   * @param {{ id: number}} payload
+   * @param {{ id: number, z2id: number}} payload
    */
-    AIRCRAFTTYPE_REMOVE: () => ({type: Z1.AIRCRAFTTYPE_REMOVE}),
+    ENTRYTIME_REMOVE: payload => ({ type: Z2.ENTRYTIME_REMOVE, payload }),
     /**
    * @param {{ id: number, depAirport: string}} payload
    */
-    DEPAIRPORT_SET: payload => ({type: Z1.DEPAIRPORT_SET, payload}),
+    EXITPOINT_SET: payload => ({ type: Z2.EXITPOINT_SET, payload }),
     /**
    * @param {{ id: number}} payload
    */
-    DEPAIRPORT_REMOVE: () => ({type: Z1.DEPAIRPORT_REMOVE}),
+    EXITPOINT_REMOVE: payload => ({ type: Z2.EXITPOINT_REMOVE }),
     /**
    * @param {{ id: number, destAirport: string}} payload
    */
-    DESTAIRPORT_SET: payload => ({type: Z1.DESTAIRPORT_SET, payload}),
+    EXITTIME_SET: payload => ({ type: Z2.EXITTIME_SET, payload }),
     /**
    * @param {{ id: number}} payload
    */
-    DESTAIRPORT_REMOVE: () => ({type: Z1.DESTAIRPORT_REMOVE}),
+    EXITTIME_REMOVE: payload => ({ type: Z2.EXITTIME_REMOVE }),
     /**
    * @param {{ id: number, entryPoint: string}} payload
    */
-    ENTRYPOINT_SET: payload => ({type: Z1.ENTRYPOINT_SET, payload}),
+    FLYCTG_SET: payload => ({ type: Z2.FLYCTG_SET, payload }),
     /**
    * @param {{ id: number}} payload
    */
-    ENTRYPOINT_REMOVE: () => ({type: Z1.ENTRYPOINT_REMOVE}),
+    FLYCTG_REMOVE: payload => ({ type: Z2.FLYCTG_REMOVE }),
     /**
    * @param {{ id: number, entryTime: string}} payload
    */
-    ENTRYTIME_SET: payload => ({type: Z1.ENTRYTIME_SET, payload}),
+    COUNTOFDEP_SET: payload => ({ type: Z2.COUNTOFDEP_SET, payload }),
     /**
    * @param {{ id: number }} payload
    */
-    ENTRYTIME_REMOVE: () => ({type: Z1.ENTRYTIME_REMOVE}),
+    COUNTOFDEP_REMOVE: payload => ({ type: Z2.COUNTOFDEP_REMOVE }),
     /**
    * @param {{ id: number, exitPoint: string}} payload
    */
-    EXITPOINT_SET: payload => ({type: Z1.EXITPOINT_SET, payload}),
+    COUNTOFAPP_SET: payload => ({ type: Z2.COUNTOFAPP_SET, payload }),
     /**
    * @param {{ id: number }} payload
    */
-    EXITPOINT_REMOVE: () => ({type: Z1.EXITPOINT_REMOVE}),
+    COUNTOFAPP_REMOVE: payload => ({ type: Z2.COUNTOFAPP_REMOVE }),
   },
   z3: {
     /**

@@ -1,14 +1,14 @@
 import { SUMMARY, Z1, Z2, Z3 } from '../types';
 const z1State = {
-  flyDate: null,
-  acftIdent: null,
-  aircraftType: null,
-  depAirport: null,
-  destAirport: null,
-  entryPoint: null,
-  entryTime: null,
-  exitPoint: null,
-  regno: null
+  flyDate: new Date(),
+  acftIdent: '',
+  aircraftType: '',
+  depAirport: '',
+  destAirport: '',
+  entryPoint: '',
+  entryTime: new Date(),
+  exitPoint: '',
+  regno: ''
 };
 const z2State = {
   code: null,
@@ -21,10 +21,10 @@ const z2State = {
   countOfApp: null
 };
 const z3State = {
-  airspaceType: null,
-  aircraftTypeName: null,
-  depAirportCoord: null,
-  destAirportCoord: null,
+  airspaceType: '',
+  aircraftTypeName: '',
+  depAirportCoord: '',
+  destAirportCoord: '',
   airspaceTypeGTime: null
 };
 const initialState = {

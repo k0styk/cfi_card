@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-// import './z3.scss';
+import { summaryAction } from '../../redux/actions/';
 
 import { makeStyles } from '@material-ui/core/styles';
 import MomentUtils from '@date-io/moment';
@@ -13,6 +13,9 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@components/Autocomplete/autocomplete';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputMask from '../../components/InputMask/inputmask';
 import moment from 'moment';
 
 const useStyles = makeStyles(theme => ({
@@ -32,8 +35,24 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const z3View = ({ }) => {
+const z3View = ({
+  id,
+  summary,
+  airspaceTypeSet,
+  aircraftTypeNameSet,
+  depAirportCoordSet,
+  destAirportCoordSet,
+  airspaceTypeGTimeSet
+}) => {
   const classes = useStyles();
+  const curSummary = summary.value.filter(v => v.id === id);
+  const {
+    airspaceType,
+    aircraftTypeName,
+    depAirportCoord,
+    destAirportCoord,
+    airspaceTypeGTime,
+  } = curSummary[0].z3;
 
   return (
     <div className="z3-view">
@@ -45,81 +64,49 @@ const z3View = ({ }) => {
         {/* 1 req */}
         <Grid item xs>
           <Autocomplete
-            options={[1, 2, 3, 4, 5]}
-            value={1}
+            autoHighlight={false}
+            options={['A','C','G','CG']}
+            value={airspaceType}
             size="small"
-            inputParams={{ label: 'Класс ВП', name: 'aircraftType', maxLength: 2 }}
-            onChange={(event, newValue) => {
-              // if (typeof newValue === 'string') {
-              //   setTimeout(() => {
-              //     this.toggleOpen(true);
-              //     this.setDialogValue({
-              //       value: newValue,
-              //       id: '',
-              //     });
-              //   });
-              //   return;
-              // }
-
-              // if (newValue && newValue.inputValue) {
-              //   this.toggleOpen(true);
-              //   this.setDialogValue({
-              //     value: newValue.inputValue,
-              //     id: '',
-              //   });
-
-              //   return;
-              // }
-              console.log('suka');
-              // this.aircraftHandleChange(newValue);
+            inputParams={{
+              label: 'Тип воздушного судна',
+              name: 'airspaceType',
+              inputProps: {
+                maxLength: 2,
+                style: { textTransform: 'uppercase' }
+              }
             }}
-            filterOptions={(options, params) => {
-              const filtered = filter(options, params);
-
-              if (params.inputValue !== '') {
-                filtered.push({
-                  inputValue: params.inputValue,
-                  title: `Добавить "${params.inputValue}"`,
-                });
-              }
-              return filtered;
-            }}
-            getOptionLabel={option => {
-              if (option.inputValue) {
-                return option.inputValue;
-              }
-              if (option.title) {
-                return option.title;
-              }
-              if (option.value) {
-                return option.value;
-              }
-              return option;
-            }}
-            // renderOption={(option) => option.title}
-            // onKeyDown={this.onInputKeyDown.bind(this)}
-            renderOptionFunc={option => { return (<React.Fragment>{option.title || option.value || option}</React.Fragment>); }} // eslint-disable-line
+            // onInputChange={(e, v) => airspaceTypeSet(id, v.toUpperCase())}
+            onChange={(e, v) => airspaceTypeSet(id, v.toUpperCase())}
+            renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
             clearOnEscape
-            freeSolo
           />
         </Grid>
         {/* 2 */}
         <Grid item xs>
           <TextField
+            value={aircraftTypeName}
+            onChange={e => aircraftTypeNameSet(id, e.target.value.toUpperCase())}
             label="Наименование типа ВС"
             inputProps={{ maxLength: 25, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
         {/* 3 */}
         <Grid item xs>
-          <TextField
+          <InputMask
+            mask="9999С9999В"
+            value={depAirportCoord}
+            onChange={e => depAirportCoordSet(id, e.target.value.toUpperCase())}
             label="Коорд А/П вылета"
             inputProps={{ maxLength: 11, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
         {/* 4 */}
         <Grid item xs>
-          <TextField
+          <InputMask
+            mask="9999С9999В"
+            value={destAirportCoord}
+            onChange={e => destAirportCoordSet(id, e.target.value.toUpperCase())}
             label="Коорд А/П посадки"
             inputProps={{ maxLength: 11, style: { textTransform: 'uppercase' } }}
           />
@@ -128,6 +115,7 @@ const z3View = ({ }) => {
         <Grid item xs>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
+              disabled
               autoOk
               mask="__:__"
               ampm={false}
@@ -138,7 +126,7 @@ const z3View = ({ }) => {
               clearable
               showTodayButton
               margin="normal"
-              placeholder="ЧЧ:ММ"
+              placeholder="приказ 80"
               value={null}
               onChange={v => v}
               KeyboardButtonProps={{
@@ -160,7 +148,15 @@ const z3View = ({ }) => {
   );
 };
 
-const mstp = state => ({});
-const mdtp = dispatch => ({});
+/* eslint-disable */
+const mstp = state => ({ summary: state.summary });
+const mdtp = dispatch => ({
+  airspaceTypeSet:      (id, airspaceType) => dispatch(summaryAction.z3.AIRSPACETYPE_SET({id, airspaceType})),
+  aircraftTypeNameSet:  (id, aircraftTypeName) => dispatch(summaryAction.z3.AIRCRAFTTYPENAME_SET({id, aircraftTypeName})),
+  depAirportCoordSet:   (id, depAirportCoord) => dispatch(summaryAction.z3.DEPAIRPORTCOORD_SET({id, depAirportCoord})),
+  destAirportCoordSet:  (id, destAirportCoord) => dispatch(summaryAction.z3.DESTAIRPORTCOORD_SET({id, destAirportCoord})),
+  airspaceTypeGTimeSet: (id, airspaceTypeGTime) => dispatch(summaryAction.z3.AIRSPACETYPEGTIME_SET({id, airspaceTypeGTime})),
+});
+/* eslint-enable */
 
 export default connect(mstp, mdtp)(z3View);

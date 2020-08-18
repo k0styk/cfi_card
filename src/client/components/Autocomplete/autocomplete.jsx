@@ -4,18 +4,6 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
 
-const countryToFlag = isoCode => {
-  const replacer = char => {
-    const numbers = '0123456789';
-    const val = char.charCodeAt(0);
-    const point = (numbers.indexOf(char) > -1) ? 120774 : 127397;
-
-    return String.fromCodePoint(val + point);
-  };
-
-  return typeof String.fromCodePoint !== 'undefined' ? isoCode.toUpperCase().replace(/./g, replacer) : isoCode;
-};
-
 const useStyles = makeStyles({
   option: {
     fontSize: 15,
@@ -42,6 +30,7 @@ const autocomplete = props => {
   const {
     label,
     variant,
+    inputProps,
     ...otherInputParams
   } = inputParams;
 
@@ -63,6 +52,7 @@ const autocomplete = props => {
         inputProps={{
           ...params.inputProps,
           autoComplete: 'new-password',
+          ...inputProps
         }}
       />}
     />

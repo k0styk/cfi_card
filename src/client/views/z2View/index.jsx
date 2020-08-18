@@ -16,6 +16,7 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@components/Autocomplete/autocomplete';
 import Button from '@material-ui/core/Button';
 import DeleteIcon from '@material-ui/icons/Delete';
+import InputMask from '../../components/InputMask/inputmask';
 import moment from 'moment';
 
 const useStyles = makeStyles(theme => ({
@@ -42,11 +43,36 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const z2View = ({ id, z2id, removeZ2 }) => {
+const z2View = ({
+  id,
+  z2id,
+  removeZ2,
+  summary,
+  codeSet,
+  entryPointSet,
+  entryTimeSet,
+  exitPointSet,
+  exitTimeSet,
+  flyCtgSet,
+  countOfDepSet,
+  countOfAppSet
+}) => {
   const classes = useStyles();
+  const curSummary = summary.value.filter(v => v.id === id);
+  const curZ2 = curSummary[0].z2.filter(v => v.id === z2id);
+  const {
+    code,
+    entryPoint,
+    entryTime,
+    exitPoint,
+    exitTime,
+    flyCtg,
+    countOfDep,
+    countOfApp
+  } = curZ2[0];
 
   return (
-    <div className="z1-view">
+    <div className="z2-view">
       <Grid container className={classes.root} spacing={1}>
         {/* 0 */}
         <Grid item xs={false}>
@@ -54,69 +80,20 @@ const z2View = ({ id, z2id, removeZ2 }) => {
         </Grid>
         {/* 1 req max 4 */}
         <Grid item xs>
-          <Autocomplete
-            options={null}
-            value={null}
-            size="small"
-            inputParams={{ label: 'РЦ/МДП', name: 'mdp' }}
-            onChange={(event, newValue) => {
-              // if (typeof newValue === 'string') {
-              //   setTimeout(() => {
-              //     this.toggleOpen(true);
-              //     this.setDialogValue({
-              //       value: newValue,
-              //       id: '',
-              //     });
-              //   });
-              //   return;
-              // }
-
-              // if (newValue && newValue.inputValue) {
-              //   this.toggleOpen(true);
-              //   this.setDialogValue({
-              //     value: newValue.inputValue,
-              //     id: '',
-              //   });
-
-              //   return;
-              // }
-              console.log('suka');
-              // this.aircraftHandleChange(newValue);
-            }}
-            filterOptions={(options, params) => {
-              const filtered = filter(options, params);
-
-              if (params.inputValue !== '') {
-                filtered.push({
-                  inputValue: params.inputValue,
-                  title: `Добавить "${params.inputValue}"`,
-                });
-              }
-              return filtered;
-            }}
-            getOptionLabel={option => {
-              if (option.inputValue) {
-                return option.inputValue;
-              }
-              if (option.title) {
-                return option.title;
-              }
-              if (option.value) {
-                return option.value;
-              }
-              return option;
-            }}
-            // renderOption={(option) => option.title}
-            // onKeyDown={this.onInputKeyDown.bind(this)}
-            renderOptionFunc={option => { return (<React.Fragment>{option.title || option.value || option}</React.Fragment>); }} // eslint-disable-line
-            clearOnEscape
-            freeSolo
+          <TextField
+            value={code}
+            onChange={e => codeSet(id, z2id, e.target.value.toUpperCase())}
+            label="РЦ/МДП"
+            inputProps={{ maxLength: 4, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
         {/* 2 req max 11 */}
         <Grid item xs>
-          <TextField
-            label="Вход в ВП к. A/C"
+          <InputMask
+            mask="9999С9999В"
+            value={entryPoint}
+            onChange={e => entryPointSet(id, z2id, e.target.value.toUpperCase())}
+            abel="Вход в ВП к. A/C"
             inputProps={{ maxLength: 11, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
@@ -135,8 +112,8 @@ const z2View = ({ id, z2id, removeZ2 }) => {
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={null}
-              onChange={v => v}
+              value={moment(entryTime)}
+              onChange={v => entryTimeSet(id,z2id,v)}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
               }}
@@ -145,7 +122,10 @@ const z2View = ({ id, z2id, removeZ2 }) => {
         </Grid>
         {/* 4 req */}
         <Grid item xs>
-          <TextField
+          <InputMask
+            mask="9999С9999В"
+            value={exitPoint}
+            onChange={e => exitPointSet(id, z2id, e.target.value.toUpperCase())}
             label="Выход из ВП к. A/C"
             inputProps={{ maxLength: 11, style: { textTransform: 'uppercase' } }}
           />
@@ -165,8 +145,8 @@ const z2View = ({ id, z2id, removeZ2 }) => {
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={null}
-              onChange={v => v}
+              value={moment(exitTime)}
+              onChange={v => exitTimeSet(id,z2id,v)}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
               }}
@@ -176,60 +156,12 @@ const z2View = ({ id, z2id, removeZ2 }) => {
         {/* 6 max 3 */}
         <Grid item xs>
           <Autocomplete
+            disabled
             options={null}
             value={null}
             size="small"
             inputParams={{ label: 'Вид полёта', name: 'mdp' }}
-            onChange={(event, newValue) => {
-              // if (typeof newValue === 'string') {
-              //   setTimeout(() => {
-              //     this.toggleOpen(true);
-              //     this.setDialogValue({
-              //       value: newValue,
-              //       id: '',
-              //     });
-              //   });
-              //   return;
-              // }
-
-              // if (newValue && newValue.inputValue) {
-              //   this.toggleOpen(true);
-              //   this.setDialogValue({
-              //     value: newValue.inputValue,
-              //     id: '',
-              //   });
-
-              //   return;
-              // }
-              console.log('suka');
-              // this.aircraftHandleChange(newValue);
-            }}
-            filterOptions={(options, params) => {
-              const filtered = filter(options, params);
-
-              if (params.inputValue !== '') {
-                filtered.push({
-                  inputValue: params.inputValue,
-                  title: `Добавить "${params.inputValue}"`,
-                });
-              }
-              return filtered;
-            }}
-            getOptionLabel={option => {
-              if (option.inputValue) {
-                return option.inputValue;
-              }
-              if (option.title) {
-                return option.title;
-              }
-              if (option.value) {
-                return option.value;
-              }
-              return option;
-            }}
-            // renderOption={(option) => option.title}
-            // onKeyDown={this.onInputKeyDown.bind(this)}
-            renderOptionFunc={option => { return (<React.Fragment>{option.title || option.value || option}</React.Fragment>); }} // eslint-disable-line
+            renderOptionFunc={option => { return (<React.Fragment>{option}</React.Fragment>); }} // eslint-disable-line
             clearOnEscape
             freeSolo
           />
@@ -237,60 +169,12 @@ const z2View = ({ id, z2id, removeZ2 }) => {
         {/* 7 max 1 need SELECT */}
         <Grid item xs>
           <Autocomplete
+            disabled
             options={null}
             value={null}
             size="small"
             inputParams={{ label: 'Кол-во первонач. вылетов', name: 'cfd' }}
-            onChange={(event, newValue) => {
-              // if (typeof newValue === 'string') {
-              //   setTimeout(() => {
-              //     this.toggleOpen(true);
-              //     this.setDialogValue({
-              //       value: newValue,
-              //       id: '',
-              //     });
-              //   });
-              //   return;
-              // }
-
-              // if (newValue && newValue.inputValue) {
-              //   this.toggleOpen(true);
-              //   this.setDialogValue({
-              //     value: newValue.inputValue,
-              //     id: '',
-              //   });
-
-              //   return;
-              // }
-              console.log('suka');
-              // this.aircraftHandleChange(newValue);
-            }}
-            filterOptions={(options, params) => {
-              const filtered = filter(options, params);
-
-              if (params.inputValue !== '') {
-                filtered.push({
-                  inputValue: params.inputValue,
-                  title: `Добавить "${params.inputValue}"`,
-                });
-              }
-              return filtered;
-            }}
-            getOptionLabel={option => {
-              if (option.inputValue) {
-                return option.inputValue;
-              }
-              if (option.title) {
-                return option.title;
-              }
-              if (option.value) {
-                return option.value;
-              }
-              return option;
-            }}
-            // renderOption={(option) => option.title}
-            // onKeyDown={this.onInputKeyDown.bind(this)}
-            renderOptionFunc={option => { return (<React.Fragment>{option.title || option.value || option}</React.Fragment>); }} // eslint-disable-line
+            renderOptionFunc={option => { return (<React.Fragment>{option}</React.Fragment>); }} // eslint-disable-line
             clearOnEscape
             freeSolo
           />
@@ -298,6 +182,7 @@ const z2View = ({ id, z2id, removeZ2 }) => {
         {/* 8  max 2*/}
         <Grid item xs>
           <TextField
+            disabled
             label="кол-во заходов на посадку"
             inputProps={{ maxLength: 5, style: { textTransform: 'uppercase' } }}
           />
@@ -318,9 +203,19 @@ const z2View = ({ id, z2id, removeZ2 }) => {
   );
 };
 
-const mstp = state => ({});
+const mstp = state => ({
+  summary: state.summary
+});
 const mdtp = dispatch => ({
-  removeZ2: (id, z2id) => dispatch(summaryAction.removeSummaryZ2({id, z2id}))
+  removeZ2:     (id, z2id) => dispatch(summaryAction.removeSummaryZ2({id, z2id})),
+  codeSet:         (id, z2id, code)         => dispatch(summaryAction.z2.({id, flyDate})),
+  entryPointSet:   (id, z2id, entryPoint)   => dispatch(summaryAction.z2.ACFTIDENT_SET({id, acftIdent})),
+  entryTimeSet:    (id, z2id, entryTime)    => dispatch(summaryAction.z2.AIRCRAFTTYPE_SET({id, aircraftType})),
+  exitPointSet:    (id, z2id, exitPoint)    => dispatch(summaryAction.z2.DEPAIRPORT_SET({id, depAirport})),
+  exitTimeSet:     (id, z2id, exitTime)     => dispatch(summaryAction.z2.DESTAIRPORT_SET({id, destAirport})),
+  flyCtgSet:       (id, z2id, flyCtg)       => dispatch(summaryAction.z2.ENTRYPOINT_SET({id, entryPoint})),
+  countOfDepSet:   (id, z2id, countOfDep)   => dispatch(summaryAction.z2.ENTRYTIME_SET({id, entryTime})),
+  countOfAppSet:   (id, z2id, countOfApp)   => dispatch(summaryAction.z2.EXITPOINT_SET({id, exitPoint})),
 });
 
 export default connect(mstp, mdtp)(z2View);
