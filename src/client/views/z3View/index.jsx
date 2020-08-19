@@ -1,26 +1,26 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { summaryAction } from '../../redux/actions/';
+import { summaryAction } from '@redux/actions';
 
 import { makeStyles } from '@material-ui/core/styles';
+import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers';
+import { Grid, Paper, TextField, MenuItem } from '@material-ui/core';
+import { InputMask } from '@components';
 import MomentUtils from '@date-io/moment';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardTimePicker,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@components/Autocomplete/autocomplete';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
-import InputMask from '../../components/InputMask/inputmask';
-import moment from 'moment';
 
 const useStyles = makeStyles(theme => ({
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 120,
+  },
+  selectEmpty: {
+    marginTop: theme.spacing(2),
+  },
   root: {
     flexGrow: 1,
+  },
+  grid: {
+    minWidth: '190px'
   },
   paper: {
     padding: theme.spacing(0),
@@ -53,66 +53,72 @@ const z3View = ({
     destAirportCoord,
     airspaceTypeGTime,
   } = curSummary[0].z3;
+  const z2l = curSummary[0].z2.length;
+  const [{z1}] = curSummary;
 
   return (
     <div className="z3-view">
-      <Grid container className={classes.root} spacing={1}>
+      <Grid container className={classes.root} spacing={1} wrap="wrap">
         {/* 0 */}
         <Grid item xs={false}>
           <Paper className={classes.paperFirst} elevation={0} square>Z3</Paper>
         </Grid>
-        {/* 1 req */}
-        <Grid item xs>
-          <Autocomplete
-            autoHighlight={false}
-            options={['A','C','G','CG']}
-            value={airspaceType}
-            size="small"
-            inputParams={{
-              label: 'Тип воздушного судна',
-              name: 'airspaceType',
-              inputProps: {
-                maxLength: 2,
-                style: { textTransform: 'uppercase' }
-              }
-            }}
-            // onInputChange={(e, v) => airspaceTypeSet(id, v.toUpperCase())}
-            onChange={(e, v) => airspaceTypeSet(id, v.toUpperCase())}
-            renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
-            clearOnEscape
-          />
-        </Grid>
-        {/* 2 */}
-        <Grid item xs>
+        {/* 1 req filter of z2 */}
+        <Grid item xs className={classes.grid}>
           <TextField
+            error={!!(airspaceType==='G' & z2l)}
+            helperText={(airspaceType==='G' & z2l)?'Измените выбор':''}
+            fullWidth
+            id="select"
+            label="Класс ВП"
+            value={airspaceType}
+            onChange={e => airspaceTypeSet(id, e.target.value.toUpperCase())}
+            select>
+            {['A','C','G','CG'].map((v,i) => {
+              if(v==='G' & z2l) {
+                return <MenuItem disabled key={i} value={v}>{v}</MenuItem>;
+              }
+              return <MenuItem key={i} value={v}>{v}</MenuItem>;
+            })}
+          </TextField>
+        </Grid>
+        {/* 2 req if z1 3 stay ZZZZ*/}
+        <Grid item xs className={classes.grid}>
+          <TextField
+            error={(z1.aircraftType==='ZZZZ'&(aircraftTypeName.length?false:true))?true:false}
+            helperText={(z1.aircraftType==='ZZZZ'&(aircraftTypeName.length?false:true))?'Заполнить':''}
             value={aircraftTypeName}
             onChange={e => aircraftTypeNameSet(id, e.target.value.toUpperCase())}
             label="Наименование типа ВС"
             inputProps={{ maxLength: 25, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
-        {/* 3 */}
-        <Grid item xs>
+        {/* 3 req if z1 4 ZZZZ*/}
+        <Grid item xs className={classes.grid}>
           <InputMask
-            mask="9999С9999В"
+            error={(z1.depAirport==='ZZZZ'&(depAirportCoord.length?false:true))?true:false}
+            helperText={(z1.depAirport==='ZZZZ'&(depAirportCoord.length?false:true))?'Заполнить':''}
+            mask="9999С99999В"
             value={depAirportCoord}
             onChange={e => depAirportCoordSet(id, e.target.value.toUpperCase())}
-            label="Коорд А/П вылета"
-            inputProps={{ maxLength: 11, style: { textTransform: 'uppercase' } }}
+            label="Коорд А-д/П-п вылета"
+            inputProps={{ maxLength: 12, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
-        {/* 4 */}
-        <Grid item xs>
+        {/* 4 req if z1 5 ZZZZ*/}
+        <Grid item xs className={classes.grid}>
           <InputMask
-            mask="9999С9999В"
+            error={(z1.destAirport==='ZZZZ'&(destAirportCoord.length?false:true))?true:false}
+            helperText={(z1.destAirport==='ZZZZ'&(destAirportCoord.length?false:true))?'Заполнить':''}
+            mask="9999С99999В"
             value={destAirportCoord}
             onChange={e => destAirportCoordSet(id, e.target.value.toUpperCase())}
-            label="Коорд А/П посадки"
-            inputProps={{ maxLength: 11, style: { textTransform: 'uppercase' } }}
+            label="Коорд А-д/П-п посадки"
+            inputProps={{ maxLength: 12, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
         {/* 5 if class G */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
               disabled
@@ -137,11 +143,11 @@ const z3View = ({
         </Grid>
         {/* 6 */}
         <Grid item xs></Grid>
-        {/* 7 req */}
+        {/* 7 */}
         <Grid item xs></Grid>
         {/* 8 */}
         <Grid item xs></Grid>
-        {/* 9 req */}
+        {/* 9 */}
         <Grid item xs></Grid>
       </Grid>
     </div>

@@ -3,10 +3,9 @@ import { connect } from 'react-redux';
 import { summaryAction } from '../../redux/actions';
 
 import './header.scss';
-import Logo from '@components/Logo/logo';
-import TimeView from '@components/TimeView/timeView';
+import { Logo, TimeView } from '@components';
 import { makeStyles } from '@material-ui/core/styles';
-import Fab from '@material-ui/core/Fab';
+import { Fab } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
 const useStyles = makeStyles(theme => ({

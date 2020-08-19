@@ -1,7 +1,7 @@
 import React from 'react';
 // import { Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { summaryAction } from '../../redux/actions';
+import { summaryAction, uiAction } from '../../redux/actions';
 import './summary.scss';
 import Z1View from '@views/z1View/';
 import Z2View from '@views/z2View/';
@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const summaryView = ({ id, summary, removeSummary, addZ2 }) => {
+const summaryView = ({ id, summary, removeSummary, addZ2, setSnack }) => {
   const DeleteButton = ({...elementProps}) =>
     (<div className="summary-button-delete" {...elementProps}>
       <CancelIcon />
@@ -87,11 +87,12 @@ const summaryView = ({ id, summary, removeSummary, addZ2 }) => {
         <Divider />
         <div className="summary-footer">
           <Button
+            onClick={() => setSnack()}
             variant="contained"
             color="primary"
             className={classes.greenBtn}
             endIcon={<Send />}
-            disabled
+            // disabled
           >
             Отправить
           </Button>
@@ -106,7 +107,8 @@ const mstp = state => ({
 });
 const mdtp = dispatch => ({
   removeSummary: id => dispatch(summaryAction.removeSummary({id})),
-  addZ2: id => dispatch(summaryAction.addSummaryZ2({id}))
+  addZ2: id => dispatch(summaryAction.addSummaryZ2({id})),
+  setSnack: () => dispatch(uiAction.alert.setAlert({message: 'suka', open: true, severity: 'success'}))
 });
 
 export default connect(mstp, mdtp)(summaryView);

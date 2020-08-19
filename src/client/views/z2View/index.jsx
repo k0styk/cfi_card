@@ -30,6 +30,9 @@ const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
   },
+  grid: {
+    minWidth: '190px'
+  },
   paper: {
     padding: theme.spacing(0),
     textAlign: 'center',
@@ -53,23 +56,23 @@ const z2View = ({
   entryTimeSet,
   exitPointSet,
   exitTimeSet,
-  flyCtgSet,
-  countOfDepSet,
-  countOfAppSet
+  // flyCtgSet,
+  // countOfDepSet,
+  // countOfAppSet
 }) => {
   const classes = useStyles();
   const curSummary = summary.value.filter(v => v.id === id);
   const curZ2 = curSummary[0].z2.filter(v => v.id === z2id);
-  const {
+  const [{
     code,
     entryPoint,
     entryTime,
     exitPoint,
     exitTime,
-    flyCtg,
-    countOfDep,
-    countOfApp
-  } = curZ2[0];
+    // flyCtg,
+    // countOfDep,
+    // countOfApp
+  }] = curZ2;
 
   return (
     <div className="z2-view">
@@ -79,7 +82,7 @@ const z2View = ({
           <Paper className={classes.paperFirst} elevation={0} square>Z2</Paper>
         </Grid>
         {/* 1 req max 4 */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <TextField
             value={code}
             onChange={e => codeSet(id, z2id, e.target.value.toUpperCase())}
@@ -88,17 +91,17 @@ const z2View = ({
           />
         </Grid>
         {/* 2 req max 11 */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <InputMask
-            mask="9999С9999В"
+            mask="9999С99999В"
             value={entryPoint}
             onChange={e => entryPointSet(id, z2id, e.target.value.toUpperCase())}
-            abel="Вход в ВП к. A/C"
-            inputProps={{ maxLength: 11, style: { textTransform: 'uppercase' } }}
+            label="Вход в ВП к. A/C"
+            inputProps={{ maxLength: 12, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
         {/* 3 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
               autoOk
@@ -112,7 +115,7 @@ const z2View = ({
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={moment(entryTime)}
+              value={moment(entryTime).utc()}
               onChange={v => entryTimeSet(id,z2id,v)}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
@@ -121,17 +124,17 @@ const z2View = ({
           </MuiPickersUtilsProvider>
         </Grid>
         {/* 4 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <InputMask
-            mask="9999С9999В"
+            mask="9999С99999В"
             value={exitPoint}
             onChange={e => exitPointSet(id, z2id, e.target.value.toUpperCase())}
             label="Выход из ВП к. A/C"
-            inputProps={{ maxLength: 11, style: { textTransform: 'uppercase' } }}
+            inputProps={{ maxLength: 12, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
         {/* 5 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
               autoOk
@@ -145,7 +148,7 @@ const z2View = ({
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={moment(exitTime)}
+              value={moment(exitTime).utc()}
               onChange={v => exitTimeSet(id,z2id,v)}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
@@ -154,41 +157,41 @@ const z2View = ({
           </MuiPickersUtilsProvider>
         </Grid>
         {/* 6 max 3 */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <Autocomplete
             disabled
-            options={null}
-            value={null}
+            options={[]}
+            value={''}
             size="small"
-            inputParams={{ label: 'Вид полёта', name: 'mdp' }}
+            inputParams={{ label: 'Приказ 80', name: 'mdp' }}
             renderOptionFunc={option => { return (<React.Fragment>{option}</React.Fragment>); }} // eslint-disable-line
             clearOnEscape
             freeSolo
           />
         </Grid>
         {/* 7 max 1 need SELECT */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <Autocomplete
             disabled
-            options={null}
-            value={null}
+            options={[]}
+            value={''}
             size="small"
-            inputParams={{ label: 'Кол-во первонач. вылетов', name: 'cfd' }}
+            inputParams={{ label: 'Приказ 80', name: 'cfd' }}
             renderOptionFunc={option => { return (<React.Fragment>{option}</React.Fragment>); }} // eslint-disable-line
             clearOnEscape
             freeSolo
           />
         </Grid>
         {/* 8  max 2*/}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <TextField
             disabled
-            label="кол-во заходов на посадку"
+            label="Приказ 80"
             inputProps={{ maxLength: 5, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
         {/* 9 null */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <Button
             variant="contained"
             className={classes.button}
@@ -208,14 +211,14 @@ const mstp = state => ({
 });
 const mdtp = dispatch => ({
   removeZ2:     (id, z2id) => dispatch(summaryAction.removeSummaryZ2({id, z2id})),
-  codeSet:         (id, z2id, code)         => dispatch(summaryAction.z2.({id, flyDate})),
-  entryPointSet:   (id, z2id, entryPoint)   => dispatch(summaryAction.z2.ACFTIDENT_SET({id, acftIdent})),
-  entryTimeSet:    (id, z2id, entryTime)    => dispatch(summaryAction.z2.AIRCRAFTTYPE_SET({id, aircraftType})),
-  exitPointSet:    (id, z2id, exitPoint)    => dispatch(summaryAction.z2.DEPAIRPORT_SET({id, depAirport})),
-  exitTimeSet:     (id, z2id, exitTime)     => dispatch(summaryAction.z2.DESTAIRPORT_SET({id, destAirport})),
-  flyCtgSet:       (id, z2id, flyCtg)       => dispatch(summaryAction.z2.ENTRYPOINT_SET({id, entryPoint})),
-  countOfDepSet:   (id, z2id, countOfDep)   => dispatch(summaryAction.z2.ENTRYTIME_SET({id, entryTime})),
-  countOfAppSet:   (id, z2id, countOfApp)   => dispatch(summaryAction.z2.EXITPOINT_SET({id, exitPoint})),
+  codeSet:         (id, z2id, code)         => dispatch(summaryAction.z2.CODE_SET({id, z2id, code})),
+  entryPointSet:   (id, z2id, entryPoint)   => dispatch(summaryAction.z2.ENTRYPOINT_SET({id, z2id, entryPoint})),
+  entryTimeSet:    (id, z2id, entryTime)    => dispatch(summaryAction.z2.ENTRYTIME_SET({id, z2id, entryTime})),
+  exitPointSet:    (id, z2id, exitPoint)    => dispatch(summaryAction.z2.EXITPOINT_SET({id, z2id, exitPoint})),
+  exitTimeSet:     (id, z2id, exitTime)     => dispatch(summaryAction.z2.EXITTIME_SET({id, z2id, exitTime})),
+  flyCtgSet:       (id, z2id, flyCtg)       => dispatch(summaryAction.z2.FLYCTG_SET({id, z2id, flyCtg})),
+  countOfDepSet:   (id, z2id, countOfDep)   => dispatch(summaryAction.z2.COUNTOFDEP_SET({id, z2id, countOfDep})),
+  countOfAppSet:   (id, z2id, countOfApp)   => dispatch(summaryAction.z2.COUNTOFAPP_SET({id, z2id, countOfApp})),
 });
 
 export default connect(mstp, mdtp)(z2View);

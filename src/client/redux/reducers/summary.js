@@ -11,14 +11,14 @@ const z1State = {
   regno: ''
 };
 const z2State = {
-  code: null,
-  entryPoint: null,
-  entryTime: null,
-  exitPoint: null,
-  exitTime: null,
-  flyCtg: null,
-  countOfDep: null,
-  countOfApp: null
+  code: '',
+  entryPoint: '',
+  entryTime: new Date(),
+  exitPoint: '',
+  exitTime: new Date(),
+  flyCtg: '',
+  countOfDep: '',
+  countOfApp: ''
 };
 const z3State = {
   airspaceType: '',

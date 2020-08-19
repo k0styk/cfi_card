@@ -63,7 +63,9 @@ module.exports.Z3 = {
   AIRSPACETYPEGTIME_REMOVE:                              'Z3_AIRSPACETYPEGTIME_REMOVE',
 };
 
-module.exports.UI = {};
+module.exports.UI = {
+  ALERT_SET:                                            'UI_ALERT_SET',
+};
 
 module.exports.ENTITIES = {};
 

@@ -115,45 +115,45 @@ export default {
    */
     ENTRYTIME_REMOVE: payload => ({ type: Z2.ENTRYTIME_REMOVE, payload }),
     /**
-   * @param {{ id: number, depAirport: string}} payload
+   * @param {{ id: number, z2id: number, exitPoint: string}} payload
    */
     EXITPOINT_SET: payload => ({ type: Z2.EXITPOINT_SET, payload }),
     /**
-   * @param {{ id: number}} payload
+   * @param {{ id: number, z2id: number}} payload
    */
-    EXITPOINT_REMOVE: payload => ({ type: Z2.EXITPOINT_REMOVE }),
+    EXITPOINT_REMOVE: payload => ({ type: Z2.EXITPOINT_REMOVE, payload }),
     /**
-   * @param {{ id: number, destAirport: string}} payload
+   * @param {{ id: number, z2id: number, exitTime: string}} payload
    */
     EXITTIME_SET: payload => ({ type: Z2.EXITTIME_SET, payload }),
     /**
-   * @param {{ id: number}} payload
+   * @param {{ id: number, z2id: number}} payload
    */
-    EXITTIME_REMOVE: payload => ({ type: Z2.EXITTIME_REMOVE }),
+    EXITTIME_REMOVE: payload => ({ type: Z2.EXITTIME_REMOVE, payload }),
     /**
-   * @param {{ id: number, entryPoint: string}} payload
+   * @param {{ id: number, z2id: number, flyCtg: string}} payload
    */
     FLYCTG_SET: payload => ({ type: Z2.FLYCTG_SET, payload }),
     /**
-   * @param {{ id: number}} payload
+   * @param {{ id: number, z2id: number}} payload
    */
-    FLYCTG_REMOVE: payload => ({ type: Z2.FLYCTG_REMOVE }),
+    FLYCTG_REMOVE: payload => ({ type: Z2.FLYCTG_REMOVE, payload }),
     /**
-   * @param {{ id: number, entryTime: string}} payload
+   * @param {{ id: number, z2id: number, countOfDep: string}} payload
    */
     COUNTOFDEP_SET: payload => ({ type: Z2.COUNTOFDEP_SET, payload }),
     /**
-   * @param {{ id: number }} payload
+   * @param {{ id: number, z2id: number }} payload
    */
-    COUNTOFDEP_REMOVE: payload => ({ type: Z2.COUNTOFDEP_REMOVE }),
+    COUNTOFDEP_REMOVE: payload => ({ type: Z2.COUNTOFDEP_REMOVE, payload }),
     /**
-   * @param {{ id: number, exitPoint: string}} payload
+   * @param {{ id: number, z2id: number, countOfApp: string}} payload
    */
     COUNTOFAPP_SET: payload => ({ type: Z2.COUNTOFAPP_SET, payload }),
     /**
-   * @param {{ id: number }} payload
+   * @param {{ id: number, z2id: number }} payload
    */
-    COUNTOFAPP_REMOVE: payload => ({ type: Z2.COUNTOFAPP_REMOVE }),
+    COUNTOFAPP_REMOVE: payload => ({ type: Z2.COUNTOFAPP_REMOVE, payload }),
   },
   z3: {
     /**

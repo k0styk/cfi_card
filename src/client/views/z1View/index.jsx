@@ -20,6 +20,9 @@ const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
   },
+  grid: {
+    minWidth: '190px'
+  },
   paper: {
     padding: theme.spacing(0),
     textAlign: 'center',
@@ -68,7 +71,7 @@ const z1View = ({
           <Paper className={classes.paperFirst} elevation={0} square>Z1</Paper>
         </Grid>
         {/* 1 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardDatePicker
               placeholder="DD/MM/YY"
@@ -86,7 +89,7 @@ const z1View = ({
           </MuiPickersUtilsProvider>
         </Grid>
         {/* 2 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <TextField
             value={acftIdent}
             onChange={e => acftIdentSet(id, e.target.value.toUpperCase())}
@@ -95,7 +98,7 @@ const z1View = ({
           />
         </Grid>
         {/* 3 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
@@ -116,7 +119,7 @@ const z1View = ({
           />
         </Grid>
         {/* 4 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
@@ -137,7 +140,7 @@ const z1View = ({
           />
         </Grid>
         {/* 5 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
@@ -158,7 +161,7 @@ const z1View = ({
           />
         </Grid>
         {/* 6 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <TextField
             value={entryPoint}
             onChange={e => entryPointSet(id, e.target.value.toUpperCase())}
@@ -167,7 +170,7 @@ const z1View = ({
           />
         </Grid>
         {/* 7 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
               autoOk
@@ -181,7 +184,7 @@ const z1View = ({
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={moment(entryTime)}
+              value={moment(entryTime).utc()}
               onChange={v => entryTimeSet(id,v)}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
@@ -190,7 +193,7 @@ const z1View = ({
           </MuiPickersUtilsProvider>
         </Grid>
         {/* 8 req */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <TextField
             value={exitPoint}
             onChange={e => exitPointSet(id, e.target.value.toUpperCase())}
@@ -199,7 +202,7 @@ const z1View = ({
           />
         </Grid>
         {/* 9 */}
-        <Grid item xs>
+        <Grid item xs className={classes.grid}>
           <TextField
             value={regno}
             onChange={e => regnoSet(id, e.target.value.toUpperCase())}

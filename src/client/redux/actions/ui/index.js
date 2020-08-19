@@ -1,13 +1,5 @@
-import * as table from './table';
-import * as user from './user';
-import * as date from './date';
-import * as modal from './modal';
-import * as weather from './weather';
+import alert from './alert';
 
 export {
-  table,
-  user,
-  date,
-  modal,
-  weather
+  alert
 };
