@@ -1,22 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { summaryAction } from '../../redux/actions';
-// import './z2.scss';
+import { summaryAction } from '@redux/actions';
+import { Autocomplete, InputMask  } from '@components';
 
 import { makeStyles } from '@material-ui/core/styles';
-import MomentUtils from '@date-io/moment';
-import {
-  MuiPickersUtilsProvider,
-  KeyboardTimePicker,
-  KeyboardDatePicker,
-} from '@material-ui/pickers';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@components/Autocomplete/autocomplete';
-import Button from '@material-ui/core/Button';
+import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers';
+import { Grid, Paper, TextField, Button } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
-import InputMask from '../../components/InputMask/inputmask';
+import MomentUtils from '@date-io/moment';
 import moment from 'moment';
 
 const useStyles = makeStyles(theme => ({
@@ -30,14 +21,14 @@ const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
   },
-  grid: {
-    minWidth: '190px'
-  },
-  paper: {
-    padding: theme.spacing(0),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
+  one:    { minWidth: '80px'  },
+  two:    { minWidth: '140px' },
+  three:  { minWidth: '110px' },
+  four:   { minWidth: '160px' },
+  five:   { minWidth: '110px' },
+  six:    { minWidth: '90px'  },
+  seven:  { minWidth: '90px'  },
+  eight:  { minWidth: '90px'  },
   paperFirst: {
     padding: '13px 10px',
     textAlign: 'center',
@@ -82,7 +73,7 @@ const z2View = ({
           <Paper className={classes.paperFirst} elevation={0} square>Z2</Paper>
         </Grid>
         {/* 1 req max 4 */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.one}>
           <TextField
             value={code}
             onChange={e => codeSet(id, z2id, e.target.value.toUpperCase())}
@@ -91,7 +82,7 @@ const z2View = ({
           />
         </Grid>
         {/* 2 req max 11 */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.two}>
           <InputMask
             mask="9999С99999В"
             value={entryPoint}
@@ -101,7 +92,7 @@ const z2View = ({
           />
         </Grid>
         {/* 3 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.three}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
               autoOk
@@ -124,7 +115,7 @@ const z2View = ({
           </MuiPickersUtilsProvider>
         </Grid>
         {/* 4 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.four}>
           <InputMask
             mask="9999С99999В"
             value={exitPoint}
@@ -134,7 +125,7 @@ const z2View = ({
           />
         </Grid>
         {/* 5 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.five}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
               autoOk
@@ -157,7 +148,7 @@ const z2View = ({
           </MuiPickersUtilsProvider>
         </Grid>
         {/* 6 max 3 */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.six}>
           <Autocomplete
             disabled
             options={[]}
@@ -170,7 +161,7 @@ const z2View = ({
           />
         </Grid>
         {/* 7 max 1 need SELECT */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.seven}>
           <Autocomplete
             disabled
             options={[]}
@@ -183,7 +174,7 @@ const z2View = ({
           />
         </Grid>
         {/* 8  max 2*/}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.eight}>
           <TextField
             disabled
             label="Приказ 80"
@@ -191,7 +182,7 @@ const z2View = ({
           />
         </Grid>
         {/* 9 null */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs>
           <Button
             variant="contained"
             className={classes.button}

@@ -17,5 +17,19 @@
     overflow: auto;
     overflow: overlay;
     padding: 10px;
+
+    &::-webkit-scrollbar-track {
+      border-radius: 3px;
+      background: #a6a6a6;
+    }
+  
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      border-radius: 3px;
+      background: #cccccc;
+    }
   }
 }

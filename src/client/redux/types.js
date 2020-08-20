@@ -1,3 +1,9 @@
+module.exports.NOTIFY = {
+  ENQUEUE_SNACKBAR:                                     'NOTIFY_ENQUEUE',
+  CLOSE_SNACKBAR:                                       'NOTIFY_CLOSE',
+  REMOVE_SNACKBAR:                                      'NOTIFY_REMOVE'
+};
+
 module.exports.SOCKET = {
   ADD_SOCKET:                                           'ADD_SOCKET',
   REMOVE_SOCKET:                                        'REMOVE_SOCKET'

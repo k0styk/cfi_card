@@ -1,38 +1,81 @@
-import React, { Component } from 'react';
+import './app.scss';
+import React from 'react';
 import { connect } from 'react-redux';
+import { initialAction, socketAction, notifyAction } from './redux/actions';
+import { Header, MainView } from '@views';
+import { Notifier } from '@components';
 import io from 'socket.io-client';
 
-import './app.scss';
-import Header from './views/header/';
-import MainView from './views/MainView/';
-// import store from './redux/store/store';
-import { initialAction, socketAction, uiAction } from './redux/actions';
-
-class App extends Component {
+class App extends React.Component {
   constructor(props) {
     super(props);
   }
 
   componentDidMount() {
-    const { setSnack } =  this.props;
-    const socket = io('/');
+    const { setSocket, InitState, notify } = this.props;
+    const socket = io({
+      reconnectionAttempts: 4,
+      reconnectionDelay: 3000,
+      reconnectionDelayMax: 10000
+    });
 
-    socket.on('connect', () => { });
+    socket.on('connect', () => {
+      notify({
+        message: 'Соединение установлено',
+        options: {
+          variant: 'success'
+        }
+      });
+    });
     socket.on('connect_error', err => {
       console.log(err);
-      setSnack({message: 'Ошибка соединения с сервером', severity: 'error'});
+      notify({
+        message: 'Ошибка соединения с сервером',
+        options: {
+          variant: 'warning'
+        }
+      });
     });
     socket.on('connect_timeout', err => {
       console.log(err);
-      setSnack({message: 'Таймаут соединения', severity: 'warning'});
+      notify({
+        message: 'Таймаут соединения с сервером',
+        options: {
+          variant: 'warning'
+        }
+      });
     });
     socket.on('error', err => {
       console.log(err);
-      setSnack({message: 'Ошибка клиента', severity: 'error'});
+      notify({
+        message: 'Ошибка на клиенте, посмотрите консоль',
+        options: {
+          variant: 'warning'
+        }
+      });
+    });
+    socket.on('reconnect_failed', () => {
+      notify({
+        message: 'Ошибка переподключения. Попробуйте переподключиться самостоятельно',
+        options: {
+          variant: 'warning'
+        }
+      });
+      notify({
+        message: 'Нет соединения с сервером',
+        options: {
+          variant: 'error',
+          persist: true,
+          anchorOrigin: {
+            vertical: 'bottom',
+            horizontal: 'center',
+          }
+        }
+      });
     });
 
-    this.props.setSocket(socket);
-    this.props.InitState();
+    setSocket(socket);
+    InitState();
   }
 
   render() {
@@ -40,15 +83,20 @@ class App extends Component {
       <div className='app-wrapper'>
         <Header />
         <MainView />
+        <Notifier />
       </div>
     );
   }
-}
+};
 
-const mapDispatchToProps = dispatch => ({
-  setSocket: socket => dispatch(socketAction.setSocket(socket)),
-  InitState: () => dispatch(initialAction()),
-  setSnack: ({message, severity}) => dispatch(uiAction.alert.setAlert({message, open: true, severity}))
+const mstp = state => ({
+  notifications: state.notifications
 });
 
-export default connect(null,mapDispatchToProps)(App);
+const mdtp = dispatch => ({
+  setSocket: socket => dispatch(socketAction.setSocket(socket)),
+  InitState: () => dispatch(initialAction()),
+  notify: (...args) => dispatch(notifyAction.enqueueSnackbar(...args)),
+});
+
+export default connect(mstp,mdtp)(App);

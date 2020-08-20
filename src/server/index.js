@@ -1,24 +1,19 @@
+import './style.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router } from 'react-router-dom';
-import store from '../client/redux/store/store';
-import App from '../client/App';
-import './style.css';
-// import { library } from '@fortawesome/fontawesome-svg-core';
-// import { fab } from '@fortawesome/free-brands-svg-icons';
-// import { faClock } from '@fortawesome/free-solid-svg-icons';
-// import { faClock } from '@fortawesome/free-regular-svg-icons';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
-// library.add(faClock);
+import store from '@redux/store/store';
+import App from '@client/App';
 
 ReactDOM.render(
-  <Router>
-    <Provider store={store}>
+  <Provider store={store}>
+    <SnackbarProvider>
       <App />
-    </Provider>
-  </Router>,
-  document.getElementById('app') // eslint-disable-line no-undef
+    </SnackbarProvider>
+  </Provider>,
+  document.getElementById('app')
 );
 
 if (module.hot)        // eslint-disable-line no-undef  

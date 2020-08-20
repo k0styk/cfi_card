@@ -1,32 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { summaryAction } from '@redux/actions';
+import { InputMask } from '@components';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers';
 import { Grid, Paper, TextField, MenuItem } from '@material-ui/core';
-import { InputMask } from '@components';
 import MomentUtils from '@date-io/moment';
 
 const useStyles = makeStyles(theme => ({
-  formControl: {
-    margin: theme.spacing(1),
-    minWidth: 120,
-  },
-  selectEmpty: {
-    marginTop: theme.spacing(2),
-  },
   root: {
     flexGrow: 1,
   },
-  grid: {
-    minWidth: '190px'
-  },
-  paper: {
-    padding: theme.spacing(0),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
+  one:    { minWidth: '100px'  },
+  two:    { minWidth: '195px' },
+  three:  { minWidth: '185px' },
+  four:   { minWidth: '190px' },
+  five:   { minWidth: '140px' },
   paperFirst: {
     padding: '13px 10px',
     textAlign: 'center',
@@ -64,7 +54,7 @@ const z3View = ({
           <Paper className={classes.paperFirst} elevation={0} square>Z3</Paper>
         </Grid>
         {/* 1 req filter of z2 */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.one}>
           <TextField
             error={!!(airspaceType==='G' & z2l)}
             helperText={(airspaceType==='G' & z2l)?'Измените выбор':''}
@@ -83,7 +73,7 @@ const z3View = ({
           </TextField>
         </Grid>
         {/* 2 req if z1 3 stay ZZZZ*/}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.two}>
           <TextField
             error={(z1.aircraftType==='ZZZZ'&(aircraftTypeName.length?false:true))?true:false}
             helperText={(z1.aircraftType==='ZZZZ'&(aircraftTypeName.length?false:true))?'Заполнить':''}
@@ -94,7 +84,7 @@ const z3View = ({
           />
         </Grid>
         {/* 3 req if z1 4 ZZZZ*/}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.three}>
           <InputMask
             error={(z1.depAirport==='ZZZZ'&(depAirportCoord.length?false:true))?true:false}
             helperText={(z1.depAirport==='ZZZZ'&(depAirportCoord.length?false:true))?'Заполнить':''}
@@ -106,7 +96,7 @@ const z3View = ({
           />
         </Grid>
         {/* 4 req if z1 5 ZZZZ*/}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.four}>
           <InputMask
             error={(z1.destAirport==='ZZZZ'&(destAirportCoord.length?false:true))?true:false}
             helperText={(z1.destAirport==='ZZZZ'&(destAirportCoord.length?false:true))?'Заполнить':''}
@@ -118,7 +108,7 @@ const z3View = ({
           />
         </Grid>
         {/* 5 if class G */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.five}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
               disabled

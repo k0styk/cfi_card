@@ -1,19 +1,14 @@
-import React from 'react';
-// import { Switch, Route } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { summaryAction, uiAction } from '../../redux/actions';
 import './summary.scss';
-import Z1View from '@views/z1View/';
-import Z2View from '@views/z2View/';
-import Z3View from '@views/z3View/';
+import React from 'react';
+import { connect } from 'react-redux';
+import { summaryAction, uiAction, notifyAction } from '@redux/actions';
+import { Z1View, Z2View, Z3View } from '@views';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Divider from '@material-ui/core/Divider';
-import AddIcon from '@material-ui/icons/Add';
-import Button from '@material-ui/core/Button';
+import { Divider, Button, Typography } from '@material-ui/core';
 import { Send } from '@material-ui/icons';
+import AddIcon from '@material-ui/icons/Add';
 import CancelIcon from '@material-ui/icons/Cancel';
-import Typography from '@material-ui/core/Typography';
 import moment from 'moment';
 
 const useStyles = makeStyles(theme => ({
@@ -49,13 +44,33 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const summaryView = ({ id, summary, removeSummary, addZ2, setSnack }) => {
+const summaryView = ({
+  id,
+  summary,
+  removeSummary,
+  addZ2,
+  // setSnack,
+  enqueueSnackbar
+}) => {
   const DeleteButton = ({...elementProps}) =>
     (<div className="summary-button-delete" {...elementProps}>
       <CancelIcon />
     </div>);
   const classes = useStyles();
   const curSummary = summary.value.filter(v => v.id === id);
+
+  const handleClick = () => {
+    enqueueSnackbar({
+      message: 'SUKA',
+      options: {
+        key: new Date().getTime() + Math.random(),
+        variant: 'warning',
+        // action: key => (
+        //   <Button onClick={() => closeSnackbar(key)}>dismiss me</Button>
+        // ),
+      },
+    });
+  };
 
   return (
     <div className="summary-view">
@@ -87,7 +102,7 @@ const summaryView = ({ id, summary, removeSummary, addZ2, setSnack }) => {
         <Divider />
         <div className="summary-footer">
           <Button
-            onClick={() => setSnack()}
+            onClick={() => handleClick()}
             variant="contained"
             color="primary"
             className={classes.greenBtn}
@@ -108,7 +123,8 @@ const mstp = state => ({
 const mdtp = dispatch => ({
   removeSummary: id => dispatch(summaryAction.removeSummary({id})),
   addZ2: id => dispatch(summaryAction.addSummaryZ2({id})),
-  setSnack: () => dispatch(uiAction.alert.setAlert({message: 'suka', open: true, severity: 'success'}))
+  // setSnack: () => dispatch(uiAction.alert.setAlert({message: 'suka', open: true, severity: 'success'})),
+  enqueueSnackbar: (...args) => dispatch(notifyAction.enqueueSnackbar(...args)),
 });
 
 export default connect(mstp, mdtp)(summaryView);

@@ -1,33 +1,31 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { summaryAction } from '../../redux/actions/';
-// import './z1.scss';
+import { summaryAction } from '@redux/actions/';
+import { Autocomplete } from '@components';
 
 import { makeStyles } from '@material-ui/core/styles';
-import MomentUtils from '@date-io/moment';
 import {
   MuiPickersUtilsProvider,
   KeyboardTimePicker,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@components/Autocomplete/autocomplete';
+import { Grid, Paper, TextField } from '@material-ui/core';
+import MomentUtils from '@date-io/moment';
 import moment from 'moment';
 
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1,
   },
-  grid: {
-    minWidth: '190px'
-  },
-  paper: {
-    padding: theme.spacing(0),
-    textAlign: 'center',
-    color: theme.palette.text.secondary,
-  },
+  one:    { minWidth: '130px' },
+  two:    { minWidth: '95px'  },
+  three:  { minWidth: '75px'  },
+  four:   { minWidth: '130px' },
+  five:   { minWidth: '135px' },
+  six:    { minWidth: '105px' },
+  seven:  { minWidth: '110px' },
+  eight:  { minWidth: '115px' },
+  nine:   { minWidth: '125px' },
   paperFirst: {
     padding: '13px 10px',
     textAlign: 'center',
@@ -71,7 +69,7 @@ const z1View = ({
           <Paper className={classes.paperFirst} elevation={0} square>Z1</Paper>
         </Grid>
         {/* 1 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.one}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardDatePicker
               placeholder="DD/MM/YY"
@@ -89,7 +87,7 @@ const z1View = ({
           </MuiPickersUtilsProvider>
         </Grid>
         {/* 2 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.two}>
           <TextField
             value={acftIdent}
             onChange={e => acftIdentSet(id, e.target.value.toUpperCase())}
@@ -98,14 +96,14 @@ const z1View = ({
           />
         </Grid>
         {/* 3 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.three}>
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
             value={aircraftType}
             size="small"
             inputParams={{
-              label: 'Тип воздушного судна',
+              label: 'Тип ВС',
               name: 'aircraftType',
               inputProps: {
                 maxLength: 4,
@@ -119,7 +117,7 @@ const z1View = ({
           />
         </Grid>
         {/* 4 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.four}>
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
@@ -140,7 +138,7 @@ const z1View = ({
           />
         </Grid>
         {/* 5 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.five}>
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
@@ -161,7 +159,7 @@ const z1View = ({
           />
         </Grid>
         {/* 6 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.six}>
           <TextField
             value={entryPoint}
             onChange={e => entryPointSet(id, e.target.value.toUpperCase())}
@@ -170,7 +168,7 @@ const z1View = ({
           />
         </Grid>
         {/* 7 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.seven}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
               autoOk
@@ -193,7 +191,7 @@ const z1View = ({
           </MuiPickersUtilsProvider>
         </Grid>
         {/* 8 req */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.eight}>
           <TextField
             value={exitPoint}
             onChange={e => exitPointSet(id, e.target.value.toUpperCase())}
@@ -202,7 +200,7 @@ const z1View = ({
           />
         </Grid>
         {/* 9 */}
-        <Grid item xs className={classes.grid}>
+        <Grid item xs className={classes.nine}>
           <TextField
             value={regno}
             onChange={e => regnoSet(id, e.target.value.toUpperCase())}
