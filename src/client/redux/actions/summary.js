@@ -8,6 +8,10 @@ export default {
    */
   removeSummary: payload => ({type: SUMMARY.REMOVE, payload}),
   /**
+   * @param {{ id: number, archieve: boolean}} payload
+   */
+  archieveSet: payload => ({type: SUMMARY.ARCHIEVE, payload}),
+  /**
    * @param {{ id: number}} payload
    */
   addSummaryZ2: payload => ({type: SUMMARY.ADD_Z2,payload}),

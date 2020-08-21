@@ -1,5 +1,7 @@
-import alert from './alert';
+import app from './app';
+import notify from './notifications';
 
 export {
-  alert
+  app,
+  notify
 };

@@ -16,8 +16,15 @@
   align-items: center;
 }
 
+  .center-block {
+    flex: 1 1 auto;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;  
+  }
+
 .block-buttons {
-  flex: 1 1 auto;
   display: flex;
   flex-flow: row wrap;
   align-items: center;

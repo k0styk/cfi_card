@@ -4,19 +4,23 @@ import { connect } from 'react-redux';
 import { uiAction } from '@redux/actions';
 import { SummaryView } from '@views';
 
-const mainView = ({ summary, alert, closeSnack }) => (
-  <div className="main-view-content grid-content">
-    <div className="work-area">
-      <div className="wrapper-summary">
-        {summary.value.map((i, idx) => (<SummaryView key={idx} id={i.id} />))}
+const mainView = ({ summary, archieve }) => {
+  const filteredSummary = summary.value.filter(v => v.archieve === archieve);
+
+  return (
+    <div className="main-view-content grid-content">
+      <div className="work-area">
+        <div className="wrapper-summary">
+          {filteredSummary.map((i, idx) => (<SummaryView key={idx} id={i.id} />))}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const mstp = state => ({
   summary: state.summary,
-  alert: state.ui.alert
+  archieve: state.ui.app.archieve
 });
 const mdtp = dispatch => ({
   closeSnack: () => dispatch(uiAction.alert.setAlert({message:'', open: false, severity: 'info'}))

@@ -1,15 +1,9 @@
-// @import '~components/constants/variables.scss';
-
 .time-view-component {
-  --borderWidth: 1px;
-  --borderRadius: 10px;
-  --width: 156px;
-  --height: 34px;
   cursor: default;
   user-select: none;
-  border-radius: var(--borderRadius);
-  width: var(--width);
-  height: var(--height);
+  border-radius: 10px;
+  width: 180px;
+  height: 60px;
   font-size: 28px;
   z-index: 0;
   text-transform: uppercase;
@@ -23,5 +17,6 @@
   .time-span {
     margin-left: 5px;
     font-size: 32px;
+    font-family: monospace;
   }
 }

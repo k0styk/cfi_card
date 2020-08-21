@@ -1,10 +1,10 @@
-import { NOTIFY } from '../types';
+import { UI } from '@redux/types';
 
 const initialState = [];
 
 export function notifications(state = initialState, action) {
   switch (action.type) {
-    case NOTIFY.ENQUEUE_SNACKBAR:
+    case UI.NOTIFY.ENQUEUE_SNACKBAR:
       return [
         ...state,
         {
@@ -12,14 +12,14 @@ export function notifications(state = initialState, action) {
         },
       ];
 
-    case NOTIFY.CLOSE_SNACKBAR:
+    case UI.NOTIFY.CLOSE_SNACKBAR:
       return state.map(n => (
         (action.dismissAll || n.key === action.key)
           ? { ...n, dismissed: true }
           : { ...n }
       ));
 
-    case NOTIFY.REMOVE_SNACKBAR:
+    case UI.NOTIFY.REMOVE_SNACKBAR:
       return state.filter(n => n.key !== action.key);
 
     default:

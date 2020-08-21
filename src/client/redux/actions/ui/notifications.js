@@ -1,6 +1,6 @@
-// @ts-check
-import { NOTIFY } from '../types';
+import { UI } from '@redux/types';
 
+export default {
 /**
  * @param {Object} notification
  * @param {string} notification.message - message
@@ -14,30 +14,27 @@ import { NOTIFY } from '../types';
  * @param {boolean} notification.options.preventDuplicate - preventDuplicate
  * @param {function} notification.options.action - action
  */
-export function enqueueSnackbar(notification) {
-  const key = notification.options && notification.options.key;
-  const newVal = {
-    ...notification,
-    key: key || new Date().getTime() + Math.random()
-  };
+  enqueueSnackbar: notification => {
+    const key = notification.options && notification.options.key;
+    const newVal = {
+      ...notification,
+      key: key || new Date().getTime() + Math.random()
+    };
 
-  return {
-    type: NOTIFY.ENQUEUE_SNACKBAR,
-    notification: newVal
-  };
-};
-
-export function closeSnackbar(key) {
-  return {
-    type: NOTIFY.CLOSE_SNACKBAR,
-    dismissAll: !key, // dismiss all if no key has been defined
-    key,
-  };
-};
-
-export function removeSnackbar(key) {
-  return {
-    type: NOTIFY.REMOVE_SNACKBAR,
-    key,
-  };
+    return {
+      type: UI.NOTIFY.ENQUEUE_SNACKBAR,
+      notification: newVal
+    };
+  },
+  /**
+  * @param {string} key - if no key, remove all
+  */
+  closeSnackbar: key => (
+    {
+      type: UI.NOTIFY.CLOSE_SNACKBAR,
+      dismissAll: !key, // dismiss all if no key has been defined
+      key,
+    }
+  ),
+  removeSnackbar: key => ({type: UI.NOTIFY.REMOVE_SNACKBAR, key})
 };

@@ -61,6 +61,41 @@ const z1View = ({
     regno
   } = curSummary[0].z1;
 
+  const validationFields = {
+    flyDate: 'flyDate',
+    acftIdent: 'acftIdent',
+    aircraftType: 'aircraftType',
+    depAirport: 'depAirport',
+    destAirport: 'destAirport',
+    entryPoint: 'entryPoint',
+    entryTime: 'entryTime',
+    exitPoint: 'exitPoint',
+    regno: 'regno',
+  };
+  const validateField = (fieldName, value) => {
+    // let fieldValidationErrors = this.state.formErrors;
+    // let emailValid = this.state.emailValid;
+    // let passwordValid = this.state.passwordValid;
+
+    switch (fieldName) {
+      case 'email':
+        emailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
+        fieldValidationErrors.email = emailValid ? '' : ' is invalid';
+        break;
+      case 'password':
+        passwordValid = value.length >= 6;
+        fieldValidationErrors.password = passwordValid ? '' : ' is too short';
+        break;
+      default:
+        break;
+    }
+    this.setState({
+      formErrors: fieldValidationErrors,
+      emailValid: emailValid,
+      passwordValid: passwordValid
+    }, this.validateForm);
+  };
+
   return (
     <div className="z1-view">
       <Grid container className={classes.root} spacing={1}>
@@ -92,7 +127,11 @@ const z1View = ({
             value={acftIdent}
             onChange={e => acftIdentSet(id, e.target.value.toUpperCase())}
             label="Индекс ВС"
-            inputProps={{ maxLength: 7, style: { textTransform: 'uppercase' } }}
+            inputProps={{
+              maxLength: 7,
+              style: { textTransform: 'uppercase' },
+              name: validationFields.acftIdent
+            }}
           />
         </Grid>
         {/* 3 req */}
@@ -107,7 +146,8 @@ const z1View = ({
               name: 'aircraftType',
               inputProps: {
                 maxLength: 4,
-                style: { textTransform: 'uppercase' }
+                style: { textTransform: 'uppercase' },
+                name: validationFields.aircraftType
               }
             }}
             onInputChange={(e, v) => aircraftTypeSet(id, v.toUpperCase())}
@@ -128,7 +168,8 @@ const z1View = ({
               name: 'depAirport',
               inputProps: {
                 maxLength: 4,
-                style: { textTransform: 'uppercase' }
+                style: { textTransform: 'uppercase' },
+                name: validationFields.depAirport
               }
             }}
             onInputChange={(e, v) => depAirportSet(id, v.toUpperCase())}
@@ -149,7 +190,8 @@ const z1View = ({
               name: 'destAirport',
               inputProps: {
                 maxLength: 4,
-                style: { textTransform: 'uppercase' }
+                style: { textTransform: 'uppercase' },
+                name: validationFields.destAirport
               }
             }}
             onInputChange={(e, v) => destAirportSet(id, v.toUpperCase())}
@@ -164,7 +206,11 @@ const z1View = ({
             value={entryPoint}
             onChange={e => entryPointSet(id, e.target.value.toUpperCase())}
             label="Точка входа"
-            inputProps={{ maxLength: 5, style: { textTransform: 'uppercase' } }}
+            inputProps={{
+              maxLength: 5,
+              style: { textTransform: 'uppercase' },
+              name: validationFields.entryPoint
+            }}
           />
         </Grid>
         {/* 7 req */}
@@ -196,7 +242,11 @@ const z1View = ({
             value={exitPoint}
             onChange={e => exitPointSet(id, e.target.value.toUpperCase())}
             label="Точка выхода"
-            inputProps={{ maxLength: 5, style: { textTransform: 'uppercase' } }}
+            inputProps={{
+              maxLength: 5,
+              style: { textTransform: 'uppercase' },
+              name: validationFields.exitPoint
+            }}
           />
         </Grid>
         {/* 9 */}
@@ -205,7 +255,11 @@ const z1View = ({
             value={regno}
             onChange={e => regnoSet(id, e.target.value.toUpperCase())}
             label="Рег. номер ВС"
-            inputProps={{ maxLength: 10, style: { textTransform: 'uppercase' } }}
+            inputProps={{
+              maxLength: 10,
+              style: { textTransform: 'uppercase' },
+              name: validationFields.regno
+            }}
           />
         </Grid>
       </Grid>

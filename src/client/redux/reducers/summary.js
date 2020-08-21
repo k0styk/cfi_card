@@ -40,6 +40,7 @@ export function summary(state = initialState, action) {
     case SUMMARY.ADD:
       const newVal = {
         id: state.counter,
+        archieve: false,
         counter: 1,
         z1: z1State,
         z2: [],
@@ -55,6 +56,19 @@ export function summary(state = initialState, action) {
       return {
         ...state,
         value: state.value.filter(i => i.id !== p.id)
+      };
+    case SUMMARY.ARCHIEVE:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              archieve: p.archieve
+            };
+          }
+          return v;
+        })
       };
     case SUMMARY.ADD_Z2:
       return {

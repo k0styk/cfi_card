@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { useSnackbar } from 'notistack';
-import { notifyAction } from '@redux/actions';
+import { uiAction } from '@redux/actions';
 
 let displayed = [];
 
@@ -15,6 +15,8 @@ const Notifier = ({
   const removeDisplayed = id => displayed = [...displayed.filter(key => id !== key)];
 
   const defaultOptions = {
+    preventDuplicate: true,
+    autoHideDuration: 1800,
     variant: 'info',
     preventDuplicate: true,
     anchorOrigin: {
@@ -58,22 +60,9 @@ const Notifier = ({
   return null;
 };
 
-const mstp = state => ({notify: state.notifications});
+const mstp = state => ({notify: state.ui.notifications});
 const mdtp = dispatch => ({
-  removeSnackbar: (...args) => dispatch(notifyAction.removeSnackbar(...args))
+  removeSnackbar: (...args) => dispatch(uiAction.notify.removeSnackbar(...args))
 });
 
 export default connect(mstp, mdtp)(Notifier);
-
-/*
-
-// on connection loss
-const key = props.enqueueSnackbar('No connection!', { 
-    variant: 'error',
-    persist: true,
-});
-
-// when we're back online
-props.closeSnackbar(key);
-
-*/

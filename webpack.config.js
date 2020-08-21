@@ -20,7 +20,7 @@ const build = ph => path.join(__dirname, 'dist', ph?ph:'');
 const common = merge([
   {
     entry: {
-      'index': source('/server/index.js')
+      'index': source('/server/entrypoint.js')
     },
     output: {
       path: build(),

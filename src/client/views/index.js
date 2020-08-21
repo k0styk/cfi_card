@@ -1,4 +1,6 @@
 import Header from './header/header';
+import SwitchFolder from './switchFolderView/switchFolder';
+import ConnectAdd from './connectView/connect';
 import MainView from './MainView/main';
 import SummaryView from './summaryView/summary';
 import Z1View from './z1View/z1';
@@ -7,6 +9,8 @@ import Z3View from './z3View/z3';
 
 export {
   Header,
+  SwitchFolder,
+  ConnectAdd,
   MainView,
   SummaryView,
   Z1View,

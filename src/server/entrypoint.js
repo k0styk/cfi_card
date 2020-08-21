@@ -1,8 +1,7 @@
-import './style.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { SnackbarProvider, useSnackbar } from 'notistack';
+import { SnackbarProvider } from 'notistack';
 
 import store from '@redux/store/store';
 import App from '@client/App';

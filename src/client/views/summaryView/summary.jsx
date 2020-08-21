@@ -1,7 +1,7 @@
 import './summary.scss';
 import React from 'react';
 import { connect } from 'react-redux';
-import { summaryAction, uiAction, notifyAction } from '@redux/actions';
+import { summaryAction, uiAction } from '../../redux/actions';
 import { Z1View, Z2View, Z3View } from '@views';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,37 +10,22 @@ import { Send } from '@material-ui/icons';
 import AddIcon from '@material-ui/icons/Add';
 import CancelIcon from '@material-ui/icons/Cancel';
 import moment from 'moment';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBox, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 
 const useStyles = makeStyles(theme => ({
   button: {
     margin: theme.spacing(1),
   },
-  greenBtn: {
-    margin: theme.spacing(1),
-    backgroundColor: '#32C332',
-    '&:hover': {
-      backgroundColor: '#329332',
-      borderColor: '#0062cc',
-      boxShadow: 'none',
-    },
-    '&:active': {
-      boxShadow: 'none',
-      backgroundColor: '#329332',
-      borderColor: '#005cbf',
-    },
-    '&:focus': {
-      boxShadow: '0 0 0 0.2rem rgba(0,123,255,.5)',
-    },
-  },
   margin: {
     margin: theme.spacing(1),
   },
   marginRight: {
-    marginRight: theme.spacing(3),
+    marginRight: theme.spacing(1),
   },
   marginSides: {
-    marginLeft: theme.spacing(3),
-    marginRight: theme.spacing(2)
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1)
   }
 }));
 
@@ -49,26 +34,34 @@ const summaryView = ({
   summary,
   removeSummary,
   addZ2,
-  // setSnack,
-  enqueueSnackbar
+  archieveSet,
+  enqueueSnackbar,
+  archieve
 }) => {
   const DeleteButton = ({...elementProps}) =>
     (<div className="summary-button-delete" {...elementProps}>
       <CancelIcon />
     </div>);
+  const ToArchieve = ({...elementProps}) => (<React.Fragment>
+    <FontAwesomeIcon icon={faBox} className={classes.marginRight} {...elementProps} />в список на отправление
+  </React.Fragment>);
+  const FromArchieve = ({...elementProps}) => (<React.Fragment>
+    <FontAwesomeIcon icon={faBoxOpen} className={classes.marginRight} {...elementProps} />в список
+  </React.Fragment>);
   const classes = useStyles();
   const curSummary = summary.value.filter(v => v.id === id);
 
   const handleClick = () => {
+    archieveSet(id, !archieve);
     enqueueSnackbar({
-      message: 'SUKA',
+      message: archieve?'Отправлено в список':'Отправлено в папку для отправления',
       options: {
-        key: new Date().getTime() + Math.random(),
-        variant: 'warning',
-        // action: key => (
-        //   <Button onClick={() => closeSnackbar(key)}>dismiss me</Button>
-        // ),
-      },
+        autoHideDuration: 3000,
+        variant: 'info',
+        action: () => (
+          <Button onClick={() => archieveSet(id, archieve)}>отмена</Button>
+        ),
+      }
     });
   };
 
@@ -89,7 +82,7 @@ const summaryView = ({
               onClick={() => addZ2(id)}
             >
               <AddIcon className={classes.marginRight} />
-              <b className={classes.marginSides}>Z2</b>
+              <b className={classes.marginSides}>Добавить Z2</b>
             </Button>
           </div>
         </div>
@@ -104,12 +97,10 @@ const summaryView = ({
           <Button
             onClick={() => handleClick()}
             variant="contained"
-            color="primary"
-            className={classes.greenBtn}
-            endIcon={<Send />}
-            // disabled
+            color="default"
+            className={classes.button}
           >
-            Отправить
+            {archieve?(<FromArchieve />):(<ToArchieve />)}
           </Button>
         </div>
       </div>
@@ -118,13 +109,14 @@ const summaryView = ({
 };
 
 const mstp = state => ({
-  summary: state.summary
+  summary: state.summary,
+  archieve: state.ui.app.archieve
 });
 const mdtp = dispatch => ({
+  archieveSet: (id, archieve) => dispatch(summaryAction.archieveSet({id, archieve})),
   removeSummary: id => dispatch(summaryAction.removeSummary({id})),
   addZ2: id => dispatch(summaryAction.addSummaryZ2({id})),
-  // setSnack: () => dispatch(uiAction.alert.setAlert({message: 'suka', open: true, severity: 'success'})),
-  enqueueSnackbar: (...args) => dispatch(notifyAction.enqueueSnackbar(...args)),
+  enqueueSnackbar: (...args) => dispatch(uiAction.notify.enqueueSnackbar(...args)),
 });
 
 export default connect(mstp, mdtp)(summaryView);

@@ -1,19 +1,14 @@
-module.exports.NOTIFY = {
-  ENQUEUE_SNACKBAR:                                     'NOTIFY_ENQUEUE',
-  CLOSE_SNACKBAR:                                       'NOTIFY_CLOSE',
-  REMOVE_SNACKBAR:                                      'NOTIFY_REMOVE'
-};
-
 module.exports.SOCKET = {
-  ADD_SOCKET:                                           'ADD_SOCKET',
-  REMOVE_SOCKET:                                        'REMOVE_SOCKET'
+  ADD_SOCKET:                                             'ADD_SOCKET',
+  REMOVE_SOCKET:                                          'REMOVE_SOCKET'
 };
 
 module.exports.SUMMARY = {
-  ADD:                                                  'SUMMARY_ADD',
-  REMOVE:                                               'SUMMARY_REMOVE',
-  ADD_Z2:                                               'SUMMARY_ADD_Z2',
-  REMOVE_Z2:                                            'SUMMARY_REMOVE_Z2'
+  ADD:                                                    'SUMMARY_ADD',
+  REMOVE:                                                 'SUMMARY_REMOVE',
+  ADD_Z2:                                                 'SUMMARY_ADD_Z2',
+  REMOVE_Z2:                                              'SUMMARY_REMOVE_Z2',
+  ARCHIEVE:                                               'SUMMARY_ARCHIEVE_SET'
 };
 
 module.exports.Z1 = {
@@ -70,17 +65,25 @@ module.exports.Z3 = {
 };
 
 module.exports.UI = {
-  ALERT_SET:                                            'UI_ALERT_SET',
+  NOTIFY: {
+    ENQUEUE_SNACKBAR:                                     'UI_NOTIFY_ENQUEUE',
+    CLOSE_SNACKBAR:                                       'UI_NOTIFY_CLOSE',
+    REMOVE_SNACKBAR:                                      'UI_NOTIFY_REMOVE'
+  },
+  APP: {
+    CONNECTION:                                           'UI_APP_CONNECTION_SET',
+    ARCHIEVE:                                             'UI_APP_ARCHIEVE_SET'
+  }
 };
 
 module.exports.ENTITIES = {};
 
 module.exports.DATE = {
-  SET_CLIENT:                                           'DATE_CLIENT_SET',
-  SET_SERVER:                                           'DATE_SERVER_SET',
-  REMOVE:                                               'DATE_REMOVE'
+  SET_CLIENT:                                             'DATE_CLIENT_SET',
+  SET_SERVER:                                             'DATE_SERVER_SET',
+  REMOVE:                                                 'DATE_REMOVE'
 };
 
 module.exports.INIT = {
-  INITIAL_ALL:                                          'INIT_INITIAL_ALL'
+  INITIAL_ALL:                                            'INIT_INITIAL_ALL'
 };

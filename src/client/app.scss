@@ -1,3 +1,13 @@
+body, html { 
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
 .app {
   width: 100%;
   height: 100%;
@@ -12,32 +22,19 @@
   width: 100%;
 }
 
-$pantone-2755: #1e2171;
-$pantone-2935: #0075bf;
-$pantone-284: #68aee0;
-$pantone-185: #ed1c24;
-$pantone-gray: #c8c8c8;
-$simple-gray: #e2e2e2;
+// $pantone-2755: #1e2171;
+// $pantone-2935: #0075bf;
+// $pantone-284: #68aee0;
+// $pantone-185: #ed1c24;
+// $pantone-gray: #c8c8c8;
+// $simple-gray: #e2e2e2;
 
-$TRIANGLED---Immersive-Light-Installation-1-hex: #BF1736;
-$TRIANGLED---Immersive-Light-Installation-2-hex: #0D1440;
-$TRIANGLED---Immersive-Light-Installation-3-hex: #1438A6;
-$TRIANGLED---Immersive-Light-Installation-4-hex: #0E2773;
-$TRIANGLED---Immersive-Light-Installation-5-hex: #1455D9;
+// $TRIANGLED---Immersive-Light-Installation-1-hex: #BF1736;
+// $TRIANGLED---Immersive-Light-Installation-2-hex: #0D1440;
+// $TRIANGLED---Immersive-Light-Installation-3-hex: #1438A6;
+// $TRIANGLED---Immersive-Light-Installation-4-hex: #0E2773;
+// $TRIANGLED---Immersive-Light-Installation-5-hex: #1455D9;
 
-// color: #0F4C81;
-// color: #638CC7;
-// color: #B6CADA;
-// color: #84898C;
-// color: #A48D7F;
-// color: #F5B895;
-// color: #F4DBB3;
-// color: #D5E3FC;
-// color: #5F92F2;
-// color: #0253E8;
-// color: #0A317B;
-// color: #091833;
-
-$gradient1: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
-$gradient2: linear-gradient(to left bottom, #0f4c81, #006393, #007aa0, #0091a6, #00a7a8, #05b7a6, #32c59d, #5ad390, #82de86, #a9e87c, #d1f174, #f9f871);
-$gradient3: linear-gradient(to left bottom, #0f4c81, #32538e, #4d5a99, #6660a3, #7e66ac, #906ab2, #a16fb6, #b373ba, #c277bc, #d27bbe, #e17fbf, #ef84c0);
+// $gradient1: linear-gradient(to right top, #d16ba5, #c777b9, #ba83ca, #aa8fd8, #9a9ae1, #8aa7ec, #79b3f4, #69bff8, #52cffe, #41dfff, #46eefa, #5ffbf1);
+// $gradient2: linear-gradient(to left bottom, #0f4c81, #006393, #007aa0, #0091a6, #00a7a8, #05b7a6, #32c59d, #5ad390, #82de86, #a9e87c, #d1f174, #f9f871);
+// $gradient3: linear-gradient(to left bottom, #0f4c81, #32538e, #4d5a99, #6660a3, #7e66ac, #906ab2, #a16fb6, #b373ba, #c277bc, #d27bbe, #e17fbf, #ef84c0);

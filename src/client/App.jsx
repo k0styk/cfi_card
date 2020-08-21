@@ -1,7 +1,7 @@
 import './app.scss';
 import React from 'react';
 import { connect } from 'react-redux';
-import { initialAction, socketAction, notifyAction } from './redux/actions';
+import { initialAction, socketAction, uiAction } from './redux/actions';
 import { Header, MainView } from '@views';
 import { Notifier } from '@components';
 import io from 'socket.io-client';
@@ -12,7 +12,7 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    const { setSocket, InitState, notify } = this.props;
+    const { setSocket, InitState, notify, connected, closeNotify } = this.props;
     const socket = io({
       reconnectionAttempts: 4,
       reconnectionDelay: 3000,
@@ -20,6 +20,8 @@ class App extends React.Component {
     });
 
     socket.on('connect', () => {
+      connected(true);
+      closeNotify('connection');
       notify({
         message: 'Соединение установлено',
         options: {
@@ -55,15 +57,18 @@ class App extends React.Component {
       });
     });
     socket.on('reconnect_failed', () => {
+      connected(false);
       notify({
-        message: 'Ошибка переподключения. Попробуйте переподключиться самостоятельно',
+        message: 'Ошибка подключения. Попробуйте подключиться самостоятельно через некоторое время',
         options: {
-          variant: 'warning'
+          variant: 'info',
+          autoHideDuration: 5000
         }
       });
       notify({
         message: 'Нет соединения с сервером',
         options: {
+          key: 'connection',
           variant: 'error',
           persist: true,
           anchorOrigin: {
@@ -96,7 +101,9 @@ const mstp = state => ({
 const mdtp = dispatch => ({
   setSocket: socket => dispatch(socketAction.setSocket(socket)),
   InitState: () => dispatch(initialAction()),
-  notify: (...args) => dispatch(notifyAction.enqueueSnackbar(...args)),
+  notify: (...args) => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+  closeNotify: key => dispatch(uiAction.notify.closeSnackbar(key)),
+  connected: connected => dispatch(uiAction.app.setConnection({connected}))
 });
 
 export default connect(mstp,mdtp)(App);
