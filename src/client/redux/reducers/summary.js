@@ -1,21 +1,21 @@
 import { SUMMARY, Z1, Z2, Z3 } from '../types';
 const z1State = {
-  flyDate: new Date(),
+  flyDate: `${new Date().getDate()}/${new Date().getMonth()+1}/${new Date().getFullYear()}`,
   acftIdent: '',
   aircraftType: '',
   depAirport: '',
   destAirport: '',
   entryPoint: '',
-  entryTime: new Date(),
+  entryTime: `${new Date().getHours()}:${new Date().getMinutes()}`,
   exitPoint: '',
   regno: ''
 };
 const z2State = {
   code: '',
   entryPoint: '',
-  entryTime: new Date(),
+  entryTime: `${new Date().getHours()}:${new Date().getMinutes()}`,
   exitPoint: '',
-  exitTime: new Date(),
+  exitTime: `${new Date().getHours()}:${new Date().getMinutes()}`,
   flyCtg: '',
   countOfDep: '',
   countOfApp: ''

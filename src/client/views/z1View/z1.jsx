@@ -34,6 +34,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+let validation = 33; // default flyDate and entryTime are set, 2<<0 | 2<<<5 = 33
 const z1View = ({
   id,
   summary,
@@ -45,7 +46,8 @@ const z1View = ({
   entryPointSet,
   entryTimeSet,
   exitPointSet,
-  regnoSet
+  regnoSet,
+  handleValidate
 }) => {
   const classes = useStyles();
   const curSummary = summary.value.filter(v => v.id === id);
@@ -62,59 +64,106 @@ const z1View = ({
   } = curSummary[0].z1;
 
   const validationFields = {
-    flyDate: 'flyDate',
-    acftIdent: 'acftIdent',
-    aircraftType: 'aircraftType',
-    depAirport: 'depAirport',
-    destAirport: 'destAirport',
-    entryPoint: 'entryPoint',
-    entryTime: 'entryTime',
-    exitPoint: 'exitPoint',
-    regno: 'regno',
+    flyDate: {
+      name: 'flyDate',
+      mask: 1<<0
+    },
+    acftIdent: {
+      name: 'acftIdent',
+      mask: 1<<1
+    },
+    aircraftType: {
+      name: 'aircraftType',
+      mask: 1<<2
+    },
+    depAirport: {
+      name: 'depAirport',
+      mask: 1<<3
+    },
+    destAirport: {
+      name: 'destAirport',
+      mask: 1<<4
+    },
+    entryTime: {
+      name: 'entryTime',
+      mask: 1<<5
+    }
   };
+  const [errorField, setError] = React.useState({
+    flyDate: '',
+    acftIdent: '',
+    aircraftType: '',
+    depAirport: '',
+    destAirport: '',
+    entryTime: '',
+  });
   const validateField = (fieldName, value) => {
-    // let fieldValidationErrors = this.state.formErrors;
-    // let emailValid = this.state.emailValid;
-    // let passwordValid = this.state.passwordValid;
-
     switch (fieldName) {
-      case 'email':
-        emailValid = value.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
-        fieldValidationErrors.email = emailValid ? '' : ' is invalid';
+      case validationFields.flyDate.name:
+      case validationFields.entryTime.name:
+        if(value._isValid) {
+          setError({
+            ...errorField,
+            [fieldName]: ''
+          });
+          validation |= validationFields[fieldName].mask;
+          handleValidate(validation);
+        } else {
+          setError({
+            ...errorField,
+            [fieldName]: 'Некорректная дата'
+          });
+          validation &= (validationFields[fieldName].mask ^ 0xFFF);
+          handleValidate(validation);
+        }
         break;
-      case 'password':
-        passwordValid = value.length >= 6;
-        fieldValidationErrors.password = passwordValid ? '' : ' is too short';
-        break;
-      default:
+      case validationFields.acftIdent.name:
+      case validationFields.aircraftType.name:
+      case validationFields.depAirport.name:
+      case validationFields.destAirport.name:
+        if (value.length) {
+          setError({
+            ...errorField,
+            [fieldName]: ''
+          });
+          validation |= validationFields[fieldName].mask;
+          handleValidate(validation);
+        } else {
+          setError({
+            ...errorField,
+            [fieldName]: 'Обязательное поле'
+          });
+          validation &= (validationFields[fieldName].mask ^ 0xFFF);
+          handleValidate(validation);
+        }
         break;
     }
-    this.setState({
-      formErrors: fieldValidationErrors,
-      emailValid: emailValid,
-      passwordValid: passwordValid
-    }, this.validateForm);
   };
 
   return (
     <div className="z1-view">
       <Grid container className={classes.root} spacing={1}>
-        {/* 0 */}
+        {/* 0     */}
         <Grid item xs={false}>
           <Paper className={classes.paperFirst} elevation={0} square>Z1</Paper>
         </Grid>
         {/* 1 req */}
-        <Grid item xs className={classes.one}>
+        <Grid item xs className={classes.one} >
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardDatePicker
+              error={!!errorField.flyDate}
+              helperText={errorField.flyDate}
               placeholder="DD/MM/YY"
               disableToolbar
               variant="inline"
               format="DD/MM/YY"
               mask="__/__/__"
               margin="normal"
-              value={moment(flyDate)}
-              onChange={v => flyDateSet(id, v)}
+              value={moment(flyDate, 'DD/MM/YY')}
+              onChange={v => {
+                validateField(validationFields.flyDate.name, v);
+                flyDateSet(id, moment(v).format('DD/MM/YY'));
+              }}
               KeyboardButtonProps={{
                 'aria-label': 'change date',
               }}
@@ -122,86 +171,128 @@ const z1View = ({
           </MuiPickersUtilsProvider>
         </Grid>
         {/* 2 req */}
-        <Grid item xs className={classes.two}>
+        <Grid item xs className={classes.two} >
           <TextField
+            error={!!errorField.acftIdent}
+            helperText={errorField.acftIdent}
             value={acftIdent}
-            onChange={e => acftIdentSet(id, e.target.value.toUpperCase())}
+            onChange={e => {
+              acftIdentSet(id, e.target.value.toUpperCase());
+              validateField(e.target.name, e.target.value);
+            }}
             label="Индекс ВС"
             inputProps={{
               maxLength: 7,
               style: { textTransform: 'uppercase' },
-              name: validationFields.acftIdent
+              name: validationFields.acftIdent.name
             }}
           />
         </Grid>
         {/* 3 req */}
-        <Grid item xs className={classes.three}>
+        <Grid item xs className={classes.three} >
           <Autocomplete
+            autoComplete={false}
             autoHighlight={false}
             options={['ZZZZ']}
             value={aircraftType}
             size="small"
             inputParams={{
+              error: !!errorField.aircraftType,
+              helperText: errorField.aircraftType,
               label: 'Тип ВС',
               name: 'aircraftType',
               inputProps: {
                 maxLength: 4,
                 style: { textTransform: 'uppercase' },
-                name: validationFields.aircraftType
+                name: validationFields.aircraftType.name,
+                autoComplete: 'off',
               }
             }}
-            onInputChange={(e, v) => aircraftTypeSet(id, v.toUpperCase())}
+            onChange={(e,v,r) => {
+              if(v) {
+                aircraftTypeSet(id, v.toUpperCase());
+                validateField(validationFields.aircraftType.name, v);
+              }
+            }}
+            onInputChange={(e, v, r) => {
+              aircraftTypeSet(id, v.toUpperCase());
+              validateField(validationFields.aircraftType.name, v);
+            }}
             renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
             clearOnEscape
             freeSolo
           />
         </Grid>
         {/* 4 req */}
-        <Grid item xs className={classes.four}>
+        <Grid item xs className={classes.four} >
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
             value={depAirport}
             size="small"
             inputParams={{
+              error: !!errorField.depAirport,
+              helperText: errorField.depAirport,
               label: 'А-д/П-п вылета',
               name: 'depAirport',
               inputProps: {
                 maxLength: 4,
                 style: { textTransform: 'uppercase' },
-                name: validationFields.depAirport
+                name: validationFields.depAirport.name,
+                autoComplete: 'off',
               }
             }}
-            onInputChange={(e, v) => depAirportSet(id, v.toUpperCase())}
+            onChange={(e,v,r) => {
+              if(v) {
+                depAirportSet(id, v.toUpperCase());
+                validateField(validationFields.depAirport.name, v);
+              }
+            }}
+            onInputChange={(e, v, r) => {
+              depAirportSet(id, v.toUpperCase());
+              validateField(validationFields.depAirport.name, v);
+            }}
             renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
             clearOnEscape
             freeSolo
           />
         </Grid>
         {/* 5 req */}
-        <Grid item xs className={classes.five}>
+        <Grid item xs className={classes.five} >
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
             value={destAirport}
             size="small"
             inputParams={{
+              error: !!errorField.destAirport,
+              helperText: errorField.destAirport,
               label: 'А-д/П-п посадки',
               name: 'destAirport',
               inputProps: {
                 maxLength: 4,
                 style: { textTransform: 'uppercase' },
-                name: validationFields.destAirport
+                name: validationFields.destAirport.name,
+                autoComplete: 'off',
               }
             }}
-            onInputChange={(e, v) => destAirportSet(id, v.toUpperCase())}
+            onChange={(e,v,r) => {
+              if(v) {
+                destAirportSet(id, v.toUpperCase());
+                validateField(validationFields.destAirport.name, v);
+              }
+            }}
+            onInputChange={(e, v) => {
+              destAirportSet(id, v.toUpperCase());
+              validateField(validationFields.destAirport.name, v);
+            }}
             renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
             clearOnEscape
             freeSolo
           />
         </Grid>
-        {/* 6 req */}
-        <Grid item xs className={classes.six}>
+        {/* 6  */}
+        <Grid item xs className={classes.six} >
           <TextField
             value={entryPoint}
             onChange={e => entryPointSet(id, e.target.value.toUpperCase())}
@@ -214,9 +305,11 @@ const z1View = ({
           />
         </Grid>
         {/* 7 req */}
-        <Grid item xs className={classes.seven}>
+        <Grid item xs className={classes.seven} >
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
+              error={!!errorField.entryTime}
+              helperText={errorField.entryTime}
               autoOk
               mask="__:__"
               ampm={false}
@@ -228,16 +321,20 @@ const z1View = ({
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={moment(entryTime).utc()}
-              onChange={v => entryTimeSet(id,v)}
+              format="HH:mm"
+              value={moment(entryTime, 'HH:mm')}
+              onChange={(d,v) => {
+                validateField(validationFields.entryTime.name, d);
+                entryTimeSet(id,moment(d).format('HH:mm'));
+              }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
               }}
             />
           </MuiPickersUtilsProvider>
         </Grid>
-        {/* 8 req */}
-        <Grid item xs className={classes.eight}>
+        {/* 8  */}
+        <Grid item xs className={classes.eight} >
           <TextField
             value={exitPoint}
             onChange={e => exitPointSet(id, e.target.value.toUpperCase())}
@@ -249,8 +346,8 @@ const z1View = ({
             }}
           />
         </Grid>
-        {/* 9 */}
-        <Grid item xs className={classes.nine}>
+        {/* 9     */}
+        <Grid item xs className={classes.nine} >
           <TextField
             value={regno}
             onChange={e => regnoSet(id, e.target.value.toUpperCase())}

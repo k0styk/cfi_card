@@ -38,10 +38,9 @@ const summaryView = ({
   enqueueSnackbar,
   archieve
 }) => {
-  const DeleteButton = ({...elementProps}) =>
-    (<div className="summary-button-delete" {...elementProps}>
-      <CancelIcon />
-    </div>);
+  const DeleteButton = ({ ...elementProps }) => (<div className="summary-button-delete" {...elementProps}>
+    <CancelIcon />
+  </div>);
   const ToArchieve = ({...elementProps}) => (<React.Fragment>
     <FontAwesomeIcon icon={faBox} className={classes.marginRight} {...elementProps} />в список на отправление
   </React.Fragment>);
@@ -50,6 +49,31 @@ const summaryView = ({
   </React.Fragment>);
   const classes = useStyles();
   const curSummary = summary.value.filter(v => v.id === id);
+
+  const [validation, setValidation] = React.useState({
+    z1Validated: 0, // 63
+    z2Validated: 15, // 31
+    z3Validated: 15, // 1 | 3 | 7 | 15
+    formValidated: 0 // 95 | 97 | 101 | 109
+  });
+  const z1ValidateHandle = state => {
+    // console.log(state);
+    setValidation({
+      ...validation,
+      formValidated: state + validation.z2Validated + validation.z3Validated,
+      z1Validated: state
+    });
+  };
+  const z2ValidateHandle = state => setValidation({
+    ...validation,
+    formValidated: state & validation.z1Validated & validation.z3Validated,
+    z2Validated: state
+  });
+  const z3ValidateHandle = state => setValidation({
+    ...validation,
+    formValidated: state & validation.z2Validated & validation.z1Validated,
+    z3Validated: state
+  });
 
   const handleClick = () => {
     archieveSet(id, !archieve);
@@ -88,13 +112,14 @@ const summaryView = ({
         </div>
         <Divider />
         <div className="summary-content">
-          <Z1View id={id} />
-          {curSummary[0].z2.map((v,idx) => <Z2View key={idx} id={id} z2id={v.id} />)}
-          <Z3View id={id} />
+          <Z1View id={id} handleValidate={z1ValidateHandle} />
+          {curSummary[0].z2.map((v,idx) => <Z2View key={idx} id={id} z2id={v.id} handleValidate={z2ValidateHandle} />)}
+          <Z3View id={id} handleValidate={z2ValidateHandle} />
         </div>
         <Divider />
         <div className="summary-footer">
           <Button
+            disabled={validation.formValidated===109?false:true}
             onClick={() => handleClick()}
             variant="contained"
             color="default"
