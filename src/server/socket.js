@@ -29,7 +29,6 @@ module.exports = socket => {
   // });
 
   socket.on(events.store.INITIAL, async (payload, action, cb) => {
-    console.log('GI');
     const client = global.dbClient;
     // const entities = await client.db(config.getValue('db').connection.dbName).collection('entities').findOne({});
     // const date = new Date();

@@ -48,33 +48,32 @@ const summaryView = ({
     <FontAwesomeIcon icon={faBoxOpen} className={classes.marginRight} {...elementProps} />в список
   </React.Fragment>);
   const classes = useStyles();
-  const curSummary = summary.value.filter(v => v.id === id);
-
+  const [curSummary] = summary.value.filter(v => v.id === id);
   const [validation, setValidation] = React.useState({
     z1Validated: 0, // 63
-    z2Validated: 15, // 31
-    z3Validated: 15, // 1 | 3 | 7 | 15
-    formValidated: 0 // 95 | 97 | 101 | 109
+    z2Validated: [], // 31 from 1, from 2 62
+    z3Validated: 0, // 1 | 3 | 7 | 15
   });
-  const z1ValidateHandle = state => {
-    // console.log(state);
+  const [formValidated, setFormValidation] = React.useState(0); // formValidated: 0 // 95 | 97 | 101 | 109
+  const z1ValidateHandle = state => setValidation({
+    ...validation,
+    z1Validated: state
+  });
+  const z2ValidateHandle = (id, state) => {
+    console.log(id, state);
+    const newVal = [...validation.z2Validated];
+
+    newVal[id] = state;
+
     setValidation({
       ...validation,
-      formValidated: state + validation.z2Validated + validation.z3Validated,
-      z1Validated: state
+      z2Validated: newVal
     });
   };
-  const z2ValidateHandle = state => setValidation({
-    ...validation,
-    formValidated: state & validation.z1Validated & validation.z3Validated,
-    z2Validated: state
-  });
   const z3ValidateHandle = state => setValidation({
     ...validation,
-    formValidated: state & validation.z2Validated & validation.z1Validated,
     z3Validated: state
   });
-
   const handleClick = () => {
     archieveSet(id, !archieve);
     enqueueSnackbar({
@@ -88,6 +87,22 @@ const summaryView = ({
       }
     });
   };
+  const eqValidationsHandle = () => {
+    const {z1,z2} = curSummary;
+    let retVal = 64; // 63 z1 + 1 z3
+
+    if(z1.aircraftType==='ZZZZ') retVal+=(1<<1);
+    if(z1.depAirport==='ZZZZ') retVal+=(1<<2);
+    if(z1.destAirport==='ZZZZ') retVal+=(1<<3);
+    retVal += (31*z2.length);
+
+    return !(formValidated === retVal);
+  };
+
+  React.useEffect(() => {
+    console.log(validation);
+    setFormValidation(validation.z1Validated+validation.z3Validated+validation.z2Validated.reduce((a,r) => a+r,0));
+  }, [validation]);
 
   return (
     <div className="summary-view">
@@ -103,7 +118,13 @@ const summaryView = ({
             <Button
               variant="contained"
               className={classes.button}
-              onClick={() => addZ2(id)}
+              onClick={() => {
+                addZ2(id);
+                setValidation({
+                  ...validation,
+                  z2Validated: [...validation.z2Validated, 0]
+                });
+              }}
             >
               <AddIcon className={classes.marginRight} />
               <b className={classes.marginSides}>Добавить Z2</b>
@@ -113,13 +134,15 @@ const summaryView = ({
         <Divider />
         <div className="summary-content">
           <Z1View id={id} handleValidate={z1ValidateHandle} />
-          {curSummary[0].z2.map((v,idx) => <Z2View key={idx} id={id} z2id={v.id} handleValidate={z2ValidateHandle} />)}
-          <Z3View id={id} handleValidate={z2ValidateHandle} />
+          {curSummary.z2.map((v,idx) =>
+            <Z2View key={idx} id={id} z2id={v.id} handleValidate={value => z2ValidateHandle((v.id-1), value)} />)
+          }
+          <Z3View id={id} handleValidate={z3ValidateHandle} />
         </div>
         <Divider />
         <div className="summary-footer">
           <Button
-            disabled={validation.formValidated===109?false:true}
+            disabled={eqValidationsHandle()}
             onClick={() => handleClick()}
             variant="contained"
             color="default"

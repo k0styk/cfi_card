@@ -184,7 +184,8 @@ const z1View = ({
             inputProps={{
               maxLength: 7,
               style: { textTransform: 'uppercase' },
-              name: validationFields.acftIdent.name
+              name: validationFields.acftIdent.name,
+              autoComplete: 'off',
             }}
           />
         </Grid>

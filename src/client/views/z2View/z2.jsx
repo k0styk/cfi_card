@@ -37,6 +37,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
+let validation = 30;//20; // entryTime + exitTime
 const z2View = ({
   id,
   z2id,
@@ -50,10 +51,11 @@ const z2View = ({
   // flyCtgSet,
   // countOfDepSet,
   // countOfAppSet
+  handleValidate
 }) => {
   const classes = useStyles();
-  const curSummary = summary.value.filter(v => v.id === id);
-  const curZ2 = curSummary[0].z2.filter(v => v.id === z2id);
+  const [curSummary] = summary.value.filter(v => v.id === id);
+  const curZ2 = curSummary.z2.filter(v => v.id === z2id);
   const [{
     code,
     entryPoint,
@@ -64,6 +66,93 @@ const z2View = ({
     // countOfDep,
     // countOfApp
   }] = curZ2;
+  const validationFields = {
+    code: {
+      name: 'code',
+      mask: 1<<0
+    },
+    entryPoint: {
+      name: 'entryPoint',
+      mask: 1<<1
+    },
+    entryTime: {
+      name: 'entryTime',
+      mask: 1<<2
+    },
+    exitPoint: {
+      name: 'exitPoint',
+      mask: 1<<3
+    },
+    exitTime: {
+      name: 'exitTime',
+      mask: 1<<4
+    }
+  };
+  const [errorField, setError] = React.useState({
+    code: '',
+    entryPoint: '',
+    entryTime: '',
+    exitPoint: '',
+    exitTime: '',
+  });
+  const validateField = (fieldName, value) => {
+    switch (fieldName) {
+      case validationFields.code.name:
+        if (value.length) {
+          setError({
+            ...errorField,
+            [fieldName]: ''
+          });
+          validation |= validationFields[fieldName].mask;
+          handleValidate(validation);
+        } else {
+          setError({
+            ...errorField,
+            [fieldName]: 'Обязательное поле'
+          });
+          validation &= (validationFields[fieldName].mask ^ 0xFFF);
+          handleValidate(validation);
+        }
+        break;
+      // TODO
+      case validationFields.entryPoint.name:
+        if(value._isValid) {
+          setError({
+            ...errorField,
+            [fieldName]: ''
+          });
+          validation |= validationFields[fieldName].mask;
+          handleValidate(validation);
+        } else {
+          setError({
+            ...errorField,
+            [fieldName]: 'Некорректная дата'
+          });
+          validation &= (validationFields[fieldName].mask ^ 0xFFF);
+          handleValidate(validation);
+        }
+        break;
+      case validationFields.entryTime.name:
+      case validationFields.exitPoint.name:
+      case validationFields.exitTime.name:
+        // if (value.length) {
+        //   setError({
+        //     ...errorField,
+        //     [fieldName]: ''
+        //   });
+        //   validation |= validationFields[fieldName].mask;
+        //   handleValidate(validation);
+        // } else {
+        //   setError({
+        //     ...errorField,
+        //     [fieldName]: 'Обязательное поле'
+        //   });
+        //   validation &= (validationFields[fieldName].mask ^ 0xFFF);
+        //   handleValidate(validation);
+        // }
+        // break;
+    }
+  };
 
   return (
     <div className="z2-view">
@@ -75,26 +164,47 @@ const z2View = ({
         {/* 1 req max 4 */}
         <Grid item xs className={classes.one}>
           <TextField
+            error={!!errorField.code}
+            helperText={errorField.code}
             value={code}
-            onChange={e => codeSet(id, z2id, e.target.value.toUpperCase())}
+            onChange={e => {
+              validateField(e.target.name, e.target.value);
+              codeSet(id, z2id, e.target.value.toUpperCase());
+            }}
             label="РЦ/МДП"
-            inputProps={{ maxLength: 4, style: { textTransform: 'uppercase' } }}
+            inputProps={{
+              maxLength: 4,
+              style: { textTransform: 'uppercase' },
+              name: validationFields.code.name,
+              autoComplete: 'off',
+            }}
           />
         </Grid>
         {/* 2 req max 11 */}
         <Grid item xs className={classes.two}>
           <InputMask
+            error={!!errorField.entryPoint}
+            helperText={errorField.entryPoint}
             mask="9999С99999В"
             value={entryPoint}
-            onChange={e => entryPointSet(id, z2id, e.target.value.toUpperCase())}
+            onChange={e => {
+              validateField(e.target.name, e.target.value);
+              entryPointSet(id, z2id, e.target.value.toUpperCase());
+            }}
             label="Вход в ВП к. A/C"
-            inputProps={{ maxLength: 12, style: { textTransform: 'uppercase' } }}
+            inputProps={{
+              maxLength: 12,
+              style: { textTransform: 'uppercase' },
+              name: validationFields.entryPoint.name
+            }}
           />
         </Grid>
         {/* 3 req */}
         <Grid item xs className={classes.three}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
+              error={!!errorField.entryTime}
+              helperText={errorField.entryTime}
               autoOk
               mask="__:__"
               ampm={false}
@@ -106,8 +216,11 @@ const z2View = ({
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={moment(entryTime).utc()}
-              onChange={v => entryTimeSet(id,z2id,v)}
+              value={moment(entryTime, 'HH:mm')}
+              onChange={(d,v) => {
+                validateField(validationFields.entryTime.name, d);
+                entryTimeSet(id,z2id,moment(d).format('HH:mm'));
+              }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
               }}
@@ -117,17 +230,28 @@ const z2View = ({
         {/* 4 req */}
         <Grid item xs className={classes.four}>
           <InputMask
+            error={!!errorField.exitPoint}
+            helperText={errorField.exitPoint}
             mask="9999С99999В"
             value={exitPoint}
-            onChange={e => exitPointSet(id, z2id, e.target.value.toUpperCase())}
+            onChange={e => {
+              validateField(e.target.name, e.target.value);
+              exitPointSet(id, z2id, e.target.value.toUpperCase());
+            }}
             label="Выход из ВП к. A/C"
-            inputProps={{ maxLength: 12, style: { textTransform: 'uppercase' } }}
+            inputProps={{
+              maxLength: 12,
+              style: { textTransform: 'uppercase' },
+              name: validationFields.exitPoint.name
+            }}
           />
         </Grid>
         {/* 5 req */}
         <Grid item xs className={classes.five}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
+              error={!!errorField.exitTime}
+              helperText={errorField.exitTime}
               autoOk
               mask="__:__"
               ampm={false}
@@ -139,8 +263,11 @@ const z2View = ({
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={moment(exitTime).utc()}
-              onChange={v => exitTimeSet(id,z2id,v)}
+              value={moment(exitTime, 'HH:mm')}
+              onChange={(d,v) => {
+                validateField(validationFields.exitTime.name, d);
+                exitTimeSet(id,z2id,moment(d).format('HH:mm'));
+              }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
               }}
