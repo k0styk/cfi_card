@@ -37,7 +37,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-let validation = 30;//20; // entryTime + exitTime
 const z2View = ({
   id,
   z2id,
@@ -51,7 +50,7 @@ const z2View = ({
   // flyCtgSet,
   // countOfDepSet,
   // countOfAppSet
-  handleValidate
+  setValid
 }) => {
   const classes = useStyles();
   const [curSummary] = summary.value.filter(v => v.id === id);
@@ -65,6 +64,7 @@ const z2View = ({
     // flyCtg,
     // countOfDep,
     // countOfApp
+    validation
   }] = curZ2;
   const validationFields = {
     code: {
@@ -95,6 +95,17 @@ const z2View = ({
     exitPoint: '',
     exitTime: '',
   });
+  const handleValidateWrapper = (fieldName, operation) => {
+    let val = 0;
+
+    if(operation) {
+      val = validation | validationFields[fieldName].mask;
+      setValid(id,z2id,val);
+    } else {
+      val = validation & (validationFields[fieldName].mask ^ 0xFFF);
+      setValid(id,z2id,val);
+    }
+  };
   const validateField = (fieldName, value) => {
     switch (fieldName) {
       case validationFields.code.name:
@@ -103,54 +114,47 @@ const z2View = ({
             ...errorField,
             [fieldName]: ''
           });
-          validation |= validationFields[fieldName].mask;
-          handleValidate(validation);
+          handleValidateWrapper(fieldName, 1);
         } else {
           setError({
             ...errorField,
             [fieldName]: 'Обязательное поле'
           });
-          validation &= (validationFields[fieldName].mask ^ 0xFFF);
-          handleValidate(validation);
+          handleValidateWrapper(fieldName, 0);
         }
         break;
-      // TODO
+      case validationFields.exitPoint.name:
       case validationFields.entryPoint.name:
+        if (value.indexOf('_') !== -1) {
+          setError({
+            ...errorField,
+            [fieldName]: 'Необходимо заполнить'
+          });
+          handleValidateWrapper(fieldName, 0);
+        } else {
+          setError({
+            ...errorField,
+            [fieldName]: ''
+          });
+          handleValidateWrapper(fieldName, 1);
+        }
+        break;
+      case validationFields.entryTime.name:
+      case validationFields.exitTime.name:
         if(value._isValid) {
           setError({
             ...errorField,
             [fieldName]: ''
           });
-          validation |= validationFields[fieldName].mask;
-          handleValidate(validation);
+          handleValidateWrapper(fieldName, 1);
         } else {
           setError({
             ...errorField,
             [fieldName]: 'Некорректная дата'
           });
-          validation &= (validationFields[fieldName].mask ^ 0xFFF);
-          handleValidate(validation);
+          handleValidateWrapper(fieldName, 0);
         }
         break;
-      case validationFields.entryTime.name:
-      case validationFields.exitPoint.name:
-      case validationFields.exitTime.name:
-        // if (value.length) {
-        //   setError({
-        //     ...errorField,
-        //     [fieldName]: ''
-        //   });
-        //   validation |= validationFields[fieldName].mask;
-        //   handleValidate(validation);
-        // } else {
-        //   setError({
-        //     ...errorField,
-        //     [fieldName]: 'Обязательное поле'
-        //   });
-        //   validation &= (validationFields[fieldName].mask ^ 0xFFF);
-        //   handleValidate(validation);
-        // }
-        // break;
     }
   };
 
@@ -313,7 +317,9 @@ const z2View = ({
           <Button
             variant="contained"
             className={classes.button}
-            onClick={() => removeZ2(id, z2id)}
+            onClick={() => {
+              removeZ2(id, z2id);
+            }}
           >
             <DeleteIcon />
             <b className={classes.marginSides}>Удалить</b>
@@ -337,6 +343,7 @@ const mdtp = dispatch => ({
   flyCtgSet:       (id, z2id, flyCtg)       => dispatch(summaryAction.z2.FLYCTG_SET({id, z2id, flyCtg})),
   countOfDepSet:   (id, z2id, countOfDep)   => dispatch(summaryAction.z2.COUNTOFDEP_SET({id, z2id, countOfDep})),
   countOfAppSet:   (id, z2id, countOfApp)   => dispatch(summaryAction.z2.COUNTOFAPP_SET({id, z2id, countOfApp})),
+  setValid:        (id, z2id, state)        => dispatch(summaryAction.z2.VALIDATION_SET({id, z2id, state}))
 });
 
 export default connect(mstp, mdtp)(z2View);

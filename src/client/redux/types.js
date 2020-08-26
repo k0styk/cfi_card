@@ -1,14 +1,15 @@
 module.exports.SOCKET = {
-  ADD_SOCKET:                                             'ADD_SOCKET',
-  REMOVE_SOCKET:                                          'REMOVE_SOCKET'
+  ADD_SOCKET:                                           'ADD_SOCKET',
+  REMOVE_SOCKET:                                        'REMOVE_SOCKET'
 };
 
 module.exports.SUMMARY = {
-  ADD:                                                    'SUMMARY_ADD',
-  REMOVE:                                                 'SUMMARY_REMOVE',
-  ADD_Z2:                                                 'SUMMARY_ADD_Z2',
-  REMOVE_Z2:                                              'SUMMARY_REMOVE_Z2',
-  ARCHIEVE:                                               'SUMMARY_ARCHIEVE_SET'
+  ADD:                                                  'SUMMARY_ADD',
+  REMOVE:                                               'SUMMARY_REMOVE',
+  ADD_Z2:                                               'SUMMARY_ADD_Z2',
+  REMOVE_Z2:                                            'SUMMARY_REMOVE_Z2',
+  ARCHIEVE:                                             'SUMMARY_ARCHIEVE_SET',
+  VALIDATION_SET:                                       'SUMMARY_VALIDATION_SET',
 };
 
 module.exports.Z1 = {
@@ -30,6 +31,7 @@ module.exports.Z1 = {
   EXITPOINT_REMOVE:                                     'Z1_EXITPOINT_REMOVE',
   REGNO_SET:                                            'Z1_REGNO_SET',
   REGNO_REMOVE:                                         'Z1_REGNO_REMOVE',
+  VALIDATION_SET:                                       'Z1_VALIDATION_SET',
 };
 
 module.exports.Z2 = {
@@ -49,41 +51,43 @@ module.exports.Z2 = {
   COUNTOFDEP_REMOVE:                                    'Z2_COUNTOFDEP_REMOVE',
   COUNTOFAPP_SET:                                       'Z2_COUNTOFAPP_SET',
   COUNTOFAPP_REMOVE:                                    'Z2_COUNTOFAPP_REMOVE',
+  VALIDATION_SET:                                       'Z2_VALIDATION_SET',
 };
 
 module.exports.Z3 = {
-  AIRSPACETYPE_SET:                                      'Z3_AIRSPACETYPE_SET',
-  AIRSPACETYPE_REMOVE:                                   'Z3_AIRSPACETYPE_REMOVE',
-  AIRCRAFTTYPENAME_SET:                                  'Z3_AIRCRAFTTYPENAME_SET',
-  AIRCRAFTTYPENAME_REMOVE:                               'Z3_AIRCRAFTTYPENAME_REMOVE',
-  DEPAIRPORTCOORD_SET:                                   'Z3_DEPAIRPORTCOORD_SET',
-  DEPAIRPORTCOORD_REMOVE:                                'Z3_DEPAIRPORTCOORD_REMOVE',
-  DESTAIRPORTCOORD_SET:                                  'Z3_DESTAIRPORTCOORD_SET',
-  DESTAIRPORTCOORD_REMOVE:                               'Z3_DESTAIRPORTCOORD_REMOVE',
-  AIRSPACETYPEGTIME_SET:                                 'Z3_AIRSPACETYPEGTIME_SET',
-  AIRSPACETYPEGTIME_REMOVE:                              'Z3_AIRSPACETYPEGTIME_REMOVE',
+  AIRSPACETYPE_SET:                                     'Z3_AIRSPACETYPE_SET',
+  AIRSPACETYPE_REMOVE:                                  'Z3_AIRSPACETYPE_REMOVE',
+  AIRCRAFTTYPENAME_SET:                                 'Z3_AIRCRAFTTYPENAME_SET',
+  AIRCRAFTTYPENAME_REMOVE:                              'Z3_AIRCRAFTTYPENAME_REMOVE',
+  DEPAIRPORTCOORD_SET:                                  'Z3_DEPAIRPORTCOORD_SET',
+  DEPAIRPORTCOORD_REMOVE:                               'Z3_DEPAIRPORTCOORD_REMOVE',
+  DESTAIRPORTCOORD_SET:                                 'Z3_DESTAIRPORTCOORD_SET',
+  DESTAIRPORTCOORD_REMOVE:                              'Z3_DESTAIRPORTCOORD_REMOVE',
+  AIRSPACETYPEGTIME_SET:                                'Z3_AIRSPACETYPEGTIME_SET',
+  AIRSPACETYPEGTIME_REMOVE:                             'Z3_AIRSPACETYPEGTIME_REMOVE',
+  VALIDATION_SET:                                       'Z3_VALIDATION_SET',
 };
 
 module.exports.UI = {
   NOTIFY: {
-    ENQUEUE_SNACKBAR:                                     'UI_NOTIFY_ENQUEUE',
-    CLOSE_SNACKBAR:                                       'UI_NOTIFY_CLOSE',
-    REMOVE_SNACKBAR:                                      'UI_NOTIFY_REMOVE'
+    ENQUEUE_SNACKBAR:                                   'UI_NOTIFY_ENQUEUE',
+    CLOSE_SNACKBAR:                                     'UI_NOTIFY_CLOSE',
+    REMOVE_SNACKBAR:                                    'UI_NOTIFY_REMOVE'
   },
   APP: {
-    CONNECTION:                                           'UI_APP_CONNECTION_SET',
-    ARCHIEVE:                                             'UI_APP_ARCHIEVE_SET'
+    CONNECTION:                                         'UI_APP_CONNECTION_SET',
+    ARCHIEVE:                                           'UI_APP_ARCHIEVE_SET'
   }
 };
 
 module.exports.ENTITIES = {};
 
 module.exports.DATE = {
-  SET_CLIENT:                                             'DATE_CLIENT_SET',
-  SET_SERVER:                                             'DATE_SERVER_SET',
-  REMOVE:                                                 'DATE_REMOVE'
+  SET_CLIENT:                                           'DATE_CLIENT_SET',
+  SET_SERVER:                                           'DATE_SERVER_SET',
+  REMOVE:                                               'DATE_REMOVE'
 };
 
 module.exports.INIT = {
-  INITIAL_ALL:                                            'INIT_INITIAL_ALL'
+  INITIAL_ALL:                                          'INIT_INITIAL_ALL'
 };

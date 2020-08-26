@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-let validation = 33; // default flyDate and entryTime are set, 2<<0 | 2<<<5 = 33
+// let validation = 33; // default flyDate and entryTime are set, 2<<0 | 2<<<5 = 33
 const z1View = ({
   id,
   summary,
@@ -47,10 +47,10 @@ const z1View = ({
   entryTimeSet,
   exitPointSet,
   regnoSet,
-  handleValidate
+  setValid,
 }) => {
   const classes = useStyles();
-  const curSummary = summary.value.filter(v => v.id === id);
+  const [curSummary] = summary.value.filter(v => v.id === id);
   const {
     flyDate,
     acftIdent,
@@ -60,8 +60,9 @@ const z1View = ({
     entryPoint,
     entryTime,
     exitPoint,
-    regno
-  } = curSummary[0].z1;
+    regno,
+    validation
+  } = curSummary.z1;
 
   const validationFields = {
     flyDate: {
@@ -97,6 +98,17 @@ const z1View = ({
     destAirport: '',
     entryTime: '',
   });
+  const handleValidateWrapper = (fieldName, operation) => {
+    let val = 0;
+
+    if(operation) {
+      val = validation | validationFields[fieldName].mask;
+      setValid(id,val);
+    } else {
+      val = validation & (validationFields[fieldName].mask ^ 0xFFF);
+      setValid(id,val);
+    }
+  };
   const validateField = (fieldName, value) => {
     switch (fieldName) {
       case validationFields.flyDate.name:
@@ -106,15 +118,13 @@ const z1View = ({
             ...errorField,
             [fieldName]: ''
           });
-          validation |= validationFields[fieldName].mask;
-          handleValidate(validation);
+          handleValidateWrapper(fieldName, 1);
         } else {
           setError({
             ...errorField,
             [fieldName]: 'Некорректная дата'
           });
-          validation &= (validationFields[fieldName].mask ^ 0xFFF);
-          handleValidate(validation);
+          handleValidateWrapper(fieldName, 0);
         }
         break;
       case validationFields.acftIdent.name:
@@ -126,15 +136,13 @@ const z1View = ({
             ...errorField,
             [fieldName]: ''
           });
-          validation |= validationFields[fieldName].mask;
-          handleValidate(validation);
+          handleValidateWrapper(fieldName, 1);
         } else {
           setError({
             ...errorField,
             [fieldName]: 'Обязательное поле'
           });
-          validation &= (validationFields[fieldName].mask ^ 0xFFF);
-          handleValidate(validation);
+          handleValidateWrapper(fieldName, 0);
         }
         break;
     }
@@ -216,8 +224,10 @@ const z1View = ({
               }
             }}
             onInputChange={(e, v, r) => {
-              aircraftTypeSet(id, v.toUpperCase());
-              validateField(validationFields.aircraftType.name, v);
+              if(r!=='reset') {
+                aircraftTypeSet(id, v.toUpperCase());
+                validateField(validationFields.aircraftType.name, v);
+              }
             }}
             renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
             clearOnEscape
@@ -250,8 +260,10 @@ const z1View = ({
               }
             }}
             onInputChange={(e, v, r) => {
-              depAirportSet(id, v.toUpperCase());
-              validateField(validationFields.depAirport.name, v);
+              if(r!=='reset') {
+                depAirportSet(id, v.toUpperCase());
+                validateField(validationFields.depAirport.name, v);
+              }
             }}
             renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
             clearOnEscape
@@ -283,9 +295,11 @@ const z1View = ({
                 validateField(validationFields.destAirport.name, v);
               }
             }}
-            onInputChange={(e, v) => {
-              destAirportSet(id, v.toUpperCase());
-              validateField(validationFields.destAirport.name, v);
+            onInputChange={(e,v,r) => {
+              if(r!=='reset') {
+                destAirportSet(id, v.toUpperCase());
+                validateField(validationFields.destAirport.name, v);
+              }
             }}
             renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
             clearOnEscape
@@ -366,7 +380,7 @@ const z1View = ({
 };
 
 const mstp = state => ({
-  summary: state.summary
+  summary: state.summary,
 });
 const mdtp = dispatch => ({
   flyDateSet:         (id, flyDate) => dispatch(summaryAction.z1.FLYDATE_SET({id, flyDate})),
@@ -378,6 +392,7 @@ const mdtp = dispatch => ({
   entryTimeSet:       (id, entryTime) => dispatch(summaryAction.z1.ENTRYTIME_SET({id, entryTime})),
   exitPointSet:       (id, exitPoint) => dispatch(summaryAction.z1.EXITPOINT_SET({id, exitPoint})),
   regnoSet:           (id, regno) => dispatch(summaryAction.z1.REGNO_SET({id, regno})),
+  setValid:           (id, state) => dispatch(summaryAction.z1.VALIDATION_SET({id, state}))
 });
 
 export default connect(mstp, mdtp)(z1View);

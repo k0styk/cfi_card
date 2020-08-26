@@ -12,6 +12,10 @@ export default {
    */
   archieveSet: payload => ({type: SUMMARY.ARCHIEVE, payload}),
   /**
+   * @param {{ id: number, fieldValidation: number, factValidation: number}} payload
+   */
+  validationSet: payload => ({type: SUMMARY.VALIDATION_SET, payload}),
+  /**
    * @param {{ id: number}} payload
    */
   addSummaryZ2: payload => ({type: SUMMARY.ADD_Z2,payload}),
@@ -20,6 +24,10 @@ export default {
    */
   removeSummaryZ2: payload => ({type: SUMMARY.REMOVE_Z2,payload}),
   z1: {
+    /**
+     * @param {{ id: number, state: number}} payload
+     */
+    VALIDATION_SET: payload => ({type: Z1.VALIDATION_SET, payload}),
     /**
      * @param {{ id: number, flyDate: string}} payload
      */
@@ -95,6 +103,10 @@ export default {
   },
   z2: {
     /**
+     * @param {{ id: number, z2id: number, state: number}} payload
+     */
+    VALIDATION_SET: payload => ({type: Z2.VALIDATION_SET, payload}),
+    /**
      * @param {{ id: number, z2id: number, code: string}} payload
      */
     CODE_SET: payload => ({ type: Z2.CODE_SET, payload }),
@@ -160,6 +172,10 @@ export default {
     COUNTOFAPP_REMOVE: payload => ({ type: Z2.COUNTOFAPP_REMOVE, payload }),
   },
   z3: {
+    /**
+     * @param {{ id: number, state: number}} payload
+     */
+    VALIDATION_SET: payload => ({type: Z3.VALIDATION_SET, payload}),
     /**
      * @param {{ id: number, airspaceType: string}} payload
      */

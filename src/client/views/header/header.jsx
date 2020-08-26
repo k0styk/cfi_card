@@ -1,6 +1,6 @@
 import './header.scss';
 import React from 'react';
-import { SwitchFolder, ConnectAdd } from '@views';
+import { SwitchFolder, ConnectAdd, UserView } from '@views';
 import { Logo, TimeView } from '@components';
 
 const header = ({ }) => (
@@ -9,6 +9,7 @@ const header = ({ }) => (
       <div className='header-block-icon'>
         <Logo />
         <TimeView />
+        <UserView />
       </div>
       <div className="center-block">
         <SwitchFolder />

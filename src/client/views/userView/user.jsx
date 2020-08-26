@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Avatar from '@material-ui/core/Avatar';
 import { deepOrange, green } from '@material-ui/core/colors';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     '& > *': {
@@ -26,9 +26,7 @@ const userView = ({user}) => {
   const classes = useStyles();
 
   return (
-    <Avatar variant="rounded" className={classes.rounded}>
-      ТЮМЕНЬ
-    </Avatar>
+    <Avatar variant="rounded" className={classes.rounded}>ТЮ</Avatar>
   );
 };
 

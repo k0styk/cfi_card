@@ -6,7 +6,6 @@ import { Z1View, Z2View, Z3View } from '@views';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { Divider, Button, Typography } from '@material-ui/core';
-import { Send } from '@material-ui/icons';
 import AddIcon from '@material-ui/icons/Add';
 import CancelIcon from '@material-ui/icons/Cancel';
 import moment from 'moment';
@@ -36,7 +35,8 @@ const summaryView = ({
   addZ2,
   archieveSet,
   enqueueSnackbar,
-  archieve
+  archieve,
+  validationSet
 }) => {
   const DeleteButton = ({ ...elementProps }) => (<div className="summary-button-delete" {...elementProps}>
     <CancelIcon />
@@ -49,33 +49,14 @@ const summaryView = ({
   </React.Fragment>);
   const classes = useStyles();
   const [curSummary] = summary.value.filter(v => v.id === id);
-  const [validation, setValidation] = React.useState({
-    z1Validated: 0, // 63
-    z2Validated: [], // 31 from 1, from 2 62
-    z3Validated: 0, // 1 | 3 | 7 | 15
-  });
-  const [formValidated, setFormValidation] = React.useState(0); // formValidated: 0 // 95 | 97 | 101 | 109
-  const z1ValidateHandle = state => setValidation({
-    ...validation,
-    z1Validated: state
-  });
-  const z2ValidateHandle = (id, state) => {
-    console.log(id, state);
-    const newVal = [...validation.z2Validated];
 
-    newVal[id] = state;
-
-    setValidation({
-      ...validation,
-      z2Validated: newVal
-    });
-  };
-  const z3ValidateHandle = state => setValidation({
-    ...validation,
-    z3Validated: state
-  });
   const handleClick = () => {
+    const val = curSummary.z1.validation+
+                curSummary.z3.validation+
+                curSummary.z2.reduce((a,r) => a+r.validation,0);
+
     archieveSet(id, !archieve);
+    validationSet(id, val, eqValidationsHandle());
     enqueueSnackbar({
       message: archieve?'Отправлено в список':'Отправлено в папку для отправления',
       options: {
@@ -89,20 +70,17 @@ const summaryView = ({
   };
   const eqValidationsHandle = () => {
     const {z1,z2} = curSummary;
+    /* default difinition */
     let retVal = 64; // 63 z1 + 1 z3
 
-    if(z1.aircraftType==='ZZZZ') retVal+=(1<<1);
-    if(z1.depAirport==='ZZZZ') retVal+=(1<<2);
-    if(z1.destAirport==='ZZZZ') retVal+=(1<<3);
-    retVal += (31*z2.length);
+    if(curSummary.z1.aircraftType ==='ZZZZ'||curSummary.z1.aircraftType ==='ЗЗЗЗ') retVal+=(1<<1);
+    if(curSummary.z1.depAirport   ==='ZZZZ'||curSummary.z1.depAirport   ==='ЗЗЗЗ') retVal+=(1<<2);
+    if(curSummary.z1.destAirport  ==='ZZZZ'||curSummary.z1.destAirport  ==='ЗЗЗЗ') retVal+=(1<<3);
+    retVal += (31*curSummary.z2.length);
+    /* default difinition */
 
-    return !(formValidated === retVal);
+    return retVal;
   };
-
-  React.useEffect(() => {
-    console.log(validation);
-    setFormValidation(validation.z1Validated+validation.z3Validated+validation.z2Validated.reduce((a,r) => a+r,0));
-  }, [validation]);
 
   return (
     <div className="summary-view">
@@ -118,13 +96,7 @@ const summaryView = ({
             <Button
               variant="contained"
               className={classes.button}
-              onClick={() => {
-                addZ2(id);
-                setValidation({
-                  ...validation,
-                  z2Validated: [...validation.z2Validated, 0]
-                });
-              }}
+              onClick={() => addZ2(id)}
             >
               <AddIcon className={classes.marginRight} />
               <b className={classes.marginSides}>Добавить Z2</b>
@@ -133,16 +105,21 @@ const summaryView = ({
         </div>
         <Divider />
         <div className="summary-content">
-          <Z1View id={id} handleValidate={z1ValidateHandle} />
+          <Z1View id={id} />
           {curSummary.z2.map((v,idx) =>
-            <Z2View key={idx} id={id} z2id={v.id} handleValidate={value => z2ValidateHandle((v.id-1), value)} />)
+            <Z2View key={idx} id={id} z2id={v.id} />)
           }
-          <Z3View id={id} handleValidate={z3ValidateHandle} />
+          <Z3View id={id} />
         </div>
         <Divider />
         <div className="summary-footer">
           <Button
-            disabled={eqValidationsHandle()}
+            disabled={
+              archieve?false:
+                !(curSummary.z1.validation+
+                  curSummary.z3.validation+
+                  curSummary.z2.reduce((a,r) => a+r.validation,0) === eqValidationsHandle())
+            }
             onClick={() => handleClick()}
             variant="contained"
             color="default"
@@ -160,11 +137,14 @@ const mstp = state => ({
   summary: state.summary,
   archieve: state.ui.app.archieve
 });
+/* eslint-disable */
 const mdtp = dispatch => ({
-  archieveSet: (id, archieve) => dispatch(summaryAction.archieveSet({id, archieve})),
-  removeSummary: id => dispatch(summaryAction.removeSummary({id})),
-  addZ2: id => dispatch(summaryAction.addSummaryZ2({id})),
-  enqueueSnackbar: (...args) => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+  archieveSet:      (id, archieve)  => dispatch(summaryAction.archieveSet({id, archieve})),
+  removeSummary:    id              => dispatch(summaryAction.removeSummary({id})),
+  addZ2:            id              => dispatch(summaryAction.addSummaryZ2({id})),
+  enqueueSnackbar:  (...args)       => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+  validationSet:    (id, fieldValidation, factValidation)  => dispatch(summaryAction.validationSet({id, fieldValidation, factValidation})),
 });
+/* eslint-enable */
 
 export default connect(mstp, mdtp)(summaryView);

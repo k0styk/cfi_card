@@ -8,7 +8,8 @@ const z1State = {
   entryPoint: '',
   entryTime: `${new Date().getHours()}:${new Date().getMinutes()}`,
   exitPoint: '',
-  regno: ''
+  regno: '',
+  validation:  33,
 };
 const z2State = {
   code: '',
@@ -18,14 +19,16 @@ const z2State = {
   exitTime: `${new Date().getHours()}:${new Date().getMinutes()}`,
   flyCtg: '',
   countOfDep: '',
-  countOfApp: ''
+  countOfApp: '',
+  validation: 20
 };
 const z3State = {
   airspaceType: '',
   aircraftTypeName: '',
   depAirportCoord: '',
   destAirportCoord: '',
-  airspaceTypeGTime: null
+  airspaceTypeGTime: null,
+  validation: 0
 };
 const initialState = {
   counter: 1,
@@ -42,6 +45,8 @@ export function summary(state = initialState, action) {
         id: state.counter,
         archieve: false,
         counter: 1,
+        fieldValidation: 0, // значение валидатора по полям
+        factValidation: 0, // какое значение валидации необходимо
         z1: z1State,
         z2: [],
         z3: z3State
@@ -97,8 +102,38 @@ export function summary(state = initialState, action) {
           return v;
         })
       };
+    case SUMMARY.VALIDATION_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              fieldValidation: p.fieldValidation,
+              factValidation: p.factValidation
+            };
+          }
+          return v;
+        })
+      };
     /* -----              SUMMARY END                                   ----- */
     /* -----              Z1 START                                      ----- */
+    case Z1.VALIDATION_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                validation: p.state
+              }
+            };
+          }
+          return v;
+        })
+      };
     case Z1.FLYDATE_SET:
       return {
         ...state,
@@ -389,6 +424,27 @@ export function summary(state = initialState, action) {
       };
     /* -----              Z1 END                                        ----- */
     /* -----              Z2 START                                      ----- */
+    case Z2.VALIDATION_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    validation: p.state
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
     case Z2.CODE_SET:
       return {
         ...state,
@@ -727,6 +783,22 @@ export function summary(state = initialState, action) {
       };
     /* -----              Z2 END                                        ----- */
     /* -----              Z3 START                                      ----- */
+    case Z3.VALIDATION_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                validation: p.state
+              }
+            };
+          }
+          return v;
+        })
+      };
     case Z3.AIRSPACETYPE_SET:
       return {
         ...state,

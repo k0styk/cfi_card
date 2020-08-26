@@ -25,7 +25,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-let validation = 0;
 const z3View = ({
   id,
   summary,
@@ -34,7 +33,7 @@ const z3View = ({
   depAirportCoordSet,
   destAirportCoordSet,
   // airspaceTypeGTimeSet
-  handleValidate
+  setValid
 }) => {
   const classes = useStyles();
   const [curSummary] = summary.value.filter(v => v.id === id);
@@ -44,9 +43,9 @@ const z3View = ({
     depAirportCoord,
     destAirportCoord,
     // airspaceTypeGTime,
+    validation
   } = curSummary.z3;
   const z2l = curSummary.z2.length;
-  const {z1} = curSummary;
 
   const validationFields = {
     airspaceType: {
@@ -67,12 +66,14 @@ const z3View = ({
     }
   };
   const handleValidateWrapper = (fieldName, operation) => {
+    let val = 0;
+
     if(operation) {
-      validation |= validationFields[fieldName].mask;
-      handleValidate(validation);
+      val = validation | validationFields[fieldName].mask;
+      setValid(id,val);
     } else {
-      validation &= (validationFields[fieldName].mask ^ 0xFFF);
-      handleValidate(validation);
+      val = validation & (validationFields[fieldName].mask ^ 0xFFF);
+      setValid(id,val);
     }
   };
   const validateField = (fieldName, value) => {
@@ -89,45 +90,37 @@ const z3View = ({
         }
         break;
       case validationFields.aircraftTypeName.name:
-        if(z1.aircraftType==='ZZZZ'&&value.length<1) {
-          handleValidateWrapper(fieldName,0);
-          // validation &= (validationFields[fieldName].mask ^ 0xFFF);
-          // handleValidate(validation);
-        } else {
-          handleValidateWrapper(fieldName,1);
-          // validation |= validationFields[fieldName].mask;
-          // handleValidate(validation);
-        }
+        if(curSummary.z1.aircraftType==='ZZZZ'||curSummary.z1.aircraftType==='ЗЗЗЗ') {
+          if(value.length) {
+            handleValidateWrapper(fieldName,1);
+          } else handleValidateWrapper(fieldName,0);
+        } else handleValidateWrapper(fieldName,0);
         break;
       case validationFields.depAirportCoord.name:
-        if(z1.depAirport==='ZZZZ') {
-          if(value.indexOf('_')!==-1) {
-            handleValidateWrapper(fieldName,0);
+        if (value.length > 0) {
+          if (curSummary.z1.depAirport === 'ZZZZ'||curSummary.z1.depAirport === 'ЗЗЗЗ') {
+            if (value.indexOf('_') !== -1) {
+              handleValidateWrapper(fieldName, 0);
+            } else {
+              handleValidateWrapper(fieldName, 1);
+            }
           } else {
-            handleValidateWrapper(fieldName, 1);
+            handleValidateWrapper(fieldName, 0);
           }
-        } else {
-          if(value.indexOf('_')!==-1) {
-            handleValidateWrapper(fieldName,0);
-          } else {
-            handleValidateWrapper(fieldName, 1);
-          }
-        }
+        } else handleValidateWrapper(fieldName, 0);
         break;
       case validationFields.destAirportCoord.name:
-        if(z1.destAirport==='ZZZZ') {
-          if(value.indexOf('_')!==-1) {
-            handleValidateWrapper(fieldName,0);
+        if (value.length > 0) {
+          if (curSummary.z1.destAirport === 'ZZZZ'||curSummary.z1.destAirport === 'ЗЗЗЗ') {
+            if (value.indexOf('_') !== -1) {
+              handleValidateWrapper(fieldName, 0);
+            } else {
+              handleValidateWrapper(fieldName, 1);
+            }
           } else {
-            handleValidateWrapper(fieldName, 1);
+            handleValidateWrapper(fieldName, 0);
           }
-        } else {
-          if(value.indexOf('_')!==-1) {
-            handleValidateWrapper(fieldName,0);
-          } else {
-            handleValidateWrapper(fieldName, 1);
-          }
-        }
+        } else handleValidateWrapper(fieldName, 0);
         break;
     }
   };
@@ -141,7 +134,7 @@ const z3View = ({
     return ['',false];
   };
   const errorResolverZ = (z1Val,val) => {
-    if(z1Val==='ZZZZ') {
+    if(z1Val==='ZZZZ'||z1Val==='ЗЗЗЗ') {
       if(!!!val||val.indexOf('_')!==-1) {
         return ['Необходимо заполнить', true];
       }
@@ -187,8 +180,8 @@ const z3View = ({
         {/* 2 req if z1 3 stay ZZZZ*/}
         <Grid item xs className={classes.two}>
           <TextField
-            error={errorResolverZ(z1.aircraftType, aircraftTypeName)[1]}
-            helperText={errorResolverZ(z1.aircraftType, aircraftTypeName)[0]}
+            error={errorResolverZ(curSummary.z1.aircraftType, aircraftTypeName)[1]}
+            helperText={errorResolverZ(curSummary.z1.aircraftType, aircraftTypeName)[0]}
             value={aircraftTypeName}
             onChange={e => {
               aircraftTypeNameSet(id, e.target.value.toUpperCase());
@@ -205,8 +198,8 @@ const z3View = ({
         {/* 3 req if z1 4 ZZZZ*/}
         <Grid item xs className={classes.three}>
           <InputMask
-            error={errorResolverZ(z1.depAirport, depAirportCoord)[1]}
-            helperText={errorResolverZ(z1.depAirport, depAirportCoord)[0]}
+            error={errorResolverZ(curSummary.z1.depAirport, depAirportCoord)[1]}
+            helperText={errorResolverZ(curSummary.z1.depAirport, depAirportCoord)[0]}
             mask="9999С99999В"
             value={depAirportCoord}
             onChange={e => {
@@ -224,8 +217,8 @@ const z3View = ({
         {/* 4 req if z1 5 ZZZZ*/}
         <Grid item xs className={classes.four}>
           <InputMask
-            error={errorResolverZ(z1.destAirport, destAirportCoord)[1]}
-            helperText={errorResolverZ(z1.destAirport, destAirportCoord)[0]}
+            error={errorResolverZ(curSummary.z1.destAirport, destAirportCoord)[1]}
+            helperText={errorResolverZ(curSummary.z1.destAirport, destAirportCoord)[0]}
             mask="9999С99999В"
             value={destAirportCoord}
             onChange={e => {
@@ -280,11 +273,12 @@ const z3View = ({
 /* eslint-disable */
 const mstp = state => ({ summary: state.summary });
 const mdtp = dispatch => ({
-  airspaceTypeSet:      (id, airspaceType) => dispatch(summaryAction.z3.AIRSPACETYPE_SET({id, airspaceType})),
-  aircraftTypeNameSet:  (id, aircraftTypeName) => dispatch(summaryAction.z3.AIRCRAFTTYPENAME_SET({id, aircraftTypeName})),
-  depAirportCoordSet:   (id, depAirportCoord) => dispatch(summaryAction.z3.DEPAIRPORTCOORD_SET({id, depAirportCoord})),
-  destAirportCoordSet:  (id, destAirportCoord) => dispatch(summaryAction.z3.DESTAIRPORTCOORD_SET({id, destAirportCoord})),
+  airspaceTypeSet:      (id, airspaceType)      => dispatch(summaryAction.z3.AIRSPACETYPE_SET({id, airspaceType})),
+  aircraftTypeNameSet:  (id, aircraftTypeName)  => dispatch(summaryAction.z3.AIRCRAFTTYPENAME_SET({id, aircraftTypeName})),
+  depAirportCoordSet:   (id, depAirportCoord)   => dispatch(summaryAction.z3.DEPAIRPORTCOORD_SET({id, depAirportCoord})),
+  destAirportCoordSet:  (id, destAirportCoord)  => dispatch(summaryAction.z3.DESTAIRPORTCOORD_SET({id, destAirportCoord})),
   airspaceTypeGTimeSet: (id, airspaceTypeGTime) => dispatch(summaryAction.z3.AIRSPACETYPEGTIME_SET({id, airspaceTypeGTime})),
+  setValid:             (id, state)             => dispatch(summaryAction.z3.VALIDATION_SET({id, state}))
 });
 /* eslint-enable */
 
