@@ -1,7 +1,7 @@
 {
-  "name": "cfi",
+  "name": "cfi_card",
   "version": "1.0.0",
-  "description": "Center Flight Information app",
+  "description": "Center Flight Information summary app",
   "private": true,
   "scripts": {
     "start1": "npx rimraf ./dist/ && concurrently \"npm:pm2\" \"npm:webpack\"",
@@ -22,7 +22,7 @@
     "lint:fix": "npx eslint --fix",
     "lint:fix-all": "npx eslint --fix src/client/**/*.js src/client/**/*.jsx src/server/**/*.js"
   },
-  "repository": "",
+  "repository": "https://git.ans.aero/Ertos/CFI_card",
   "keywords": [],
   "author": "",
   "license": "",
@@ -30,18 +30,23 @@
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
     "connect": "^3.7.0",
-    "connect-mongodb": "^1.1.5",
+    "connect-mongo": "^3.2.0",
     "cookie-parser": "^1.4.4",
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-session": "^1.17.1",
     "express-socket.io-session": "^1.3.5",
     "helmet": "^3.21.1",
+    "jwt-then": "^1.0.1",
     "memorystore": "^1.6.2",
     "moment": "^2.24.0",
     "mongodb": "^3.5.0",
+    "mongoose": "^5.10.1",
+    "morgan": "^1.10.0",
     "serialize-javascript": "^2.1.2",
     "serve-static": "^1.14.1",
     "socket.io": "^2.3.0",
+    "superagent": "^6.0.0",
     "uuid": "^8.0.0"
   },
   "engines": {

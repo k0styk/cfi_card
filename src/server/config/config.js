@@ -6,6 +6,7 @@ class Config {
     const file = path.resolve(
       `${__dirname}/${process.env.NODE_ENV}.config.json`
     );
+
     try {
       this.values = JSON.parse(fs.readFileSync(file));
     } catch(e) {
@@ -20,6 +21,11 @@ class Config {
     } else {
       return this.values[key];
     }
+  }
+
+  getAll() {
+    if(this.values) return this.values;
+    else null;
   }
 }
 

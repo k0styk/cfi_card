@@ -7,8 +7,10 @@ const { v4: uuidv4 } = require('uuid');
 const userData = {};
 
 module.exports = socket => {
-  // console.log('a user connected:',socket.id);
-  // io.on("connection", function (socket) {
+  console.log('a user connected:',socket.id);
+  console.log(socket.handshake);
+
+  // io.on('connection', function (socket) {
   //   // Accept a login event with user's data
   //   socket.on("login", function (userdata) {
   //     console.log('login');
@@ -154,3 +156,63 @@ module.exports = socket => {
   //   });
   // });
 };
+
+
+/*
+
+// wrong and old
+io.set('authorization', function(handshake, callback) {
+    handshake.cookies = cookie.parse(handshake.headers.cookie || '');
+    var sidCookie = handshake.cookies[cfg.session.key];
+    var sid = cookieParser.signedCookie(sidCookie, cfg.session.secret);
+    if(!sid){
+        log.error('Not session found');
+    }
+    redis.get('sess:'+sid, function(err, data) {
+        if(err){
+            log.error('io.authorization -> ',err);
+            return;
+        }
+        if(data){
+            handshake.user = jsonParse(data);
+            callback(null, true);
+        }
+    });
+});
+
+io.sockets.on('connection', (socket) => {
+    var userLogin = socket.handshake.user.LOGIN;
+    log.info("Socket is connect: "+userLogin);
+    socket.on('msg', (data) => {
+        log.info(data);
+        socket.emit('msg',{text:'server say:' + new Date()});
+    });
+    socket.on('disconnect', function() {
+        log.info("Socket is disconnect");
+    });
+});
+
+
+// new
+io.use(function(socket, next) {
+    var handshakeData = socket.request;
+    handshakeData.cookies = cookie.parse(handshakeData.headers.cookie || '');
+    var sidCookie = handshakeData.cookies[cfg.session.key];
+    var sid = cookieParser.signedCookie(sidCookie, cfg.session.secret);
+    if(!sid){
+        log.error('Not session found');
+    }
+    redis.get('sess:'+sid, function(err, data) {
+        if(err){
+            log.error('io.authorization -> ',err);
+            next(new Error('not authorized'));
+        }
+        if(data){
+            socket.handshake.user = jsonParse(data);
+            next();
+        }
+    });
+
+});
+
+*/
