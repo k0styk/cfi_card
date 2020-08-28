@@ -103,17 +103,16 @@ const z1View = ({
 
     if(operation) {
       val = validation | validationFields[fieldName].mask;
-      setValid(id,val);
     } else {
       val = validation & (validationFields[fieldName].mask ^ 0xFFF);
-      setValid(id,val);
     }
+    setValid(id,val);
   };
   const validateField = (fieldName, value) => {
     switch (fieldName) {
       case validationFields.flyDate.name:
       case validationFields.entryTime.name:
-        if(value._isValid) {
+        if(value&&value._isValid) {
           setError({
             ...errorField,
             [fieldName]: ''
@@ -253,7 +252,7 @@ const z1View = ({
                 autoComplete: 'off',
               }
             }}
-            onChange={(e,v,r) => {
+            onChange={(e,v) => {
               if(v) {
                 depAirportSet(id, v.toUpperCase());
                 validateField(validationFields.depAirport.name, v);

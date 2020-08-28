@@ -1,23 +1,34 @@
 import './app.scss';
 import React from 'react';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { initialAction, socketAction, uiAction } from './redux/actions';
-import { Header, MainView } from '@views';
+import { Header } from '@views';
+import { IndexPage, LoginPage, RegisterPage, SummaryPage } from '@pages';
 import { Notifier } from '@components';
 import io from 'socket.io-client';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.socket = null;
   }
 
   componentDidMount() {
-    const { setSocket, InitState, notify, connected, closeNotify } = this.props;
+    const {
+      setSocket,
+      InitState,
+      notify,
+      connected,
+      closeNotify
+    } = this.props;
     const socket = io({
       reconnectionAttempts: 4,
       reconnectionDelay: 3000,
       reconnectionDelayMax: 10000
     });
+
+    this.socket = socket;
 
     socket.on('connect', () => {
       connected(true);
@@ -83,11 +94,59 @@ class App extends React.Component {
     InitState();
   }
 
+  setupSocket() {
+    const {token} = this.props;
+
+    if (token && !this.socket) {
+      // console.log(token);
+      // const newSocket = io("/", {
+      //   query: {
+      //     token: token,
+      //   },
+      // });
+
+      // newSocket.on("disconnect", () => {
+      //   setSocket(null);
+      //   setTimeout(setupSocket, 3000);
+      //   makeToast("error", "Socket Disconnected!");
+      // });
+
+      // newSocket.on("connect", () => {
+      //   makeToast("success", "Socket Connected!");
+      // });
+
+      // setSocket(newSocket);
+    }
+  };
+
   render() {
     return (
       <div className='app-wrapper'>
         <Header />
-        <MainView />
+        <BrowserRouter>
+          <Switch>
+            <Route
+              path="/"
+              component={IndexPage}
+              exact
+            />
+            <Route
+              path="/login"
+              component={LoginPage}
+              exact
+            />
+            <Route
+              path="/register"
+              component={RegisterPage}
+              exact
+            />
+            <Route
+              path="/summary"
+              component={SummaryPage}
+              exact
+            />
+          </Switch>
+        </BrowserRouter>
         <Notifier />
       </div>
     );
@@ -95,7 +154,8 @@ class App extends React.Component {
 };
 
 const mstp = state => ({
-  notifications: state.notifications
+  notifications: state.notifications,
+  token: state.user.token
 });
 
 const mdtp = dispatch => ({

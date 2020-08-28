@@ -20,7 +20,7 @@ const build = ph => path.join(__dirname, 'dist', ph?ph:'');
 const common = merge([
   {
     entry: {
-      'index': source('/server/entrypoint.js')
+      'index': source('server/entrypoint.js')
     },
     output: {
       path: build(),
@@ -31,10 +31,11 @@ const common = merge([
       extensions: ['.js', '.jsx'],
       alias: {
         '@': source(),
-        '@components': path.resolve(__dirname, 'src/client/components/'),
-        '@views': path.resolve(__dirname, 'src/client/views/'),
-        '@redux': path.resolve(__dirname, 'src/client/redux/'),
-        '@client': path.resolve(__dirname, 'src/client/'),
+        '@components': source('client/components/'),
+        '@views': source('client/views/'),
+        '@pages': source('client/pages/'),
+        '@redux': source('client/redux/'),
+        '@client': source('client/'),
       }
     },
     plugins: [

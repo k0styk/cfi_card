@@ -70,23 +70,18 @@ const z3View = ({
 
     if(operation) {
       val = validation | validationFields[fieldName].mask;
-      setValid(id,val);
     } else {
       val = validation & (validationFields[fieldName].mask ^ 0xFFF);
-      setValid(id,val);
     }
+    setValid(id,val);
   };
   const validateField = (fieldName, value) => {
     switch (fieldName) {
       case validationFields.airspaceType.name:
         if(value==='G'&&z2l) {
           handleValidateWrapper(fieldName,0);
-          // validation &= (validationFields[fieldName].mask ^ 0xFFF);
-          // handleValidate(validation);
         } else {
           handleValidateWrapper(fieldName,1);
-          // validation |= validationFields[fieldName].mask;
-          // handleValidate(validation);
         }
         break;
       case validationFields.aircraftTypeName.name:
@@ -174,7 +169,7 @@ const z3View = ({
             select
           >
             {['A','C','G','CG'].map((v,i) =>
-              <MenuItem disabled={(v==='G' && !!z2l)} key={i} value={v}>{v}</MenuItem>)}
+              <MenuItem disabled={(v==='G' && !!z2l)} key={v} value={v}>{v}</MenuItem>)}
           </TextField>
         </Grid>
         {/* 2 req if z1 3 stay ZZZZ*/}

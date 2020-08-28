@@ -100,11 +100,10 @@ const z2View = ({
 
     if(operation) {
       val = validation | validationFields[fieldName].mask;
-      setValid(id,z2id,val);
     } else {
       val = validation & (validationFields[fieldName].mask ^ 0xFFF);
-      setValid(id,z2id,val);
     }
+    setValid(id,z2id,val);
   };
   const validateField = (fieldName, value) => {
     switch (fieldName) {
@@ -141,7 +140,7 @@ const z2View = ({
         break;
       case validationFields.entryTime.name:
       case validationFields.exitTime.name:
-        if(value._isValid) {
+        if(value&&value._isValid) {
           setError({
             ...errorField,
             [fieldName]: ''

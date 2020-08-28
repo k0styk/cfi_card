@@ -106,8 +106,8 @@ const summaryView = ({
         <Divider />
         <div className="summary-content">
           <Z1View id={id} />
-          {curSummary.z2.map((v,idx) =>
-            <Z2View key={idx} id={id} z2id={v.id} />)
+          {curSummary.z2.map(v =>
+            <Z2View key={new Date().getTime()+Math.random().toString(16).substring(2, 8)} id={id} z2id={v.id} />)
           }
           <Z3View id={id} />
         </div>

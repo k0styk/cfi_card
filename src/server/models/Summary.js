@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 
 const summarySchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: 'Name is required!',
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: 'User is required!',
+      ref: 'User',
     },
     rights: {
       type: String,

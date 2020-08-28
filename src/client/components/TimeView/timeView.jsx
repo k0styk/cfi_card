@@ -1,15 +1,13 @@
 // @ts-check
 import React from 'react';
-import { connect } from 'react-redux';
 import './timeView.scss';
-import cx from 'classnames';
+import { connect } from 'react-redux';
 import moment from 'moment';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 
 const TimeView = ({date,...elementProps}) => {
-  const css = cx('time-view-component');
   const [diffTime, setDiffTime] = React.useState(0);
   const [time, setTime] = React.useState('00:00:00');
   let timeId;
@@ -29,7 +27,7 @@ const TimeView = ({date,...elementProps}) => {
     return () => timeId && clearTimeout(timeId);
   }, [time]);
 
-  return (<div className={css} {...elementProps}>
+  return (<div className="time-view-component" {...elementProps}>
     <FontAwesomeIcon icon={faClock} mask={['far', 'circle']}/>
     <span className="time-span">{time}</span>
   </div>);

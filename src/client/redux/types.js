@@ -3,6 +3,11 @@ module.exports.SOCKET = {
   REMOVE_SOCKET:                                        'REMOVE_SOCKET'
 };
 
+module.exports.USER = {
+  SET:                                                  'USER_SET',
+  RESET:                                                'USER_RESET'
+};
+
 module.exports.SUMMARY = {
   ADD:                                                  'SUMMARY_ADD',
   REMOVE:                                               'SUMMARY_REMOVE',

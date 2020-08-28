@@ -1,9 +1,14 @@
-module.exports.constant = {
-  EVENT_NAME: 'EVENT_NAME'
-};
-
 module.exports.ui = {
   GET_DATE_FROM_SERVER: 'GET_DATE_FROM_SERVER'
+};
+
+module.exports.user = {
+  login: 'login',
+  login_success: 'login_successfull',
+  login_err: 'login_err',
+  logout: 'logout',
+  logout_success: 'logout_successfull',
+  logout_err: 'logout_err',
 };
 
 module.exports.store = {
