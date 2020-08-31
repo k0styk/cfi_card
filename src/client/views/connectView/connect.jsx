@@ -17,10 +17,9 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const conAdd = ({connected, archieve, socket, addSummary}) => {
+const conAdd = ({connected,archieve,socket,addSummary,userId}) => {
   const classes = useStyles();
-
-  return connected?(archieve?
+  const Component = () => connected?(archieve?
     (
       <Fab
         variant="extended"
@@ -60,12 +59,14 @@ const conAdd = ({connected, archieve, socket, addSummary}) => {
         Подключиться
       </Fab>
     );
+
+  return <Component />;
 };
 
-const mstp = state => ({
-  archieve: state.ui.app.archieve,
-  connected: state.ui.app.connected,
-  socket: state.socket
+const mstp = ({socket,ui}) => ({
+  archieve: ui.app.archieve,
+  connected: ui.app.connected,
+  socket: socket,
 });
 
 const mdtp = dispatch => ({

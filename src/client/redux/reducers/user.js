@@ -1,6 +1,5 @@
 import { USER, INIT } from '../types';
-const initialState = {
-  token: '',
+const initialState = { // clear this
   description: '',
   displayName: '',
   rights: '',

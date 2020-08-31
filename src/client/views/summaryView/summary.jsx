@@ -34,7 +34,7 @@ const summaryView = ({
   removeSummary,
   addZ2,
   archieveSet,
-  enqueueSnackbar,
+  notify,
   archieve,
   validationSet
 }) => {
@@ -57,7 +57,7 @@ const summaryView = ({
 
     archieveSet(id, !archieve);
     validationSet(id, val, eqValidationsHandle());
-    enqueueSnackbar({
+    notify({
       message: archieve?'Отправлено в список':'Отправлено в папку для отправления',
       options: {
         autoHideDuration: 3000,
@@ -142,7 +142,7 @@ const mdtp = dispatch => ({
   archieveSet:      (id, archieve)  => dispatch(summaryAction.archieveSet({id, archieve})),
   removeSummary:    id              => dispatch(summaryAction.removeSummary({id})),
   addZ2:            id              => dispatch(summaryAction.addSummaryZ2({id})),
-  enqueueSnackbar:  (...args)       => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+  notify:           (...args)       => dispatch(uiAction.notify.enqueueSnackbar(...args)),
   validationSet:    (id, fieldValidation, factValidation)  => dispatch(summaryAction.validationSet({id, fieldValidation, factValidation})),
 });
 /* eslint-enable */

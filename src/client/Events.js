@@ -9,6 +9,13 @@ module.exports.user = {
   logout: 'logout',
   logout_success: 'logout_successfull',
   logout_err: 'logout_err',
+  register: 'register',
+  register_success: 'register_success',
+  register_err: 'register_err',
+};
+
+module.exports.summary = {
+  save: 'summary_save',
 };
 
 module.exports.store = {

@@ -1,15 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-const IndexPage = props => {
+const IndexPage = ({id, history}) => {
   React.useEffect(() => {
-    const {token} = props;
-
-    console.log(token);
-    if (!token) {
-      props.history.push('/login');
+    console.log(id);
+    if (!id) {
+      history.push('/login');
     } else {
-      props.history.push('/summary');
+      history.push('/summary');
     }
     // eslint-disable-next-line
   }, [0]);
@@ -17,7 +15,7 @@ const IndexPage = props => {
 };
 
 const mstp = state => ({
-  token: state.user.token
+  id: state.user.id
 });
 
 const mdtp = dispatch => ({});

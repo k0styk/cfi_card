@@ -36,25 +36,25 @@ exports.register = async (req, res) => {
   });
 };
 
-exports.login = async (req, res) => {
-  const { login, password } = req.body;
-  const user = await User.findOne({
-    login,
-    password: global.hashPass(password, config.salt),
-  });
+// exports.login = async (req, res) => {
+//   const { login, password } = req.body;
+//   const user = await User.findOne({
+//     login,
+//     password: global.hashPass(password, config.salt),
+//   });
 
-  if (!user) throw 'Nickname and Password did not match.';
+//   if (!user) throw 'Nickname and Password did not match.';
 
-  const token = await jwt.sign({
-    id: user.id,
-    description: user.description,
-    department: user.department,
-    displayName: user.displayName,
-    rights: user.rights
-  }, config.secret);
+//   const token = await jwt.sign({
+//     id: user.id,
+//     description: user.description,
+//     department: user.department,
+//     displayName: user.displayName,
+//     rights: user.rights
+//   }, config.secret);
 
-  res.json({
-    message: 'User logged in successfully!',
-    token,
-  });
-};
+//   res.json({
+//     message: 'User logged in successfully!',
+//     token,
+//   });
+// };

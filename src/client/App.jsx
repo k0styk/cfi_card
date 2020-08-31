@@ -1,3 +1,4 @@
+import 'normalize.css';
 import './app.scss';
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
@@ -94,31 +95,6 @@ class App extends React.Component {
     InitState();
   }
 
-  setupSocket() {
-    const {token} = this.props;
-
-    if (token && !this.socket) {
-      // console.log(token);
-      // const newSocket = io("/", {
-      //   query: {
-      //     token: token,
-      //   },
-      // });
-
-      // newSocket.on("disconnect", () => {
-      //   setSocket(null);
-      //   setTimeout(setupSocket, 3000);
-      //   makeToast("error", "Socket Disconnected!");
-      // });
-
-      // newSocket.on("connect", () => {
-      //   makeToast("success", "Socket Connected!");
-      // });
-
-      // setSocket(newSocket);
-    }
-  };
-
   render() {
     return (
       <div className='app-wrapper'>
@@ -155,15 +131,14 @@ class App extends React.Component {
 
 const mstp = state => ({
   notifications: state.notifications,
-  token: state.user.token
 });
 
 const mdtp = dispatch => ({
-  setSocket: socket => dispatch(socketAction.setSocket(socket)),
-  InitState: () => dispatch(initialAction()),
-  notify: (...args) => dispatch(uiAction.notify.enqueueSnackbar(...args)),
-  closeNotify: key => dispatch(uiAction.notify.closeSnackbar(key)),
-  connected: connected => dispatch(uiAction.app.setConnection({connected}))
+  setSocket:    socket      => dispatch(socketAction.setSocket(socket)),
+  InitState:    ()          => dispatch(initialAction()),
+  notify:       (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+  closeNotify:  key         => dispatch(uiAction.notify.closeSnackbar(key)),
+  connected:    connected   => dispatch(uiAction.app.setConnection({connected}))
 });
 
 export default connect(mstp,mdtp)(App);

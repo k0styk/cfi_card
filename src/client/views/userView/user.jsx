@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import { makeStyles } from '@material-ui/core/styles';
-import Avatar from '@material-ui/core/Avatar';
 import { deepOrange, green } from '@material-ui/core/colors';
 
 const useStyles = makeStyles(theme => ({
@@ -26,7 +25,9 @@ const userView = ({user}) => {
   const classes = useStyles();
 
   return (
-    <Avatar variant="rounded" className={classes.rounded}>ТЮ</Avatar>
+    <div className="user-view">
+      {user.displayName || user.login}
+    </div>
   );
 };
 

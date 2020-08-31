@@ -3,10 +3,6 @@ import { withRouter } from 'react-router-dom';
 
 import { MainView } from '@views';
 
-const SummaryPage = props => {
-  console.log('Summary');
-
-  return <MainView />;
-};
+const SummaryPage = ({}) => <MainView />;
 
 export default SummaryPage;

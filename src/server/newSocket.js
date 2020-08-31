@@ -4,7 +4,8 @@ const mongoose = require('mongoose');
 
 const events = require('../client/Events');
 const socketMiddleware = require('./middlewares/socket');
-const {config} = global;
+const userController = require('./controllers/userController');
+const { config } = global;
 
 /* usage SESSION */
 // const session = socket.request.session; // eslint-disable-line
@@ -25,17 +26,21 @@ module.exports = server => {
   io.on('connection', socket => {
     console.log('Socket connected: ', socket.id);
 
-    socket.on(events.user.login, async ({login, password}, cb) => {
+    socket.on('disconnect', () => {
+      console.log('Disconnected: user[' + socket.request.session.userId + '] socket[' + socket.id + ']');
+    });
+
+    socket.on(events.user.login, async ({login,password}, cb) => {
       const session = socket.request.session; // eslint-disable-line
 
-      if(session.userId) {
-        if(session.token) {
-          console.log('User ['+login+'] is logged in yet!');
-          cb({eventName: events.user.login_err, message: 'User [ '+login+' ] is logged in yet!'});
+      if (session.userId) {
+        if (session.token) {
+          console.log('User [ ' + login + ' ] is logged in yet!');
+          cb({eventName:events.user.login_err,message:'User [ '+login+' ] is logged in yet!'});
           return;
         }
         console.log('No session token!');
-        cb({eventName: events.user.login_err, message: 'Holy crap! Its crashed, try relogin'});
+        cb({eventName:events.user.login_err,message:'Holy crap! Its crashed, try relogin'});
         return;
       }
       const user = await User.findOne({
@@ -48,9 +53,10 @@ module.exports = server => {
         message = 'Login [ '+login+' ] and Password did not match.';
 
         console.log(message);
-        cb({eventName: events.user.login_err, message});
+        cb({eventName:events.user.login_err,message});
       } else {
         const tokenOpts = {
+          login: user.login,
           id: user.id,
           rights: user.rights,
           description: user.description,
@@ -62,33 +68,74 @@ module.exports = server => {
         session.token = token;
         session.userId = user.id;
         session.save();
-        cb({eventName: events.user.login_success, token, message});
+        cb({eventName:events.user.login_success,token,message});
       }
     });
 
     socket.on(events.user.logout, async ({}, cb) => {
       const session = socket.request.session; // eslint-disable-line
-      if(session.userId) {
-        if(session.token) {
+      if (session.userId) {
+        if (session.token) {
           delete session.token;
           delete session.userId;
           session.save();
           console.log('Logout');
-          cb({eventName: events.user.logout_success, message: 'Logout successfull'});
+          cb({eventName:events.user.logout_success,message:'Logout successfull'});
+          return;
         }
         console.log('No session token!');
-        cb({eventName: events.user.login_err, message: 'Holy crap! Its crashed, try relogin'});
+        cb({eventName:events.user.login_err,message:'Holy crap! Its crashed, try relogin'});
         return;
       } else {
         console.log('Nobody logout');
-        cb({eventName: events.user.logout_err, message: 'Nobody logout'});
+        cb({eventName:events.user.logout_err,message:'Nobody logout'});
         return;
       };
     });
 
-    socket.on('disconnect', () => {
-      console.log('Disconnected: ' + socket.userId);
+    socket.on(events.user.register, async ({
+      login,
+      password,
+      description,
+      displayName,
+      department,
+      rights
+    }, cb) => {
+      let message = 'Register [ '+login+' ] successfull';
+
+      if (login.length < 2) {
+        message = 'Login must be atleast 2 characters long.';
+        cb({eventName:events.user.register_err,message});
+        return;
+      };
+      if (password.length < 6){
+        message = 'Password must be atleast 6 characters long.';
+        cb({eventName:events.user.register_err,message});
+        return;
+      }
+      const userExists = await User.findOne({ login });
+
+      if (userExists) {
+        message = 'User with same login already exits.';
+        cb({eventName:events.user.register_err,message});
+        return;
+      };
+
+      const user = new User({
+        login,
+        password: global.hashPass(password, config.salt),
+        description: description?description:undefined,
+        displayName: displayName?displayName:undefined,
+        department: department?department:undefined,
+        rights: rights?rights:undefined,
+      });
+
+      await user.save();
+      message = 'User [ ' + login + ' ] registered successfully!';
+      cb({eventName:events.user.register_success,message});
     });
+
+    socket.on(events.summary.save, async () => { /* IMPLEMENT */ });
 
     socket.on('chatroomMessage', async ({ chatroomId, message }) => {
       // if (message.trim().length > 0) {
@@ -109,17 +156,14 @@ module.exports = server => {
     });
 
     socket.on(events.store.INITIAL, async (payload, action, cb) => {
-      // const client = global.dbClient;
       const session = socket.request.session; // eslint-disable-line
-      // const entities = await client.db(config.getValue('db').connection.dbName).collection('entities').findOne({});
-      // const date = new Date();
       let userObj = null;
 
-      if(session.userId) {
-        if(session.token) {
+      if (session.userId) {
+        if (session.token) {
           const payload = await jwt.verify(session.token, config.secret);
 
-          userObj = {...payload};
+          userObj = { ...payload };
         }
       }
 
