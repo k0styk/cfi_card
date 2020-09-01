@@ -156,7 +156,7 @@ const z3View = ({
             fullWidth
             id="select"
             label="Класс ВП"
-            value={airspaceType}
+            value={airspaceType?airspaceType:''}
             onChange={e => {
               airspaceTypeSet(id, e.target.value.toUpperCase());
               validateField(e.target.name, e.target.value);

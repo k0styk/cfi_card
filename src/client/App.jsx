@@ -13,6 +13,30 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.socket = null;
+
+    function AuthWrapper(WrappedComponent) {
+      return class extends React.Component {
+        constructor(props) {
+          super(props);
+        }
+
+        componentDidMount() {
+          console.log(props);
+          const id = localStorage.getItem('userId');
+
+          if (!id) {
+            props.histoty.push('/login');
+          }
+        }
+
+        render() {
+          // Оборачиваем компонент в контейнер без мутаций. Супер!
+          return <WrappedComponent {...this.props} />;
+        }
+      };
+    };
+
+    this.Component = AuthWrapper(SummaryPage);
   }
 
   componentDidMount() {
@@ -96,6 +120,8 @@ class App extends React.Component {
   }
 
   render() {
+    const { Component } = this;
+
     return (
       <div className='app-wrapper'>
         <Header />
@@ -118,7 +144,10 @@ class App extends React.Component {
             />
             <Route
               path="/summary"
-              component={SummaryPage}
+              render={props => {
+                console.log(props);
+                return <Component {...props} />;
+              }}
               exact
             />
           </Switch>
@@ -134,11 +163,11 @@ const mstp = state => ({
 });
 
 const mdtp = dispatch => ({
-  setSocket:    socket      => dispatch(socketAction.setSocket(socket)),
-  InitState:    ()          => dispatch(initialAction()),
-  notify:       (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
-  closeNotify:  key         => dispatch(uiAction.notify.closeSnackbar(key)),
-  connected:    connected   => dispatch(uiAction.app.setConnection({connected}))
+  setSocket: socket => dispatch(socketAction.setSocket(socket)),
+  InitState: () => dispatch(initialAction()),
+  notify: (...args) => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+  closeNotify: key => dispatch(uiAction.notify.closeSnackbar(key)),
+  connected: connected => dispatch(uiAction.app.setConnection({ connected }))
 });
 
-export default connect(mstp,mdtp)(App);
+export default connect(mstp, mdtp)(App);

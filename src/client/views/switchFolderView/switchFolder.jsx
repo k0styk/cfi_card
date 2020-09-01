@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { uiAction } from '@redux/actions';
 
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, ButtonGroup } from '@material-ui/core';
+import { Button, ButtonGroup, Badge } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArchive, faThList } from '@fortawesome/free-solid-svg-icons';
 
@@ -17,34 +17,57 @@ const useStyles = makeStyles(theme => ({
       margin: theme.spacing(1),
     },
   },
-  marginRight: {
-    marginRight: theme.spacing(1)
+  margin: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+  },
+  marginR: {
+    marginRight: theme.spacing(1),
   }
 }));
 
-const switchFolder = ({archiveSet, archieve}) => {
+const switchFolder = ({archiveSet, archieve, summary}) => {
   const classes = useStyles();
+  const getLengthList = () => summary.value.filter(v => v.archieve === false).length;
+  const getLengthArchieve = () => summary.value.filter(v => v.archieve === true).length;
 
   return (<div className={classes.root}>
     <ButtonGroup variant="text" color="primary" aria-label="text primary button group">
       <Button color={`${!archieve?'secondary':'primary'}`}
         onClick={() => archiveSet(false)}
       >
-        <FontAwesomeIcon icon={faThList} className={classes.marginRight} />
         Список
+        <Badge
+          className={classes.marginR}
+          badgeContent={getLengthList()}
+          max={99}
+          color={`${!archieve?'secondary':'primary'}`}
+          showZero
+        >
+          <FontAwesomeIcon icon={faThList} className={classes.margin} />
+        </Badge>
       </Button>
       <Button color={`${archieve?'secondary':'primary'}`}
         onClick={() => archiveSet(true)}
       >
-        <FontAwesomeIcon icon={faArchive} className={classes.marginRight} />
         Для отправления
+        <Badge
+          className={classes.marginR}
+          badgeContent={getLengthArchieve()}
+          max={99}
+          color={`${archieve?'secondary':'primary'}`}
+          showZero
+        >
+          <FontAwesomeIcon icon={faArchive} className={classes.margin} />
+        </Badge>
       </Button>
     </ButtonGroup>
   </div>);
 };
 
-const mstp = state => ({
-  archieve: state.ui.app.archieve
+const mstp = ({ui, summary}) => ({
+  archieve: ui.app.archieve,
+  summary
 });
 
 const mdtp = dispatch => ({

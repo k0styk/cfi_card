@@ -24,7 +24,7 @@ module.exports = server => {
 
   io.use(socketMiddleware);
   io.on('connection', socket => {
-    console.log('Socket connected: ', socket.id);
+    // console.log('Socket connected: ', socket.id);
 
     socket.on('disconnect', () => {
       console.log('Disconnected: user[' + socket.request.session.userId + '] socket[' + socket.id + ']');
@@ -35,8 +35,10 @@ module.exports = server => {
 
       if (session.userId) {
         if (session.token) {
-          console.log('User [ ' + login + ' ] is logged in yet!');
-          cb({eventName:events.user.login_err,message:'User [ '+login+' ] is logged in yet!'});
+          const payload = await jwt.verify(session.token, config.secret);
+
+          console.log('User [ ' + login + ' ] try sign in, session for [ '+payload.login+' ]');
+          cb({eventName:events.user.login_err,message:'You must logout before sign in!'});
           return;
         }
         console.log('No session token!');

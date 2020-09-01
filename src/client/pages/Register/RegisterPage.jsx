@@ -3,31 +3,53 @@ import { connect } from 'react-redux';
 import { uiAction } from '../../redux/actions';
 import { user as userEvents } from '../../Events';
 
+import {
+  MenuItem,TextField, Button, InputLabel, Backdrop,
+  InputAdornment, IconButton, Input, FormControl } from '@material-ui/core';
+import { Visibility, VisibilityOff } from '@material-ui/icons';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+  button: {
+    margin: theme.spacing(1),
+    paddingRight: theme.spacing(2),
+    paddingLeft: theme.spacing(2),
+  },
+  marginSides: {
+    margin: theme.spacing(2),
+    marginRight: theme.spacing(3),
+    marginLeft: theme.spacing(3)
+  }
+}));
+
 const RegisterPage = ({ history, socket, notify, user }) => {
-  const loginRef = React.createRef();
-  const passwordRef = React.createRef();
-  const descriptionRef = React.createRef();
-  const displayNameRef = React.createRef();
-  const departmentRef = React.createRef();
-  const rightsRef = user.rights === 'admin'?React.createRef():undefined;
+  const classes = useStyles();
+  const defaultValues = {
+    login: '',
+    password: '',
+    showPassword: false,
+    description: '',
+    displayName: '',
+    department: '',
+    rights: undefined,
+  };
+  const [values, setValues] = React.useState(defaultValues);
+  const handleChange = prop => event => {
+    console.log(event.target);
+    setValues({ ...values, [prop]: event.target.value });
+  };
+  const handleClickShowPassword = () => {
+    setValues({ ...values, showPassword: !values.showPassword });
+  };
+  const handleMouseDownPassword = event => {
+    event.preventDefault();
+  };
 
-  const registerUser = () => {
-    const login = loginRef.current.value;
-    const password = passwordRef.current.value;
-    const description = descriptionRef.current.value;
-    const displayName = displayNameRef.current.value;
-    const department = departmentRef.current.value;
-    const rights = rightsRef && rightsRef.current.value;
+  const registerUser = e => {
+    e.preventDefault();
+    const formData = {...values};
 
-    const formData = {
-      login,
-      password,
-      description,
-      displayName,
-      department,
-      rights
-    };
-
+    delete formData.showPassword;
     socket.emit(userEvents.register, formData, ({ eventName, message }) => {
       if (eventName === userEvents.register_err) {
         console.error(message);
@@ -41,10 +63,7 @@ const RegisterPage = ({ history, socket, notify, user }) => {
       }
       if (eventName === userEvents.register_success) {
         console.log(message);
-
-        setTimeout(() => {
-          history.push('/login');
-        }, 2000);
+        setValues(defaultValues);
         notify({
           message,
           options: {
@@ -57,72 +76,112 @@ const RegisterPage = ({ history, socket, notify, user }) => {
   };
 
   return (
-    <div className='card'>
-      <div className='cardHeader'>Registration</div>
-      <div className='cardBody'>
-        <div className='inputGroup'>
-          <label htmlFor='Login'>Login</label>
-          <input
-            type='text'
-            name='login'
-            id='login'
-            placeholder='Enter login here...'
-            ref={loginRef}
-          />
+    <form onSubmit={registerUser}>
+      <div className='card'>
+        <div className='cardHeader'>Регистрация</div>
+        <div className='cardBody'>
+          <div className={classes.marginSides}>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="login">Логин</InputLabel>
+              <Input
+                fullWidth
+                maxLength="30"
+                id="login"
+                value={values.login}
+                onChange={handleChange('login')}
+              />
+            </FormControl>
+          </div>
+          <div className={classes.marginSides}>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="password">Пароль</InputLabel>
+              <Input
+                fullWidth
+                maxLength="30"
+                id="password"
+                type={values.showPassword ? 'text' : 'password'}
+                value={values.password}
+                onChange={handleChange('password')}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
+                    >
+                      {values.showPassword ? <Visibility /> : <VisibilityOff />}
+                    </IconButton>
+                  </InputAdornment>
+                }
+              />
+            </FormControl>
+          </div>
+          <div className={classes.marginSides}>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="displayName">Отображаемое имя</InputLabel>
+              <Input
+                fullWidth
+                maxLength="30"
+                id="displayName"
+                value={values.displayName}
+                onChange={handleChange('displayName')}
+              />
+            </FormControl>
+          </div>
+          <div className={classes.marginSides}>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="description">Описание</InputLabel>
+              <Input
+                fullWidth
+                maxLength="30"
+                id="description"
+                value={values.description}
+                onChange={handleChange('description')}
+              />
+            </FormControl>
+          </div>
+          <div className={classes.marginSides}>
+            <FormControl fullWidth>
+              <InputLabel htmlFor="department">Подразделение</InputLabel>
+              <Input
+                fullWidth
+                maxLength="30"
+                id="department"
+                value={values.department}
+                onChange={handleChange('department')}
+              />
+            </FormControl>
+          </div>
+          {user.rights === 'admin' || user.rights === 'manager' ? <div className={classes.marginSides}>
+            <FormControl fullWidth>
+              <TextField
+                fullWidth
+                id="rights"
+                label="Роль"
+                value={values.rights?values.rights:''}
+                onChange={handleChange('rights')}
+                select
+              >
+                {['user', 'manager', user.rights === 'admin'?'admin':''].map((v, i) =>
+                  v?<MenuItem disabled={(v === 'G' && !!z2l)} key={v} value={v}>{v}</MenuItem>:null)
+                }
+              </TextField>
+            </FormControl>
+          </div> : null}
+          <div className="button-block">
+            <Button
+              className={classes.button}
+              color="primary"
+              variant="contained"
+              type="submit"
+            >
+              Зарегистрировать
+            </Button>
+          </div>
+          {/* <button onClick={registerUser}>Зарегистрировать</button> */}
         </div>
-        <div className='inputGroup'>
-          <label htmlFor='password'>Password</label>
-          <input
-            type='password'
-            name='password'
-            id='password'
-            placeholder='Enter Password here...'
-            ref={passwordRef}
-          />
-        </div>
-        <div className='inputGroup'>
-          <label htmlFor='displayName'>Display name</label>
-          <input
-            type='text'
-            name='displayName'
-            id='displayName'
-            placeholder='Display name on header'
-            ref={displayNameRef}
-          />
-        </div>
-        <div className='inputGroup'>
-          <label htmlFor='description'>Description</label>
-          <input
-            type='text'
-            name='description'
-            id='description'
-            placeholder='Some words...'
-            ref={descriptionRef}
-          />
-        </div>
-        <div className='inputGroup'>
-          <label htmlFor='department'>department</label>
-          <input
-            type='text'
-            name='department'
-            id='department'
-            placeholder='Department'
-            ref={departmentRef}
-          />
-        </div>
-        {user.rights === 'admin'?<div className='inputGroup'>
-          <label htmlFor='rights'>rights</label>
-          <input
-            type='text'
-            name='rights'
-            id='rights'
-            placeholder='user default'
-            ref={rightsRef}
-          />
-        </div>:null}
-        <button onClick={registerUser}>Register</button>
       </div>
-    </div>
+    </form>
   );
 };
 

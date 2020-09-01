@@ -1,9 +1,9 @@
 import React from 'react';
-import { connect } from 'react-redux';
 
-const IndexPage = ({id, history}) => {
+const IndexPage = ({history}) => {
   React.useEffect(() => {
-    console.log(id);
+    const id = localStorage.getItem('userId');
+
     if (!id) {
       history.push('/login');
     } else {
@@ -14,10 +14,4 @@ const IndexPage = ({id, history}) => {
   return <div></div>;
 };
 
-const mstp = state => ({
-  id: state.user.id
-});
-
-const mdtp = dispatch => ({});
-
-export default connect(mstp,mdtp)(IndexPage);
+export default IndexPage;
