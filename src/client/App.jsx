@@ -1,42 +1,19 @@
 import 'normalize.css';
 import './app.scss';
+import { initialAction, socketAction, uiAction } from '@redux/actions';
+import { IndexPage, LoginPage, RegisterPage, SummaryPage } from '@pages';
+import { Notifier } from '@components';
+import { Header } from '@views';
+
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { initialAction, socketAction, uiAction } from './redux/actions';
-import { Header } from '@views';
-import { IndexPage, LoginPage, RegisterPage, SummaryPage } from '@pages';
-import { Notifier } from '@components';
 import io from 'socket.io-client';
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.socket = null;
-
-    function AuthWrapper(WrappedComponent) {
-      return class extends React.Component {
-        constructor(props) {
-          super(props);
-        }
-
-        componentDidMount() {
-          console.log(props);
-          const id = localStorage.getItem('userId');
-
-          if (!id) {
-            props.histoty.push('/login');
-          }
-        }
-
-        render() {
-          // Оборачиваем компонент в контейнер без мутаций. Супер!
-          return <WrappedComponent {...this.props} />;
-        }
-      };
-    };
-
-    this.Component = AuthWrapper(SummaryPage);
   }
 
   componentDidMount() {
@@ -120,12 +97,10 @@ class App extends React.Component {
   }
 
   render() {
-    const { Component } = this;
-
     return (
       <div className='app-wrapper'>
-        <Header />
         <BrowserRouter>
+          <Header />
           <Switch>
             <Route
               path="/"
@@ -144,10 +119,7 @@ class App extends React.Component {
             />
             <Route
               path="/summary"
-              render={props => {
-                console.log(props);
-                return <Component {...props} />;
-              }}
+              component={SummaryPage}
               exact
             />
           </Switch>

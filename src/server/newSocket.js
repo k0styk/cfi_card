@@ -95,6 +95,21 @@ module.exports = server => {
       };
     });
 
+    socket.on(events.user.checkAuth, async ({ id }, cb) => {
+      const isLogged = false;
+      const session = socket.request.session; // eslint-disable-line
+
+      if (session.userId) {
+        if (session.userId === id) {
+          cb({ isLogged: true });
+        } else {
+          cb({isLogged});
+        }
+      } else {
+        cb({isLogged});
+      }
+    });
+
     socket.on(events.user.register, async ({
       login,
       password,

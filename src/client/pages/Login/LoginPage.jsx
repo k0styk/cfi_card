@@ -75,7 +75,9 @@ const LoginPage = ({ socket, setUser, removeUser, notify, history }) => {
   const loginUser = e => {
     e.preventDefault();
     setLoader(true);
-    const { login, password } = values;
+    // const { login, password } = values;
+    const login = 'kostyk';
+    const password = '12345678';
 
     setTimeout(() => {
       try {

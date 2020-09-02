@@ -12,6 +12,7 @@ module.exports.user = {
   register: 'register',
   register_success: 'register_success',
   register_err: 'register_err',
+  checkAuth: 'checkAuth',
 };
 
 module.exports.summary = {

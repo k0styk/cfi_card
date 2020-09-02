@@ -1,17 +1,28 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-const IndexPage = ({history}) => {
-  React.useEffect(() => {
+import { user as userEvents } from '../../Events';
+
+const IndexPage = ({history, socket}) => {
+  React.useLayoutEffect(() => {
     const id = localStorage.getItem('userId');
 
-    if (!id) {
-      history.push('/login');
-    } else {
-      history.push('/summary');
+    if(socket.emit) {
+      socket.emit(userEvents.checkAuth, ({id}), ({isLogged}) => {
+        if(isLogged) {
+          history.push('/summary');
+        } else {
+          history.push('/login');
+        }
+      });
     }
-    // eslint-disable-next-line
-  }, [0]);
-  return <div></div>;
+  }, [socket]);
+
+  return <div />;
 };
 
-export default IndexPage;
+const mstp = state => ({
+  socket: state.socket,
+});
+
+export default connect(mstp,{})(IndexPage);

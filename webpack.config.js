@@ -8,11 +8,9 @@ const images = require('./webpack/images');
 const babel = require('./webpack/babel');
 const lintJS = require('./webpack/js.lint');
 const extractCSS = require('./webpack/css.extract');
-const fonts = require('./webpack/fonts');
 const devserver = require('./webpack/devserver');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-// const copy = require('./webpack/copy');
 
 const source = ph => path.join(__dirname, 'src', ph?ph:'');
 const build = ph => path.join(__dirname, 'dist', ph?ph:'');

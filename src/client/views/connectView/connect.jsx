@@ -7,6 +7,7 @@ import { Fab } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlug, faDolly } from '@fortawesome/free-solid-svg-icons';
 import AddIcon from '@material-ui/icons/Add';
+import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -17,9 +18,16 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const conAdd = ({connected,archieve,socket,addSummary,userId}) => {
+const conAdd = ({connected,archieve,socket,addSummary}) => {
+  const [render, setRender] = React.useState(false);
   const classes = useStyles();
-  const Component = () => connected?(archieve?
+  const location = useLocation();
+
+  React.useEffect(() => {
+    setRender(/summary/gi.test(location.pathname));
+  }, [location]);
+
+  const Component = () => connected?(render?archieve?
     (
       <Fab
         variant="extended"
@@ -45,7 +53,7 @@ const conAdd = ({connected,archieve,socket,addSummary,userId}) => {
         <AddIcon className={classes.extendedIcon}/>
         Добавить сводку
       </Fab>
-    )):
+    ):null):
     (
       <Fab
         variant="extended"

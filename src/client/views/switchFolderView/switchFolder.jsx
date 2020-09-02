@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Button, ButtonGroup, Badge } from '@material-ui/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArchive, faThList } from '@fortawesome/free-solid-svg-icons';
+import { useLocation } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -30,8 +31,14 @@ const switchFolder = ({archiveSet, archieve, summary}) => {
   const classes = useStyles();
   const getLengthList = () => summary.value.filter(v => v.archieve === false).length;
   const getLengthArchieve = () => summary.value.filter(v => v.archieve === true).length;
+  const [render, setRender] = React.useState(false);
+  const location = useLocation();
 
-  return (<div className={classes.root}>
+  React.useEffect(() => {
+    setRender(/summary/gi.test(location.pathname));
+  }, [location]);
+
+  return render?(<div className={classes.root}>
     <ButtonGroup variant="text" color="primary" aria-label="text primary button group">
       <Button color={`${!archieve?'secondary':'primary'}`}
         onClick={() => archiveSet(false)}
@@ -62,7 +69,7 @@ const switchFolder = ({archiveSet, archieve, summary}) => {
         </Badge>
       </Button>
     </ButtonGroup>
-  </div>);
+  </div>):null;
 };
 
 const mstp = ({ui, summary}) => ({

@@ -1,10 +1,9 @@
 import './header.scss';
 import React from 'react';
-import { connect } from 'react-redux';
 import { Logo, TimeView } from '@components';
 import { SwitchFolder, ConnectAdd, UserView } from '@views';
 
-const header = ({userId}) => (
+const header = ({}) => (
   <div className='header-wrapper grid-header'>
     <div className='header'>
       <div className='header-block-icon'>
@@ -13,18 +12,13 @@ const header = ({userId}) => (
         <UserView />
       </div>
       <div className="center-block">
-        {userId?<SwitchFolder />:null}
+        <SwitchFolder />
       </div>
       <div className='block-buttons'>
-        {userId?<ConnectAdd />:null}
+        <ConnectAdd />
       </div>
     </div>
   </div>
 );
 
-const mstp = ({user}) => ({
-  userId: user.id
-});
-const mdtp = dispatch => ({});
-
-export default connect(mstp,mdtp)(header);
+export default header;
