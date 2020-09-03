@@ -9,6 +9,7 @@ import {
   InputAdornment, IconButton, Input, FormControl } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -27,7 +28,8 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const LoginPage = ({ socket, setUser, removeUser, notify, history }) => {
+const LoginPage = ({socket,setUser,logout,notify}) => {
+  const history = useHistory();
   const classes = useStyles();
   const [loader, setLoader] = React.useState(false);
   const [values, setValues] = React.useState({
@@ -61,7 +63,7 @@ const LoginPage = ({ socket, setUser, removeUser, notify, history }) => {
         console.log(message);
 
         localStorage.clear();
-        removeUser();
+        logout();
         notify({
           message,
           options: {
@@ -97,6 +99,7 @@ const LoginPage = ({ socket, setUser, removeUser, notify, history }) => {
             console.log(message);
             const payload = JSON.parse(atob(token.split('.')[1]));
 
+            localStorage.setItem('user', JSON.stringify(payload));
             localStorage.setItem('userId', payload.id);
             setUser(payload);
             notify({
@@ -106,7 +109,7 @@ const LoginPage = ({ socket, setUser, removeUser, notify, history }) => {
                 variant: 'success',
               }
             });
-            setTimeout(() => history.push('/'), 600);
+            setTimeout(() => history.replace('/summary'), 600);
             setLoader(false);
           }
         });
@@ -194,14 +197,13 @@ const LoginPage = ({ socket, setUser, removeUser, notify, history }) => {
   );
 };
 
-const mstp = ({ socket }) => ({
-  socket
-});
-
-const mdtp = dispatch => ({
-  setUser:    (...args)   => dispatch(userAction.setUser(...args)),
-  removeUser: ()          => dispatch(userAction.removeUser()),
-  notify:     (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
-});
-
-export default connect(mstp, mdtp)(LoginPage);
+export default connect(
+  ({ socket }) => ({
+    socket
+  }),
+  dispatch => ({
+    setUser:    (...args)   => dispatch(userAction.setUser(...args)),
+    logout:     ()          => dispatch(userAction.logoutUser()),
+    notify:     (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+  })
+)(LoginPage);

@@ -8,8 +8,8 @@ export function setUser(payload) {
   };
 }
 
-export function removeUser() {
+export function logoutUser() {
   return {
-    type: USER.RESET
+    type: USER.LOGOUT
   };
 }

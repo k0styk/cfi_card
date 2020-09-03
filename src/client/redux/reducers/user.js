@@ -13,7 +13,6 @@ export function user(state = initialState, action) {
         ...state,
         ...action.payload
       };
-    case USER.RESET: return initialState;
     case INIT.INITIAL_ALL:
       return action.payload.user?{
         ...state,

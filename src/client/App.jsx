@@ -6,9 +6,29 @@ import { Notifier } from '@components';
 import { Header } from '@views';
 
 import React from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import io from 'socket.io-client';
+
+const PrivateRoute = ({ component: Component, redirect, socket, ...rest }) => (
+  (<Route
+    {...rest}
+    render={props => {
+      if(localStorage.getItem('userId')) {
+        return (<Component {...props} />);
+      } else {
+        return (<Redirect
+          to={{
+            pathname: redirect,
+            state: {
+              from: props.location
+            }
+          }}
+        />);
+      }
+    }}
+  />)
+);
 
 class App extends React.Component {
   constructor(props) {
@@ -98,8 +118,8 @@ class App extends React.Component {
 
   render() {
     return (
-      <div className='app-wrapper'>
-        <BrowserRouter>
+      <BrowserRouter>
+        <div className='app-wrapper'>
           <Header />
           <Switch>
             <Route
@@ -117,21 +137,26 @@ class App extends React.Component {
               component={RegisterPage}
               exact
             />
-            <Route
+            <PrivateRoute
+              socket={this.props.socket}
               path="/summary"
+              redirect="/login"
+              condition={this.props.user}
               component={SummaryPage}
               exact
             />
           </Switch>
-        </BrowserRouter>
-        <Notifier />
-      </div>
+          <Notifier />
+        </div>
+      </BrowserRouter>
     );
   }
 };
 
 const mstp = state => ({
   notifications: state.notifications,
+  user: state.user,
+  socket: state.socket
 });
 
 const mdtp = dispatch => ({
@@ -139,7 +164,7 @@ const mdtp = dispatch => ({
   InitState: () => dispatch(initialAction()),
   notify: (...args) => dispatch(uiAction.notify.enqueueSnackbar(...args)),
   closeNotify: key => dispatch(uiAction.notify.closeSnackbar(key)),
-  connected: connected => dispatch(uiAction.app.setConnection({ connected }))
+  connected: connected => dispatch(uiAction.app.setConnection({ connected })),
 });
 
 export default connect(mstp, mdtp)(App);

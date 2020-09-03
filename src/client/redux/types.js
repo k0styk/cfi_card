@@ -1,11 +1,12 @@
 module.exports.SOCKET = {
   ADD_SOCKET:                                           'ADD_SOCKET',
-  REMOVE_SOCKET:                                        'REMOVE_SOCKET'
+  REMOVE_SOCKET:                                        'REMOVE_SOCKET',
 };
 
 module.exports.USER = {
   SET:                                                  'USER_SET',
-  RESET:                                                'USER_RESET'
+  RESET:                                                'USER_RESET',
+  LOGOUT:                                               'USER_LOGOUT',
 };
 
 module.exports.SUMMARY = {
@@ -77,11 +78,11 @@ module.exports.UI = {
   NOTIFY: {
     ENQUEUE_SNACKBAR:                                   'UI_NOTIFY_ENQUEUE',
     CLOSE_SNACKBAR:                                     'UI_NOTIFY_CLOSE',
-    REMOVE_SNACKBAR:                                    'UI_NOTIFY_REMOVE'
+    REMOVE_SNACKBAR:                                    'UI_NOTIFY_REMOVE',
   },
   APP: {
     CONNECTION:                                         'UI_APP_CONNECTION_SET',
-    ARCHIEVE:                                           'UI_APP_ARCHIEVE_SET'
+    ARCHIEVE:                                           'UI_APP_ARCHIEVE_SET',
   }
 };
 
@@ -90,9 +91,9 @@ module.exports.ENTITIES = {};
 module.exports.DATE = {
   SET_CLIENT:                                           'DATE_CLIENT_SET',
   SET_SERVER:                                           'DATE_SERVER_SET',
-  REMOVE:                                               'DATE_REMOVE'
+  REMOVE:                                               'DATE_REMOVE',
 };
 
 module.exports.INIT = {
-  INITIAL_ALL:                                          'INIT_INITIAL_ALL'
+  INITIAL_ALL:                                          'INIT_INITIAL_ALL',
 };

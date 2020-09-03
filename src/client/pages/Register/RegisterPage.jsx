@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const RegisterPage = ({ history, socket, notify, user }) => {
+const RegisterPage = ({socket,notify,user}) => {
   const classes = useStyles();
   const defaultValues = {
     login: '',
@@ -35,7 +35,6 @@ const RegisterPage = ({ history, socket, notify, user }) => {
   };
   const [values, setValues] = React.useState(defaultValues);
   const handleChange = prop => event => {
-    console.log(event.target);
     setValues({ ...values, [prop]: event.target.value });
   };
   const handleClickShowPassword = () => {
@@ -178,7 +177,6 @@ const RegisterPage = ({ history, socket, notify, user }) => {
               Зарегистрировать
             </Button>
           </div>
-          {/* <button onClick={registerUser}>Зарегистрировать</button> */}
         </div>
       </div>
     </form>

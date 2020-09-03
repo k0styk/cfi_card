@@ -1,10 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import { MainView } from '@views';
 import { user as userEvents } from '../../Events';
 
-const SummaryPage = ({history, socket }) => {
+const SummaryPage = ({socket}) => {
+  const history = useHistory();
 
   React.useLayoutEffect(() => {
     const id = localStorage.getItem('userId');
@@ -12,17 +14,18 @@ const SummaryPage = ({history, socket }) => {
     if(socket.emit) {
       socket.emit(userEvents.checkAuth, ({id}), ({isLogged}) => {
         if(!isLogged) {
-          history.push('/login');
+          history.replace('/login');
         }
       });
     }
-  }, [socket]);
+  });
 
   return <MainView />;
 };
 
-const mstp = state => ({
-  socket: state.socket,
-});
-
-export default connect(mstp,{})(SummaryPage);
+export default connect(
+  ({socket}) => ({
+    socket,
+  }),
+  {}
+)(SummaryPage);

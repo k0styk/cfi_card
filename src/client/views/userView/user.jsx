@@ -7,7 +7,6 @@ import { Link, Redirect, useLocation, useHistory } from 'react-router-dom';
 import { userAction, uiAction } from '@redux/actions';
 import { user as userEvents } from '../../Events';
 
-
 const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
@@ -25,7 +24,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const userView = ({user, socket, notify, removeUser}) => {
+const userView = ({user, socket, notify, logout}) => {
   const history = useHistory();
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -52,32 +51,32 @@ const userView = ({user, socket, notify, removeUser}) => {
   };
   const handleLogout = () => {
     handleClose();
-    socket.emit(userEvents.logout, {}, ({ eventName, message }) => {
-      if (eventName === userEvents.logout_err) {
-        console.error(message);
-        notify({
-          message,
-          options: {
-            autoHideDuration: 1500,
-            variant: 'error',
-          }
-        });
-      }
-      if (eventName === userEvents.logout_success) {
-        console.log(message);
-
-        localStorage.clear();
-        removeUser();
-        history.replace('/');
-        notify({
-          message,
-          options: {
-            autoHideDuration: 1500,
-            variant: 'success',
-          }
-        });
-      }
-    });
+    if (confirm('Уверены что хотите выйти?')) {
+      socket.emit(userEvents.logout, {}, ({ eventName, message }) => {
+        if (eventName === userEvents.logout_err) {
+          console.error(message);
+          notify({
+            message,
+            options: {
+              autoHideDuration: 1500,
+              variant: 'error',
+            }
+          });
+        }
+        if (eventName === userEvents.logout_success) {
+          console.log(message);
+          logout();
+          history.replace('/');
+          notify({
+            message,
+            options: {
+              autoHideDuration: 1500,
+              variant: 'success',
+            }
+          });
+        }
+      });
+    }
   };
 
   return (
@@ -108,6 +107,7 @@ const mstp = state => ({
 });
 
 const mdtp = dispatch => ({
+  logout: () => dispatch(userAction.logoutUser()),
   removeUser: ()          => dispatch(userAction.removeUser()),
   notify:     (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
 });

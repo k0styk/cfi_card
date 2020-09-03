@@ -5,10 +5,10 @@ const compression = require('compression');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const session = require('./session');
-const morgan = require('morgan')
+const morgan = require('morgan');
 const app = express();
 
-app.use(morgan('combined'));
+// app.use(morgan('combined'));
 app.use(cors());
 app.use(helmet());
 app.use(compression());
