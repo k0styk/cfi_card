@@ -1,17 +1,17 @@
-import Header from './header/header';
-import SwitchFolder from './switchFolderView/switchFolder';
-import UserView from './userView/user';
-import ConnectAdd from './connectView/connect';
-import MainView from './MainView/main';
-import SummaryView from './summaryView/summary';
-import Z1View from './z1View/z1';
-import Z2View from './z2View/z2';
-import Z3View from './z3View/z3';
+import HeaderView from './header/header';
+import SwitchFolderView from './switchFolder/switchFolder';
+import UserView from './user/user';
+import ServerButtonView from './serverButton/serverButton';
+import MainView from './main/main';
+import SummaryView from './summary/summary';
+import Z1View from './z1/z1';
+import Z2View from './z2/z2';
+import Z3View from './z3/z3';
 
 export {
-  Header,
-  SwitchFolder,
-  ConnectAdd,
+  HeaderView,
+  SwitchFolderView,
+  ServerButtonView,
   MainView,
   SummaryView,
   Z1View,

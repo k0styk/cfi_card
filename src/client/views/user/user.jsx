@@ -1,56 +1,37 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { makeStyles } from '@material-ui/core/styles';
-import { deepOrange, green, red } from '@material-ui/core/colors';
 import { Button, Menu, MenuItem } from '@material-ui/core/';
-import { Link, Redirect, useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
+
 import { userAction, uiAction } from '@redux/actions';
 import { user as userEvents } from '../../Events';
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex',
-    '& > *': {
-      margin: theme.spacing(1),
-    },
-  },
-  square: {
-    color: theme.palette.getContrastText(deepOrange[500]),
-    backgroundColor: deepOrange[500],
-  },
-  rounded: {
-    color: '#fff',
-    backgroundColor: green[500],
-  },
-}));
-
 const userView = ({user, socket, notify, logout}) => {
   const history = useHistory();
-  const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
-  const handleClick = event => {
+  const openMenu = event => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const closeMenu = () => {
     setAnchorEl(null);
   };
   const handleSummary = () => {
-    handleClose();
+    closeMenu();
     history.replace('/summary');
   };
   const handleProfile = () => {
-    handleClose();
+    closeMenu();
   };
   const handleRegister = () => {
     history.replace('/register');
-    handleClose();
+    closeMenu();
   };
   const handleUsersList = () => {
-    handleClose();
+    closeMenu();
   };
   const handleLogout = () => {
-    handleClose();
+    closeMenu();
     if (confirm('Уверены что хотите выйти?')) {
       socket.emit(userEvents.logout, {}, ({ eventName, message }) => {
         if (eventName === userEvents.logout_err) {
@@ -81,7 +62,7 @@ const userView = ({user, socket, notify, logout}) => {
 
   return (
     <div className="user-view">
-      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={handleClick}>
+      <Button aria-controls="simple-menu" aria-haspopup="true" onClick={openMenu}>
         {user.displayName || user.login}
       </Button>
       <Menu
@@ -89,13 +70,21 @@ const userView = ({user, socket, notify, logout}) => {
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}
-        onClose={handleClose}
+        onClose={closeMenu}
       >
-        <MenuItem onClick={handleSummary}>Главная</MenuItem> {/* IFF*/}
-        <MenuItem onClick={handleProfile}>Профиль</MenuItem> {/* IFF*/}
-        <MenuItem onClick={handleRegister}>Регистрация</MenuItem> {/* IFF*/}
-        <MenuItem onClick={handleUsersList}>Список пользователей</MenuItem> {/* IFF*/}
-        <MenuItem onClick={handleLogout}>Выход</MenuItem> {/* IFF*/}
+        <MenuItem onClick={handleSummary}>Главная</MenuItem>
+        <MenuItem disabled onClick={handleProfile}>Профиль</MenuItem>
+        {
+          (user.rights==='manager'||user.rights==='admin')?
+            (<MenuItem onClick={handleRegister}>Регистрация</MenuItem>):
+            null
+        }
+        {
+          (user.rights==='manager'||user.rights==='admin')?
+            (<MenuItem disabled onClick={handleUsersList}>Список пользователей</MenuItem>):
+            null
+        }
+        <MenuItem onClick={handleLogout}>Выход</MenuItem>
       </Menu>
     </div>
   );

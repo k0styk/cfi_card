@@ -3,7 +3,7 @@ import './app.scss';
 import { initialAction, socketAction, uiAction } from '@redux/actions';
 import { IndexPage, LoginPage, RegisterPage, SummaryPage } from '@pages';
 import { Notifier } from '@components';
-import { Header } from '@views';
+import { HeaderView } from '@views';
 
 import React from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
@@ -120,7 +120,7 @@ class App extends React.Component {
     return (
       <BrowserRouter>
         <div className='app-wrapper'>
-          <Header />
+          <HeaderView />
           <Switch>
             <Route
               path="/"

@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const conAdd = ({connected,archieve,socket,addSummary}) => {
+const serverButton = ({connected,archieve,socket,addSummary}) => {
   const [render, setRender] = React.useState(false);
   const classes = useStyles();
   const location = useLocation();
@@ -81,4 +81,4 @@ const mdtp = dispatch => ({
   addSummary: () =>  dispatch(summaryAction.addSummary()),
 });
 
-export default connect(mstp, mdtp)(conAdd);
+export default connect(mstp, mdtp)(serverButton);

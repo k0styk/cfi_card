@@ -1,21 +1,21 @@
 import './header.scss';
 import React from 'react';
-import { Logo, TimeView } from '@components';
-import { SwitchFolder, ConnectAdd, UserView } from '@views';
+import { Logo, Time } from '@components';
+import { SwitchFolderView, ServerButtonView, UserView } from '@views';
 
 const header = ({}) => (
   <div className='header-wrapper grid-header'>
     <div className='header'>
       <div className='header-block-icon'>
         <Logo />
-        <TimeView />
+        <Time />
         <UserView />
       </div>
       <div className="center-block">
-        <SwitchFolder />
+        <SwitchFolderView />
       </div>
       <div className='block-buttons'>
-        <ConnectAdd />
+        <ServerButtonView />
       </div>
     </div>
   </div>
