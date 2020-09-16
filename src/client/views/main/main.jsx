@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { uiAction } from '@redux/actions';
 import { SummaryView } from '@views';
 
-const mainView = ({ summary, archieve }) => {
+const mainView = ({ summary, archieve, uiLoader }) => {
   const filteredSummary = summary.value.filter(v => v.archieve === archieve);
 
   return (
@@ -18,9 +18,9 @@ const mainView = ({ summary, archieve }) => {
   );
 };
 
-const mstp = state => ({
-  summary: state.summary,
-  archieve: state.ui.app.archieve
+const mstp = ({summary, ui}) => ({
+  summary,
+  archieve: ui.app.archieve,
 });
 const mdtp = dispatch => ({
   closeSnack: () => dispatch(uiAction.alert.setAlert({message:'', open: false, severity: 'info'}))

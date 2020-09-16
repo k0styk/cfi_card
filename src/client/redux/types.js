@@ -83,6 +83,7 @@ module.exports.UI = {
   APP: {
     CONNECTION:                                         'UI_APP_CONNECTION_SET',
     ARCHIEVE:                                           'UI_APP_ARCHIEVE_SET',
+    LOADER:                                             'UI_APP_LOADER_SET',
   }
 };
 

@@ -8,6 +8,9 @@ import { HeaderView } from '@views';
 import React from 'react';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { compose } from 'redux';
+import { withStyles } from '@material-ui/core/styles';
+import { CircularProgress, Backdrop } from '@material-ui/core';
 import io from 'socket.io-client';
 
 const PrivateRoute = ({ component: Component, redirect, socket, ...rest }) => (
@@ -29,6 +32,12 @@ const PrivateRoute = ({ component: Component, redirect, socket, ...rest }) => (
     }}
   />)
 );
+const useStyles = theme => ({
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+});
 
 class App extends React.Component {
   constructor(props) {
@@ -117,6 +126,8 @@ class App extends React.Component {
   }
 
   render() {
+    const { classes } = this.props;
+
     return (
       <BrowserRouter>
         <div className='app-wrapper'>
@@ -146,6 +157,9 @@ class App extends React.Component {
               exact
             />
           </Switch>
+          <Backdrop className={classes.backdrop} open={this.props.uiLoader}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
           <Notifier />
         </div>
       </BrowserRouter>
@@ -153,18 +167,21 @@ class App extends React.Component {
   }
 };
 
-const mstp = state => ({
-  notifications: state.notifications,
-  user: state.user,
-  socket: state.socket
-});
-
-const mdtp = dispatch => ({
-  setSocket: socket => dispatch(socketAction.setSocket(socket)),
-  InitState: () => dispatch(initialAction()),
-  notify: (...args) => dispatch(uiAction.notify.enqueueSnackbar(...args)),
-  closeNotify: key => dispatch(uiAction.notify.closeSnackbar(key)),
-  connected: connected => dispatch(uiAction.app.setConnection({ connected })),
-});
-
-export default connect(mstp, mdtp)(App);
+export default compose(
+  connect(
+    ({notifications,user,socket,ui}) => ({
+      notifications,
+      user,
+      socket,
+      uiLoader: ui.app.uiLoader,
+    }),
+    dispatch => ({
+      setSocket: socket => dispatch(socketAction.setSocket(socket)),
+      InitState: () => dispatch(initialAction()),
+      notify: (...args) => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+      closeNotify: key => dispatch(uiAction.notify.closeSnackbar(key)),
+      connected: connected => dispatch(uiAction.app.setConnection({ connected })),
+    })
+  ),
+  withStyles(useStyles)
+)(App);

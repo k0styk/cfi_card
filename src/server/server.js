@@ -17,8 +17,7 @@ mongoose.connection.once('open', () => console.log('MongoDB Connected!'));
 //Bring in the models
 require('./models/User');
 
-// const app = ;
-const server = require('./app').listen(PORT,HOST, listenCallback);
+const server = require('./app').listen(PORT,HOST,listenCallback);
 
 // MONGO ON WINDOWS LOAD SO BAD, we deal connection on start app
 async function listenCallback() {
@@ -54,5 +53,5 @@ process.on('message', async msg => {
 /* PM2 END */
 
 // const io = require('socket.io')(server);
-const io = require('./newSocket')(server);
+const io = require('./socket')(server);
 /* eslint-enable */

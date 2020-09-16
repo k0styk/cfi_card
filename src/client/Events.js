@@ -17,6 +17,9 @@ module.exports.user = {
 
 module.exports.summary = {
   save: 'summary_save',
+  save_success: 'summary_save_success',
+  save_partial: 'summary_save_partial',
+  save_err: 'summary_save_err',
 };
 
 module.exports.store = {

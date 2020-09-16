@@ -1,218 +1,236 @@
-const { io } = require('./server');
-const events = require('../client/Events');
-const crypto = require('crypto');
-const config = require('../../config/config');
 const moment = require('moment');
-const { v4: uuidv4 } = require('uuid');
-const userData = {};
+const jwt = require('jwt-then');
+const mongoose = require('mongoose');
 
-module.exports = socket => {
-  console.log('a user connected:',socket.id);
-  console.log(socket.handshake);
+const events = require('../client/Events');
+const socketMiddleware = require('./middlewares/socket');
+const userController = require('./controllers/userController');
+const { config } = global;
 
-  // io.on('connection', function (socket) {
-  //   // Accept a login event with user's data
-  //   socket.on("login", function (userdata) {
-  //     console.log('login');
-  //     socket.handshake.session.userdata = userdata;
-  //     socket.handshake.session.save();
-  //   });
-  //   socket.on("logout", function (userdata) {
-  //     if (socket.handshake.session.userdata) {
-  //       console.log('logout');
-  //       delete socket.handshake.session.userdata;
-  //       socket.handshake.session.save();
-  //     }
-  //   });
-  //   socket.on('checksession', function () {
-  //     console.log('check');
-  //     socket.emit('checksession', socket.handshake.session);
-  //   });
-  // });
+/* usage SESSION */
+// const session = socket.request.session; // eslint-disable-line
 
-  socket.on(events.store.INITIAL, async (payload, action, cb) => {
-    const client = global.dbClient;
-    // const entities = await client.db(config.getValue('db').connection.dbName).collection('entities').findOne({});
-    // const date = new Date();
-    const uiDate = moment().format('DD.MM.YYYY');
-    const obj = {
-      ui: {
-        date: uiDate
-      },
-      crypto: {
-        publicKey: 'maybe hash'
-      },
-      date: {
-        server: new Date()
-      },
-      // entities: entities
-    };
+// session.connections++;
+// session.save();
+/* SESSION usage */
 
-    // if (socket.handshake.session.sessId) {
-    //   obj.flights = userData[socket.handshake.session.sessId].flights;
-    //   obj.ui.table = userData[socket.handshake.session.sessId].ui.table;
-    // } else {
-    //   socket.handshake.session.sessId = uuidv4();
-    //   socket.handshake.session.save();
+// const payload = await jwt.verify(token, config.secret); // GET TOKEN
+// const token = await jwt.sign({ id: user.id, rights: user.rights }, config.secret); // SET TOKEN
+// const Message = mongoose.model('Message');
+const User = mongoose.model('User');
 
-    //   userData[socket.handshake.session.sessId] = {};
-    // }
-    action.payload = obj;
-    cb(null, action);
+module.exports = server => {
+  const io = require('socket.io').listen(server);
+
+  io.use(socketMiddleware);
+  io.on('connection', socket => {
+    // console.log('Socket connected: ', socket.id);
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected: user[' + socket.request.session.userId + '] socket[' + socket.id + ']');
+    });
+
+    socket.on(events.user.login, async ({login,password}, cb) => {
+      const session = socket.request.session; // eslint-disable-line
+
+      if (session.userId) {
+        if (session.token) {
+          const payload = await jwt.verify(session.token, config.secret);
+
+          console.log('User [ ' + login + ' ] try sign in, session for [ '+payload.login+' ]');
+          cb({eventName:events.user.login_err,message:'You must logout before sign in!'});
+          return;
+        }
+        console.log('No session token!');
+        cb({eventName:events.user.login_err,message:'Holy crap! Its crashed, try relogin'});
+        return;
+      }
+      const user = await User.findOne({
+        login,
+        password: global.hashPass(password, config.salt),
+      });
+      let message = 'Login successfull';
+
+      if (!user) {
+        message = 'Login [ '+login+' ] and Password did not match.';
+
+        console.log(message);
+        cb({eventName:events.user.login_err,message});
+      } else {
+        const tokenOpts = {
+          login: user.login,
+          id: user.id,
+          rights: user.rights,
+          description: user.description,
+          displayName: user.displayName,
+          department: user.department
+        };
+        const token = await jwt.sign(tokenOpts, config.secret);
+
+        session.token = token;
+        session.userId = user.id;
+        session.save();
+        cb({eventName:events.user.login_success,token,message});
+      }
+    });
+
+    socket.on(events.user.logout, async ({}, cb) => {
+      const session = socket.request.session; // eslint-disable-line
+      if (session.userId) {
+        if (session.token) {
+          delete session.token;
+          delete session.userId;
+          session.save();
+          console.log('Logout');
+          cb({eventName:events.user.logout_success,message:'Logout successfull'});
+          return;
+        }
+        console.log('No session token!');
+        cb({eventName:events.user.login_err,message:'Holy crap! Its crashed, try relogin'});
+        return;
+      } else {
+        console.log('Nobody logout');
+        cb({eventName:events.user.logout_err,message:'Nobody logout'});
+        return;
+      };
+    });
+
+    socket.on(events.user.checkAuth, async ({ id }, cb) => {
+      const isLogged = false;
+      const session = socket.request.session; // eslint-disable-line
+
+      if (session.userId) {
+        if (session.userId === id) {
+          cb({ isLogged: true });
+        } else {
+          cb({isLogged});
+        }
+      } else {
+        cb({isLogged});
+      }
+    });
+
+    socket.on(events.user.register, async ({
+      login,
+      password,
+      description,
+      displayName,
+      department,
+      rights
+    }, cb) => {
+      let message = 'Register [ '+login+' ] successfull';
+
+      if (login.length < 2) {
+        message = 'Login must be atleast 2 characters long.';
+        cb({eventName:events.user.register_err,message});
+        return;
+      };
+      if (password.length < 6){
+        message = 'Password must be atleast 6 characters long.';
+        cb({eventName:events.user.register_err,message});
+        return;
+      }
+      const userExists = await User.findOne({ login });
+
+      if (userExists) {
+        message = 'User with same login already exits.';
+        cb({eventName:events.user.register_err,message});
+        return;
+      };
+
+      const user = new User({
+        login,
+        password: global.hashPass(password, config.salt),
+        description: description?description:undefined,
+        displayName: displayName?displayName:undefined,
+        department: department?department:undefined,
+        rights: rights?rights:undefined,
+      });
+
+      await user.save();
+      message = 'User [ ' + login + ' ] registered successfully!';
+      cb({eventName:events.user.register_success,message});
+    });
+
+    socket.on(events.summary.save, async ({summary}, cb) => {
+      const session = socket.request.session; // eslint-disable-line
+
+      if (session.userId && session.token) {
+        const resultSummary = [];
+        const invalidSummary = [];
+        const validate = summary => {
+          
+          return true;
+        };
+
+        summary.forEach((v,i) => {
+          if(validate(v)) {
+            resultSummary.push(v);
+          } else {
+            invalidSummary.push(v);
+          }
+        });
+
+        if(invalidSummary.length) {
+          cb({eventName:events.summary.save_partial,message:'', summary: invalidSummary});
+        } else {
+          // cb({eventName:events.summary.save_success,message:''});
+        }
+      } else {
+        console.log('No session!');
+        cb({eventName:events.summary.save_err,message:'No session!'});
+      }
+    });
+
+    socket.on('chatroomMessage', async ({ chatroomId, message }) => {
+      // if (message.trim().length > 0) {
+      //   const user = await User.findOne({ _id: socket.userId });
+      //   const newMessage = new Message({
+      //     chatroom: chatroomId,
+      //     user: socket.userId,
+      //     message,
+      //   });
+
+      //   io.to(chatroomId).emit('newMessage', {
+      //     message,
+      //     name: user.name,
+      //     userId: socket.userId,
+      //   });
+      //   await newMessage.save();
+      // }
+    });
+
+    socket.on(events.store.INITIAL, async (payload, action, cb) => {
+      const session = socket.request.session; // eslint-disable-line
+      let userObj = null;
+
+      if (session.userId) {
+        if (session.token) {
+          const payload = await jwt.verify(session.token, config.secret);
+
+          userObj = { ...payload };
+        }
+      }
+
+      const uiDate = moment().format('DD.MM.YYYY');
+      const obj = {
+        ui: {
+          date: uiDate
+        },
+        crypto: {
+          publicKey: 'maybe hash'
+        },
+        date: {
+          server: new Date()
+        },
+        user: userObj
+        // entities: entities
+      };
+
+      action.payload = obj;
+      cb(null, action);
+    });
   });
 
-  // socket.on(events.store.UPDATE, async (flights, table) => {
-  //   userData[socket.handshake.session.sessId] = { flights, ui: { table }};
-  //   process.env.LOGGER && console.log(userData);
-  // });
-
-  // Нужно научиться делать последовательные экшены исходя из результата
-  // socket.on(events.entities.AIRCRAFTS.ADD, async (payload, action, cb) => {
-  //   const client = global.dbClient;
-  //   const aircraft = action.payload;
-
-  //   await client.db(config.getValue('db').connection.dbName)
-  //     .collection('entities').updateOne({}, {$push: { 'aircrafts': aircraft}});
-
-  //   const entities = await client.db(config.getValue('db').connection.dbName)
-  //     .collection('entities').find({}).toArray();
-
-  //   const index = entities[0].aircrafts.indexOf(aircraft);
-
-  //   action[1].payload.type = index;
-  //   console.log(action);
-  //   cb(null, action);
-  // });
-
-  // socket.on(events.entities.AIRCRAFTS.DELETE, async (payload, action, cb) => {
-  //   const client = global.dbClient;
-  //   const aircraft = action.payload;
-  //   const entities = await client.db(config.getValue('db').connection.dbName)
-  //     .collection('entities').updateOne({}, { $pull: { aircrafts: aircraft } });
-
-  //   cb(null, action);
-  // });
-
-  // 
-  // socket.on(ui.USER, (payload, action, cb) => {
-
-  //   cb(null, action);
-  // });
-
-  // socket.on(events.app.SAVE, async (payload, action, cb) => {
-  //   const client = global.dbClient;
-  //   const data = {
-  //     flight: {
-  //       ...payload
-  //     }
-  //   };
-
-  //   data.serverTime = new Date();
-  //   const result = await client.db(config.getValue('db').connection.dbName).collection('flights').insertOne(data);
-
-  //   action.payload = 1;
-  //   delete userData[socket.handshake.session.sessId];
-  //   delete socket.handshake.session.sessId;
-  //   socket.handshake.session.save();
-  //   cb(null, action);
-  // });
-
-  // socket.on(events.entities.AIRCRAFTS.ADD, async (payload, action, cb) => {
-  //   const client = global.dbClient;
-  //   const result = await client.db(config.getValue('db').connection.dbName)
-  //     .collection('entities').findOne({});
-
-  //   if (result.aircrafts.indexOf(payload) === -1) {
-  //     const aircrafts = [...result.aircrafts, payload];
-
-  //     await client.db(config.getValue('db').connection.dbName)
-  //       .collection('entities').updateOne({}, { $set: { aircrafts: aircrafts } });
-  //   }
-  // });
-
-  // socket.on(events.entities.ROUTES.ADD, async (payload, action, cb) => {
-  //   const client = global.dbClient;
-  //   const result = await client.db(config.getValue('db').connection.dbName)
-  //     .collection('entities').findOne({});
-
-  //   const routes = [...result.routes];
-
-  //   payload.map(v => !(~routes.indexOf(v)) && routes.push(v));
-  //   const routesEnd = routes.filter((v, i) => routes.indexOf(v) === i);
-
-  //   await client.db(config.getValue('db').connection.dbName)
-  //     .collection('entities').updateOne({}, { $set: { routes: routesEnd } });
-  // });
-
-  // socket.on('redux-logger', async payload => {
-  //   process.env.LOGGER && console.log(payload);
-  //   const jsonContent = JSON.stringify(payload)+'\n';
-
-  //   require('fs').appendFile(require('path').join(__dirname, '../../.logs/redux.json'), jsonContent, 'utf8', err => {
-  //     if (err) {
-  //       console.log('An error occured while writing JSON Object to File.');
-  //       return console.log(err);
-  //     }
-  //   });
-  // });
+  return io;
 };
-
-
-/*
-
-// wrong and old
-io.set('authorization', function(handshake, callback) {
-    handshake.cookies = cookie.parse(handshake.headers.cookie || '');
-    var sidCookie = handshake.cookies[cfg.session.key];
-    var sid = cookieParser.signedCookie(sidCookie, cfg.session.secret);
-    if(!sid){
-        log.error('Not session found');
-    }
-    redis.get('sess:'+sid, function(err, data) {
-        if(err){
-            log.error('io.authorization -> ',err);
-            return;
-        }
-        if(data){
-            handshake.user = jsonParse(data);
-            callback(null, true);
-        }
-    });
-});
-
-io.sockets.on('connection', (socket) => {
-    var userLogin = socket.handshake.user.LOGIN;
-    log.info("Socket is connect: "+userLogin);
-    socket.on('msg', (data) => {
-        log.info(data);
-        socket.emit('msg',{text:'server say:' + new Date()});
-    });
-    socket.on('disconnect', function() {
-        log.info("Socket is disconnect");
-    });
-});
-
-
-// new
-io.use(function(socket, next) {
-    var handshakeData = socket.request;
-    handshakeData.cookies = cookie.parse(handshakeData.headers.cookie || '');
-    var sidCookie = handshakeData.cookies[cfg.session.key];
-    var sid = cookieParser.signedCookie(sidCookie, cfg.session.secret);
-    if(!sid){
-        log.error('Not session found');
-    }
-    redis.get('sess:'+sid, function(err, data) {
-        if(err){
-            log.error('io.authorization -> ',err);
-            next(new Error('not authorized'));
-        }
-        if(data){
-            socket.handshake.user = jsonParse(data);
-            next();
-        }
-    });
-
-});
-
-*/

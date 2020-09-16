@@ -5,8 +5,8 @@ import { userAction, uiAction } from '../../redux/actions';
 import { user as userEvents } from '../../Events';
 
 import {
-  CircularProgress, Button, InputLabel, Backdrop,
-  InputAdornment, IconButton, Input, FormControl } from '@material-ui/core';
+  Button, InputLabel, InputAdornment,
+  IconButton, Input, FormControl } from '@material-ui/core';
 import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router-dom';
@@ -28,10 +28,9 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const LoginPage = ({socket,setUser,logout,notify}) => {
+const LoginPage = ({socket,setUser,logout,notify,setLoader}) => {
   const history = useHistory();
   const classes = useStyles();
-  const [loader, setLoader] = React.useState(false);
   const [values, setValues] = React.useState({
     login: '',
     password: '',
@@ -187,9 +186,6 @@ const LoginPage = ({socket,setUser,logout,notify}) => {
             </Button>
           </div>
         </div>
-        <Backdrop className={classes.backdrop} open={loader} onClick={() => setLoader(false)}>
-          <CircularProgress color="inherit" />
-        </Backdrop>
       </form>
     </React.Fragment>
   );
@@ -203,5 +199,6 @@ export default connect(
     setUser:    (...args)   => dispatch(userAction.setUser(...args)),
     logout:     ()          => dispatch(userAction.logoutUser()),
     notify:     (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+    setLoader:  state       => dispatch(uiAction.app.setLoader({uiLoader: state})),
   })
 )(LoginPage);
