@@ -85,7 +85,7 @@ const z3View = ({
         }
         break;
       case validationFields.aircraftTypeName.name:
-        if(curSummary.z1.aircraftType==='ZZZZ'||curSummary.z1.aircraftType==='ЗЗЗЗ') {
+        if(curSummary.z1.aircraftType==='ZZZZ') {
           if(value.length) {
             handleValidateWrapper(fieldName,1);
           } else handleValidateWrapper(fieldName,0);
@@ -93,7 +93,7 @@ const z3View = ({
         break;
       case validationFields.depAirportCoord.name:
         if (value.length > 0) {
-          if (curSummary.z1.depAirport === 'ZZZZ'||curSummary.z1.depAirport === 'ЗЗЗЗ') {
+          if (curSummary.z1.depAirport === 'ZZZZ') {
             if (value.indexOf('_') !== -1) {
               handleValidateWrapper(fieldName, 0);
             } else {
@@ -106,7 +106,7 @@ const z3View = ({
         break;
       case validationFields.destAirportCoord.name:
         if (value.length > 0) {
-          if (curSummary.z1.destAirport === 'ZZZZ'||curSummary.z1.destAirport === 'ЗЗЗЗ') {
+          if (curSummary.z1.destAirport === 'ZZZZ') {
             if (value.indexOf('_') !== -1) {
               handleValidateWrapper(fieldName, 0);
             } else {
@@ -195,7 +195,7 @@ const z3View = ({
           <InputMask
             error={errorResolverZ(curSummary.z1.depAirport, depAirportCoord)[1]}
             helperText={errorResolverZ(curSummary.z1.depAirport, depAirportCoord)[0]}
-            mask="9999С99999В"
+            mask="9999N99999E"
             value={depAirportCoord}
             onChange={e => {
               depAirportCoordSet(id, e.target.value.toUpperCase());
@@ -214,7 +214,7 @@ const z3View = ({
           <InputMask
             error={errorResolverZ(curSummary.z1.destAirport, destAirportCoord)[1]}
             helperText={errorResolverZ(curSummary.z1.destAirport, destAirportCoord)[0]}
-            mask="9999С99999В"
+            mask="9999N99999E"
             value={destAirportCoord}
             onChange={e => {
               destAirportCoordSet(id, e.target.value.toUpperCase());

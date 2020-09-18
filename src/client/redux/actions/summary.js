@@ -4,6 +4,10 @@ import { SUMMARY, Z1, Z2, Z3 } from '../types';
 export default {
   addSummary: () => ({type: SUMMARY.ADD}),
   /**
+   * @param {Array} payload
+   */
+  setSummary: payload => ({type: SUMMARY.ADD, payload}),
+  /**
    * @param {{ id: number}} payload
    */
   removeSummary: payload => ({type: SUMMARY.REMOVE, payload}),

@@ -73,14 +73,16 @@ const summaryView = ({
     /* default difinition */
     let retVal = 64; // 63 z1 + 1 z3
 
-    if(curSummary.z1.aircraftType ==='ZZZZ'||curSummary.z1.aircraftType ==='ЗЗЗЗ') retVal+=(1<<1);
-    if(curSummary.z1.depAirport   ==='ZZZZ'||curSummary.z1.depAirport   ==='ЗЗЗЗ') retVal+=(1<<2);
-    if(curSummary.z1.destAirport  ==='ZZZZ'||curSummary.z1.destAirport  ==='ЗЗЗЗ') retVal+=(1<<3);
-    retVal += (31*curSummary.z2.length);
+    if(z1.aircraftType ==='ZZZZ') retVal+=(1<<1);
+    if(z1.depAirport   ==='ZZZZ') retVal+=(1<<2);
+    if(z1.destAirport  ==='ZZZZ') retVal+=(1<<3);
+    retVal += (31*z2.length);
     /* default difinition */
 
     return retVal;
   };
+
+  console.log('SUMMARY');
 
   return (
     <div className="summary-view">

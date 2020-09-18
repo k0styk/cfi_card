@@ -1,60 +1,60 @@
 const mongoose = require('mongoose');
 const User = mongoose.model('User');
-const jwt = require('jwt-then');
+const events = require('../../client/Events');
 const {config} = global;
 
-exports.register = async (req, res) => {
-  const {
-    login,
-    password,
-    description,
-    displayName,
-    department,
-    rights,
-  } = req.body;
+exports.register = async ({
+  login,
+  password,
+  description,
+  displayName,
+  department,
+  rights
+}, cb) => {
+  let message = 'Register [ ' + login + ' ] successfull';
 
-  if(login.length < 2) throw 'Nickname must be atleast 2 characters long.';
-  if (password.length < 6) throw 'Password must be atleast 6 characters long.';
+  if (login.length < 2) {
+    message = 'Login must be atleast 2 characters long.';
+    cb({ eventName: events.user.register_err, message });
+    return;
+  };
+  if (password.length < 6) {
+    message = 'Password must be atleast 6 characters long.';
+    cb({ eventName: events.user.register_err, message });
+    return;
+  }
+  const userExists = await User.findOne({ login });
 
-  const userExists = await User.findOne({login});
-
-  if (userExists) throw 'User with same login already exits.';
+  if (userExists) {
+    message = 'User with same login already exits.';
+    cb({ eventName: events.user.register_err, message });
+    return;
+  };
 
   const user = new User({
     login,
-    description,
-    displayName,
-    department,
-    // rights,
     password: global.hashPass(password, config.salt),
+    description: description ? description : undefined,
+    displayName: displayName ? displayName : undefined,
+    department: department ? department : undefined,
+    rights: rights ? rights : undefined,
   });
 
   await user.save();
-
-  res.json({
-    message: 'User [' + login + '] registered successfully!',
-  });
+  message = 'User [ ' + login + ' ] registered successfully!';
+  cb({ eventName: events.user.register_success, message });
 };
 
-// exports.login = async (req, res) => {
-//   const { login, password } = req.body;
-//   const user = await User.findOne({
-//     login,
-//     password: global.hashPass(password, config.salt),
-//   });
+exports.login = async ({login,password}) => {
+  const user = await User.findOne({
+    login,
+    password: global.hashPass(password, config.salt),
+  });
 
-//   if (!user) throw 'Nickname and Password did not match.';
+  if(user) {
+    user.lastLogin = new Date();
+    user.save();
+  }
 
-//   const token = await jwt.sign({
-//     id: user.id,
-//     description: user.description,
-//     department: user.department,
-//     displayName: user.displayName,
-//     rights: user.rights
-//   }, config.secret);
-
-//   res.json({
-//     message: 'User logged in successfully!',
-//     token,
-//   });
-// };
+  return user;
+};

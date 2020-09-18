@@ -10,6 +10,7 @@ module.exports.USER = {
 };
 
 module.exports.SUMMARY = {
+  SET:                                                  'SUMMARY_SET',
   ADD:                                                  'SUMMARY_ADD',
   REMOVE:                                               'SUMMARY_REMOVE',
   ADD_Z2:                                               'SUMMARY_ADD_Z2',

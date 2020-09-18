@@ -16,6 +16,9 @@ mongoose.connection.once('open', () => console.log('MongoDB Connected!'));
 
 //Bring in the models
 require('./models/User');
+require('./models/Summary');
+require('./models/SummaryDocument');
+require('./models/DaySummaries');
 
 const server = require('./app').listen(PORT,HOST,listenCallback);
 

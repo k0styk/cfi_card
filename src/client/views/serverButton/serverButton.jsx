@@ -20,7 +20,15 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const serverButton = ({connected,archieve,socket,addSummary,setLoader,summary}) => {
+const serverButton = ({
+  connected,
+  archieve,
+  socket,
+  addSummary,
+  setLoader,
+  summary,
+  notify
+}) => {
   const [render, setRender] = React.useState(false);
   const classes = useStyles();
   const location = useLocation();
@@ -37,7 +45,7 @@ const serverButton = ({connected,archieve,socket,addSummary,setLoader,summary}) 
       setLoader(true);
       const filteredSummary = summary.value.filter(v => v.archieve === true);
 
-      socket.emit(summaryEvents.save, {summary: filteredSummary}, ({ eventName, notAccepted }) => {
+      socket.emit(summaryEvents.save, {summary: filteredSummary}, ({ eventName, message, notAccepted }) => {
         if (eventName === summaryEvents.save_err) {
           console.error(message);
           setLoader(false);
@@ -49,8 +57,22 @@ const serverButton = ({connected,archieve,socket,addSummary,setLoader,summary}) 
             }
           });
         }
-        if (eventName === summaryEvents.save_success) {
+        if (eventName === summaryEvents.save_partial) {
+          console.log(notAccepted);
+          const newArray = [...summary.value, ...notAccepted];
+          const res = newArray.slice().reverse().filter((v,i,a) => a.findIndex(t => (t.id === v.id))===i).reverse();
 
+          console.log(res);
+          setLoader(false);
+          notify({
+            message,
+            options: {
+              autoHideDuration: 1500,
+              variant: 'warning',
+            }
+          });
+        }
+        if (eventName === summaryEvents.save_success) {
           setLoader(false);
           notify({
             message,
@@ -136,7 +158,9 @@ export default connect(
     summary,
   }),
   dispatch => ({
-    addSummary: () =>  dispatch(summaryAction.addSummary()),
-    setLoader:  state       => dispatch(uiAction.app.setLoader({uiLoader: state})),
+    setSummary: payload   => dispatch(summaryAction.setSummary(payload)),
+    addSummary: ()        => dispatch(summaryAction.addSummary()),
+    setLoader:  state     => dispatch(uiAction.app.setLoader({uiLoader: state})),
+    notify:     (...args) => dispatch(uiAction.notify.enqueueSnackbar(...args))
   })
 )(serverButton);

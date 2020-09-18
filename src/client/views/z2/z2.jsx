@@ -171,8 +171,8 @@ const z2View = ({
             helperText={errorField.code}
             value={code}
             onChange={e => {
-              validateField(e.target.name, e.target.value);
               codeSet(id, z2id, e.target.value.toUpperCase());
+              validateField(e.target.name, e.target.value);
             }}
             label="РЦ/МДП"
             inputProps={{
@@ -188,11 +188,11 @@ const z2View = ({
           <InputMask
             error={!!errorField.entryPoint}
             helperText={errorField.entryPoint}
-            mask="9999С99999В"
+            mask="9999N99999E"
             value={entryPoint}
             onChange={e => {
-              validateField(e.target.name, e.target.value);
               entryPointSet(id, z2id, e.target.value.toUpperCase());
+              validateField(e.target.name, e.target.value);
             }}
             label="Вход в ВП к. A/C"
             inputProps={{
@@ -221,8 +221,8 @@ const z2View = ({
               placeholder="08:00"
               value={moment(entryTime, 'HH:mm')}
               onChange={(d,v) => {
-                validateField(validationFields.entryTime.name, d);
                 entryTimeSet(id,z2id,moment(d).format('HH:mm'));
+                validateField(validationFields.entryTime.name, d);
               }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
@@ -235,11 +235,11 @@ const z2View = ({
           <InputMask
             error={!!errorField.exitPoint}
             helperText={errorField.exitPoint}
-            mask="9999С99999В"
+            mask="9999N99999E"
             value={exitPoint}
             onChange={e => {
-              validateField(e.target.name, e.target.value);
               exitPointSet(id, z2id, e.target.value.toUpperCase());
+              validateField(e.target.name, e.target.value);
             }}
             label="Выход из ВП к. A/C"
             inputProps={{
@@ -268,8 +268,8 @@ const z2View = ({
               placeholder="08:00"
               value={moment(exitTime, 'HH:mm')}
               onChange={(d,v) => {
-                validateField(validationFields.exitTime.name, d);
                 exitTimeSet(id,z2id,moment(d).format('HH:mm'));
+                validateField(validationFields.exitTime.name, d);
               }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',

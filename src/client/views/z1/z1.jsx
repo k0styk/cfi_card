@@ -127,10 +127,24 @@ const z1View = ({
         }
         break;
       case validationFields.acftIdent.name:
+        if (value.length) {
+          setError({
+            ...errorField,
+            [fieldName]: ''
+          });
+          handleValidateWrapper(fieldName, 1);
+        } else {
+          setError({
+            ...errorField,
+            [fieldName]: 'Обязательное поле'
+          });
+          handleValidateWrapper(fieldName, 0);
+        }
+        break;
       case validationFields.aircraftType.name:
       case validationFields.depAirport.name:
       case validationFields.destAirport.name:
-        if (value.length) {
+        if (value.length === 4) {
           setError({
             ...errorField,
             [fieldName]: ''

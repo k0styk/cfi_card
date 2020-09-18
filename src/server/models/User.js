@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
     lastLogin: Date
   },
   {
+    versionKey: false,
     timestamps: true,
   }
 );
