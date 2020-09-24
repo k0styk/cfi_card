@@ -15,7 +15,7 @@ module.exports.SUMMARY = {
   REMOVE:                                               'SUMMARY_REMOVE',
   ADD_Z2:                                               'SUMMARY_ADD_Z2',
   REMOVE_Z2:                                            'SUMMARY_REMOVE_Z2',
-  ARCHIEVE:                                             'SUMMARY_ARCHIEVE_SET',
+  ARCHIVE:                                              'SUMMARY_ARCHIVE_SET',
   VALIDATION_SET:                                       'SUMMARY_VALIDATION_SET',
 };
 
@@ -83,12 +83,10 @@ module.exports.UI = {
   },
   APP: {
     CONNECTION:                                         'UI_APP_CONNECTION_SET',
-    ARCHIEVE:                                           'UI_APP_ARCHIEVE_SET',
+    ARCHIVE:                                            'UI_APP_ARCHIVE_SET',
     LOADER:                                             'UI_APP_LOADER_SET',
   }
 };
-
-module.exports.ENTITIES = {};
 
 module.exports.DATE = {
   SET_CLIENT:                                           'DATE_CLIENT_SET',

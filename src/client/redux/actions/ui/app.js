@@ -6,9 +6,9 @@ export default {
    */
   setConnection: payload => ({type: UI.APP.CONNECTION, payload}),
   /**
-   * @param {{ archieve: boolean}} payload
+   * @param {{ archive: boolean}} payload
    */
-  setArchieve: payload => ({type: UI.APP.ARCHIEVE, payload}),
+  setArchive: payload => ({type: UI.APP.ARCHIVE, payload}),
   /**
    * @param {{ uiLoader: boolean}} payload
    */

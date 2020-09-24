@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
 
 const z3View = ({
   id,
-  summary,
+  curSummary,
   airspaceTypeSet,
   aircraftTypeNameSet,
   depAirportCoordSet,
@@ -36,7 +36,7 @@ const z3View = ({
   setValid
 }) => {
   const classes = useStyles();
-  const [curSummary] = summary.value.filter(v => v.id === id);
+  // const [curSummary] = summary.value.filter(v => v.id === id);
   const {
     airspaceType,
     aircraftTypeName,
@@ -47,98 +47,47 @@ const z3View = ({
   } = curSummary.z3;
   const z2l = curSummary.z2.length;
 
-  const validationFields = {
-    airspaceType: {
-      name: 'airspaceType',
-      mask: 1<<0
-    },
-    aircraftTypeName: {
-      name: 'aircraftTypeName',
-      mask: 1<<1
-    },
-    depAirportCoord: {
-      name: 'depAirportCoord',
-      mask: 1<<2
-    },
-    destAirportCoord: {
-      name: 'destAirportCoord',
-      mask: 1<<3
-    }
-  };
-  const handleValidateWrapper = (fieldName, operation) => {
-    let val = 0;
-
-    if(operation) {
-      val = validation | validationFields[fieldName].mask;
-    } else {
-      val = validation & (validationFields[fieldName].mask ^ 0xFFF);
-    }
-    setValid(id,val);
-  };
-  const validateField = (fieldName, value) => {
-    switch (fieldName) {
-      case validationFields.airspaceType.name:
-        if(value==='G'&&z2l) {
-          handleValidateWrapper(fieldName,0);
-        } else {
-          handleValidateWrapper(fieldName,1);
-        }
-        break;
-      case validationFields.aircraftTypeName.name:
-        if(curSummary.z1.aircraftType==='ZZZZ') {
-          if(value.length) {
-            handleValidateWrapper(fieldName,1);
-          } else handleValidateWrapper(fieldName,0);
-        } else handleValidateWrapper(fieldName,0);
-        break;
-      case validationFields.depAirportCoord.name:
-        if (value.length > 0) {
-          if (curSummary.z1.depAirport === 'ZZZZ') {
-            if (value.indexOf('_') !== -1) {
-              handleValidateWrapper(fieldName, 0);
-            } else {
-              handleValidateWrapper(fieldName, 1);
-            }
-          } else {
-            handleValidateWrapper(fieldName, 0);
-          }
-        } else handleValidateWrapper(fieldName, 0);
-        break;
-      case validationFields.destAirportCoord.name:
-        if (value.length > 0) {
-          if (curSummary.z1.destAirport === 'ZZZZ') {
-            if (value.indexOf('_') !== -1) {
-              handleValidateWrapper(fieldName, 0);
-            } else {
-              handleValidateWrapper(fieldName, 1);
-            }
-          } else {
-            handleValidateWrapper(fieldName, 0);
-          }
-        } else handleValidateWrapper(fieldName, 0);
-        break;
-    }
-  };
   const errorResolverG = (z2Val, val) => {
     if(z2Val) {
       if(val === 'G') {
-        return ['Недопустимо',true];
+        return 'Недопустимо';
       }
-      return ['',false];
+      return '';
     }
-    return ['',false];
+    return '';
   };
   const errorResolverZ = (z1Val,val) => {
-    if(z1Val==='ZZZZ'||z1Val==='ЗЗЗЗ') {
+    if(z1Val==='ZZZZ') {
       if(!!!val||val.indexOf('_')!==-1) {
-        return ['Необходимо заполнить', true];
+        return 'Необходимо заполнить';
       }
-      return ['', false];
+      return '';
     };
     if(val.indexOf('_')!==-1) {
-      return ['Необходимо заполнить', true];
+      return 'Необходимо заполнить';
     }
-    return ['', false];
+    return '';
+  };
+  const handleValidateWrapper = ({mask, operation}) => {
+    let val = 0;
+
+    if(operation) {
+      val = validation | mask;
+    } else {
+      val = validation & (mask ^ 0xFFF);
+    }
+    setValid(id,val);
+  };
+  const validateField = (fieldName, value,z1,z2l) => {
+    const validation = z3Validator.validateField(fieldName, value,z1,z2l);
+
+    // if(validation.error[fieldName] !== errorField[fieldName]) {
+    //   setError({
+    //     ...errorField,
+    //     ...validation.error
+    //   });
+    // }
+    handleValidateWrapper(validation);
   };
 
   return (
@@ -151,20 +100,20 @@ const z3View = ({
         {/* 1 req filter of z2 */}
         <Grid item xs className={classes.one}>
           <TextField
-            error={errorResolverG(z2l,airspaceType)[1]}
-            helperText={errorResolverG(z2l,airspaceType)[0]}
+            error={!!errorResolverG(z2l,airspaceType)}
+            helperText={errorResolverG(z2l,airspaceType)}
             fullWidth
             id="select"
             label="Класс ВП"
             value={airspaceType?airspaceType:''}
             onChange={e => {
               airspaceTypeSet(id, e.target.value.toUpperCase());
-              validateField(e.target.name, e.target.value);
+              // validateField(e.target.name, e.target.value);
             }}
             inputProps={{
               maxLength: 2,
               style: { textTransform: 'uppercase' },
-              name: validationFields.airspaceType.name
+              name: 'airspaceType'
             }}
             select
           >
@@ -175,56 +124,56 @@ const z3View = ({
         {/* 2 req if z1 3 stay ZZZZ*/}
         <Grid item xs className={classes.two}>
           <TextField
-            error={errorResolverZ(curSummary.z1.aircraftType, aircraftTypeName)[1]}
-            helperText={errorResolverZ(curSummary.z1.aircraftType, aircraftTypeName)[0]}
+            error={!!errorResolverZ(curSummary.z1.aircraftType, aircraftTypeName)}
+            helperText={errorResolverZ(curSummary.z1.aircraftType, aircraftTypeName)}
             value={aircraftTypeName}
             onChange={e => {
               aircraftTypeNameSet(id, e.target.value.toUpperCase());
-              validateField(e.target.name, e.target.value);
+              // validateField(e.target.name, e.target.value);
             }}
             label="Наименование типа ВС"
             inputProps={{
               maxLength: 25,
               style: { textTransform: 'uppercase' },
-              name: validationFields.aircraftTypeName.name
+              name: 'aircraftTypeName'
             }}
           />
         </Grid>
         {/* 3 req if z1 4 ZZZZ*/}
         <Grid item xs className={classes.three}>
           <InputMask
-            error={errorResolverZ(curSummary.z1.depAirport, depAirportCoord)[1]}
-            helperText={errorResolverZ(curSummary.z1.depAirport, depAirportCoord)[0]}
+            error={!!errorResolverZ(curSummary.z1.depAirport, depAirportCoord)}
+            helperText={errorResolverZ(curSummary.z1.depAirport, depAirportCoord)}
             mask="9999N99999E"
             value={depAirportCoord}
             onChange={e => {
               depAirportCoordSet(id, e.target.value.toUpperCase());
-              validateField(e.target.name, e.target.value);
+              // validateField(e.target.name, e.target.value);
             }}
             label="Коорд А-д/П-п вылета"
             inputProps={{
               maxLength: 12,
               style: { textTransform: 'uppercase' },
-              name: validationFields.depAirportCoord.name
+              name: 'depAirportCoord'
             }}
           />
         </Grid>
         {/* 4 req if z1 5 ZZZZ*/}
         <Grid item xs className={classes.four}>
           <InputMask
-            error={errorResolverZ(curSummary.z1.destAirport, destAirportCoord)[1]}
-            helperText={errorResolverZ(curSummary.z1.destAirport, destAirportCoord)[0]}
+            error={!!errorResolverZ(curSummary.z1.destAirport, destAirportCoord)}
+            helperText={errorResolverZ(curSummary.z1.destAirport, destAirportCoord)}
             mask="9999N99999E"
             value={destAirportCoord}
             onChange={e => {
               destAirportCoordSet(id, e.target.value.toUpperCase());
-              validateField(e.target.name, e.target.value);
+              // validateField(e.target.name, e.target.value);
             }}
             label="Коорд А-д/П-п посадки"
             inputProps={{
               maxLength: 12,
               style: { textTransform: 'uppercase' },
-              name: validationFields.destAirportCoord.name
+              name: 'destAirportCoord'
             }}
           />
         </Grid>
@@ -277,4 +226,4 @@ const mdtp = dispatch => ({
 });
 /* eslint-enable */
 
-export default connect(mstp, mdtp)(z3View);
+export default /*React.memo(*/connect(mstp, mdtp)(z3View)/*)*/;

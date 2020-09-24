@@ -4,26 +4,29 @@ import { connect } from 'react-redux';
 import { uiAction } from '@redux/actions';
 import { SummaryView } from '@views';
 
-const mainView = ({ summary, archieve, uiLoader }) => {
-  const filteredSummary = summary.value.filter(v => v.archieve === archieve);
+const mainView = ({ summary, archive }) => {
+  const filteredSummary = summary.value.filter(v => v.archive === archive);
 
   return (
     <div className="main-view-content grid-content">
       <div className="work-area">
         <div className="wrapper-summary">
-          {filteredSummary.map((i, idx) => (<SummaryView key={idx} id={i.id} />))}
+          {filteredSummary.map((i, idx) =>
+            (<SummaryView
+              key={'SummaryView:'+idx+':'+new Date().getTime().toString().substr(-6)}
+              id={i.id}
+              curSummary={i}
+            />))}
         </div>
       </div>
     </div>
   );
 };
 
-const mstp = ({summary, ui}) => ({
-  summary,
-  archieve: ui.app.archieve,
-});
-const mdtp = dispatch => ({
-  closeSnack: () => dispatch(uiAction.alert.setAlert({message:'', open: false, severity: 'info'}))
-});
-
-export default connect(mstp, mdtp)(mainView);
+export default connect(
+  ({summary, ui}) => ({
+    summary,
+    archive: ui.app.archive,
+  }),
+  dispatch => ({})
+)(mainView);

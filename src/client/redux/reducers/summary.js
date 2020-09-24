@@ -48,7 +48,7 @@ export function summary(state = initialState, action) {
     case SUMMARY.ADD:
       const newVal = {
         id: state.counter,
-        archieve: false,
+        archive: false,
         counter: 1,
         fieldValidation: 0, // значение валидатора по полям
         factValidation: 0, // какое значение валидации необходимо
@@ -67,14 +67,14 @@ export function summary(state = initialState, action) {
         ...state,
         value: state.value.filter(i => i.id !== p.id)
       };
-    case SUMMARY.ARCHIEVE:
+    case SUMMARY.ARCHIVE:
       return {
         ...state,
         value: state.value.map((v,i) => {
           if(v.id === p.id) {
             return {
               ...v,
-              archieve: p.archieve
+              archive: p.archive
             };
           }
           return v;

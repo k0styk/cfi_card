@@ -30,40 +30,40 @@ const useStyles = makeStyles(theme => ({
 
 const summaryView = ({
   id,
-  summary,
+  curSummary,
   removeSummary,
   addZ2,
-  archieveSet,
+  archiveSet,
   notify,
-  archieve,
+  archive,
   validationSet
 }) => {
   const DeleteButton = ({ ...elementProps }) => (<div className="summary-button-delete" {...elementProps}>
     <CancelIcon />
   </div>);
-  const ToArchieve = ({...elementProps}) => (<React.Fragment>
+  const ToArchive = ({...elementProps}) => (<React.Fragment>
     <FontAwesomeIcon icon={faBox} className={classes.marginRight} {...elementProps} />в список на отправление
   </React.Fragment>);
-  const FromArchieve = ({...elementProps}) => (<React.Fragment>
+  const FromArchive = ({...elementProps}) => (<React.Fragment>
     <FontAwesomeIcon icon={faBoxOpen} className={classes.marginRight} {...elementProps} />в список
   </React.Fragment>);
   const classes = useStyles();
-  const [curSummary] = summary.value.filter(v => v.id === id);
+  // const [curSummary] = summary.value.filter(v => v.id === id);
 
   const handleClick = () => {
     const val = curSummary.z1.validation+
                 curSummary.z3.validation+
                 curSummary.z2.reduce((a,r) => a+r.validation,0);
 
-    archieveSet(id, !archieve);
+    archiveSet(id, !archive);
     validationSet(id, val, eqValidationsHandle());
     notify({
-      message: archieve?'Отправлено в список':'Отправлено в папку для отправления',
+      message: archive?'Отправлено в список':'Отправлено в папку для отправления',
       options: {
         autoHideDuration: 3000,
         variant: 'info',
         action: () => (
-          <Button onClick={() => archieveSet(id, archieve)}>отмена</Button>
+          <Button onClick={() => archiveSet(id, archive)}>отмена</Button>
         ),
       }
     });
@@ -107,17 +107,22 @@ const summaryView = ({
         </div>
         <Divider />
         <div className="summary-content">
-          <Z1View id={id} />
-          {curSummary.z2.map(v =>
-            <Z2View key={new Date().getTime()+Math.random().toString(16).substring(2, 8)} id={id} z2id={v.id} />)
+          <Z1View id={id} curSummary={curSummary} />
+          {curSummary.z2.map((v,i) =>
+            <Z2View
+              key={'Z2View:'+i+':'+new Date().getTime().toString().substr(-6)}
+              id={id}
+              z2id={v.id}
+              curZ2={v}
+            />)
           }
-          <Z3View id={id} />
+          <Z3View id={id} curSummary={curSummary} />
         </div>
         <Divider />
         <div className="summary-footer">
           <Button
             disabled={
-              archieve?false:
+              archive?false:
                 !(curSummary.z1.validation+
                   curSummary.z3.validation+
                   curSummary.z2.reduce((a,r) => a+r.validation,0) === eqValidationsHandle())
@@ -127,7 +132,7 @@ const summaryView = ({
             color="default"
             className={classes.button}
           >
-            {archieve?(<FromArchieve />):(<ToArchieve />)}
+            {archive?(<FromArchive />):(<ToArchive />)}
           </Button>
         </div>
       </div>
@@ -136,12 +141,11 @@ const summaryView = ({
 };
 
 const mstp = state => ({
-  summary: state.summary,
-  archieve: state.ui.app.archieve
+  archive: state.ui.app.archive
 });
 /* eslint-disable */
 const mdtp = dispatch => ({
-  archieveSet:      (id, archieve)  => dispatch(summaryAction.archieveSet({id, archieve})),
+  archiveSet:      (id, archive)  => dispatch(summaryAction.archiveSet({id, archive})),
   removeSummary:    id              => dispatch(summaryAction.removeSummary({id})),
   addZ2:            id              => dispatch(summaryAction.addSummaryZ2({id})),
   notify:           (...args)       => dispatch(uiAction.notify.enqueueSnackbar(...args)),
@@ -149,4 +153,4 @@ const mdtp = dispatch => ({
 });
 /* eslint-enable */
 
-export default connect(mstp, mdtp)(summaryView);
+export default React.memo(connect(mstp, mdtp)(summaryView));

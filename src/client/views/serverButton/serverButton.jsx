@@ -22,12 +22,13 @@ const useStyles = makeStyles(theme => ({
 
 const serverButton = ({
   connected,
-  archieve,
+  archive,
   socket,
   addSummary,
   setLoader,
   summary,
-  notify
+  setSummary,
+  notify,
 }) => {
   const [render, setRender] = React.useState(false);
   const classes = useStyles();
@@ -43,7 +44,7 @@ const serverButton = ({
   const handleSend = () => {
     try {
       setLoader(true);
-      const filteredSummary = summary.value.filter(v => v.archieve === true);
+      const filteredSummary = summary.value.filter(v => v.archive === true);
 
       socket.emit(summaryEvents.save, {summary: filteredSummary}, ({ eventName, message, notAccepted }) => {
         if (eventName === summaryEvents.save_err) {
@@ -58,11 +59,30 @@ const serverButton = ({
           });
         }
         if (eventName === summaryEvents.save_partial) {
-          console.log(notAccepted);
-          const newArray = [...summary.value, ...notAccepted];
-          const res = newArray.slice().reverse().filter((v,i,a) => a.findIndex(t => (t.id === v.id))===i).reverse();
+          const res = [];
 
-          console.log(res);
+          for (let i = 0; i < summary.value.length; i++) {
+            const v = summary.value[i];
+
+            if(v.archive) {
+              let flag = false;
+
+              for (let j = 0; j < notAccepted.length; j++) {
+                const e = notAccepted[j];
+
+                if(v.id === e.id) {
+                  flag = true;
+                  break;
+                }
+              }
+              if(flag)
+                res.push(v);
+            } else {
+              res.push(v);
+            }
+          }
+
+          setSummary(res);
           setLoader(false);
           notify({
             message,
@@ -73,6 +93,7 @@ const serverButton = ({
           });
         }
         if (eventName === summaryEvents.save_success) {
+          setSummary(summary.value.filter(v => !v.archive));
           setLoader(false);
           notify({
             message,
@@ -96,7 +117,7 @@ const serverButton = ({
     }
   };
 
-  const Component = () => connected?(render?archieve?
+  const Component = () => connected?(render?archive?
     (
       <div>
         <Button
@@ -152,7 +173,7 @@ const serverButton = ({
 
 export default connect(
   ({socket,ui,summary}) => ({
-    archieve: ui.app.archieve,
+    archive: ui.app.archive,
     connected: ui.app.connected,
     socket,
     summary,

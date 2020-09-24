@@ -6,7 +6,7 @@ exports.save = async ({summary, userId}) => {
   const error = doc.validateSync();
 
   if(error) {
-    throw new Error('Validation wrong');
+    throw error;
   } else {
     doc.save();
   }

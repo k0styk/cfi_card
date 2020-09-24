@@ -3,28 +3,28 @@ const mongoose = require('mongoose');
 const schemaSummaryZ2 = new mongoose.Schema({
   id: Number,
   code: {
-    required: true,
+    required: 'code req',
     type: String,
     minlength:4,
     maxlength:4
   },
   entryPoint: {
-    required: true,
+    required: 'entryPoint req',
     type: String,
     match: /^\d{4}N\d{5}E$/gmi
   },
   entryTime: {
-    required: true,
+    required: 'entryTime req',
     type: String,
     match: /^([01]\d|2[0-3]):[0-5]\d$/gmi
   },
   exitPoint: {
-    required: true,
+    required: 'exitPoint req',
     type: String,
     match: /^\d{4}N\d{5}E$/gmi
   },
   exitTime: {
-    required: true,
+    required: 'exitTime req',
     type: String,
     match: /^([01]\d|2[0-3]):[0-5]\d$/gmi
   },
@@ -32,7 +32,7 @@ const schemaSummaryZ2 = new mongoose.Schema({
   // countOfDep: {},
   // countOfApp: {},
   validation: {
-    required: true,
+    required: 'validation req',
     type: Number,
     enum: [31],
   }
@@ -44,8 +44,8 @@ const schemaSummaryZ2 = new mongoose.Schema({
 
 const summarySchema = new mongoose.Schema({
   id: Number,
-  archieve: {
-    required: true,
+  archive: {
+    required: 'archive req',
     type: Boolean,
     enum: [true]
   },
@@ -54,30 +54,30 @@ const summarySchema = new mongoose.Schema({
   factValidation: Number,
   z1: {
     flyDate: {
-      required: true,
+      required: 'z1.flyDate req',
       type: String,
       match: /^\d{2}\/\d{2}\/\d{2}$/gmi
     },
     acftIdent: {
-      required: true,
+      required: 'z1.acftIdent req',
       type: String,
       minlength:1,
       maxlength:7,
     },
     aircraftType: {
-      required: true,
+      required: 'z1.aircraftType req',
       type: String,
       minlength:4,
       maxlength:4
     },
     depAirport: {
-      required: true,
+      required: 'z1.depAirport req',
       type: String,
       minlength:4,
       maxlength:4
     },
     destAirport: {
-      required: true,
+      required: 'z1.destAirport req',
       type: String,
       minlength:4,
       maxlength:4,
@@ -86,7 +86,7 @@ const summarySchema = new mongoose.Schema({
       type: String,
     },
     entryTime: {
-      required: true,
+      required: 'z1.entryTime req',
       type: String,
       match: /^([01]\d|2[0-3]):[0-5]\d$/gmi
     },
@@ -97,7 +97,7 @@ const summarySchema = new mongoose.Schema({
       type: String,
     },
     validation: {
-      required: true,
+      required: 'z1.validation req',
       type: Number,
       enum: [63],
     },
@@ -105,7 +105,7 @@ const summarySchema = new mongoose.Schema({
   z2: [schemaSummaryZ2],
   z3: {
     airspaceType: {
-      required: true,
+      required: 'airspaceType req',
       type: String,
       enum: ['A','C','G','CG']
     },
@@ -113,26 +113,26 @@ const summarySchema = new mongoose.Schema({
       type: String,
       maxlength: 25,
       required: function() {
-        return this.z1.aircraftType === 'ZZZZ';
+        return (this.z1.aircraftType === 'ZZZZ')?'aircraftTypeName req':false;
       }
     },
     depAirportCoord: {
       type: String,
       match: /^\d{4}N\d{5}E$/gmi,
       required: function() {
-        return this.z1.depAirport === 'ZZZZ';
+        return (this.z1.depAirport === 'ZZZZ')?'depAirportCoord req':false;
       }
     },
     destAirportCoord: {
       type: String,
       match: /^\d{4}N\d{5}E$/gmi,
       required: function() {
-        return this.z1.destAirport === 'ZZZZ';
+        return (this.z1.destAirport === 'ZZZZ')?'destAirportCoord req':false;
       }
     },
     // airspaceTypeGTime: {},
     validation: {
-      required: true,
+      required: 'validation req',
       type: Number,
       enum: [1,3,5,9,11,13,15]
     }

@@ -41,7 +41,7 @@ const z2View = ({
   id,
   z2id,
   removeZ2,
-  summary,
+  curZ2,
   codeSet,
   entryPointSet,
   entryTimeSet,
@@ -53,9 +53,9 @@ const z2View = ({
   setValid
 }) => {
   const classes = useStyles();
-  const [curSummary] = summary.value.filter(v => v.id === id);
-  const curZ2 = curSummary.z2.filter(v => v.id === z2id);
-  const [{
+  // const [curSummary] = summary.value.filter(v => v.id === id);
+  // const curZ2 = curSummary.z2.filter(v => v.id === z2id);
+  const {
     code,
     entryPoint,
     entryTime,
@@ -65,29 +65,7 @@ const z2View = ({
     // countOfDep,
     // countOfApp
     validation
-  }] = curZ2;
-  const validationFields = {
-    code: {
-      name: 'code',
-      mask: 1<<0
-    },
-    entryPoint: {
-      name: 'entryPoint',
-      mask: 1<<1
-    },
-    entryTime: {
-      name: 'entryTime',
-      mask: 1<<2
-    },
-    exitPoint: {
-      name: 'exitPoint',
-      mask: 1<<3
-    },
-    exitTime: {
-      name: 'exitTime',
-      mask: 1<<4
-    }
-  };
+  } = curZ2;
   const [errorField, setError] = React.useState({
     code: '',
     entryPoint: '',
@@ -95,66 +73,26 @@ const z2View = ({
     exitPoint: '',
     exitTime: '',
   });
-  const handleValidateWrapper = (fieldName, operation) => {
+  const handleValidateWrapper = ({mask, operation}) => {
     let val = 0;
 
     if(operation) {
-      val = validation | validationFields[fieldName].mask;
+      val = validation | mask;
     } else {
-      val = validation & (validationFields[fieldName].mask ^ 0xFFF);
+      val = validation & (mask ^ 0xFFF);
     }
     setValid(id,z2id,val);
   };
   const validateField = (fieldName, value) => {
-    switch (fieldName) {
-      case validationFields.code.name:
-        if (value.length) {
-          setError({
-            ...errorField,
-            [fieldName]: ''
-          });
-          handleValidateWrapper(fieldName, 1);
-        } else {
-          setError({
-            ...errorField,
-            [fieldName]: 'Обязательное поле'
-          });
-          handleValidateWrapper(fieldName, 0);
-        }
-        break;
-      case validationFields.exitPoint.name:
-      case validationFields.entryPoint.name:
-        if (value.indexOf('_') !== -1) {
-          setError({
-            ...errorField,
-            [fieldName]: 'Необходимо заполнить'
-          });
-          handleValidateWrapper(fieldName, 0);
-        } else {
-          setError({
-            ...errorField,
-            [fieldName]: ''
-          });
-          handleValidateWrapper(fieldName, 1);
-        }
-        break;
-      case validationFields.entryTime.name:
-      case validationFields.exitTime.name:
-        if(value&&value._isValid) {
-          setError({
-            ...errorField,
-            [fieldName]: ''
-          });
-          handleValidateWrapper(fieldName, 1);
-        } else {
-          setError({
-            ...errorField,
-            [fieldName]: 'Некорректная дата'
-          });
-          handleValidateWrapper(fieldName, 0);
-        }
-        break;
+    const validation = z2Validator.validateField(fieldName, value);
+
+    if(validation.error[fieldName] !== errorField[fieldName]) {
+      setError({
+        ...errorField,
+        ...validation.error
+      });
     }
+    handleValidateWrapper(validation);
   };
 
   return (
@@ -172,13 +110,13 @@ const z2View = ({
             value={code}
             onChange={e => {
               codeSet(id, z2id, e.target.value.toUpperCase());
-              validateField(e.target.name, e.target.value);
+              // validateField(e.target.name, e.target.value);
             }}
             label="РЦ/МДП"
             inputProps={{
               maxLength: 4,
               style: { textTransform: 'uppercase' },
-              name: validationFields.code.name,
+              name: 'code',
               autoComplete: 'off',
             }}
           />
@@ -192,13 +130,13 @@ const z2View = ({
             value={entryPoint}
             onChange={e => {
               entryPointSet(id, z2id, e.target.value.toUpperCase());
-              validateField(e.target.name, e.target.value);
+              // validateField(e.target.name, e.target.value);
             }}
             label="Вход в ВП к. A/C"
             inputProps={{
               maxLength: 12,
               style: { textTransform: 'uppercase' },
-              name: validationFields.entryPoint.name
+              name: 'entryPoint'
             }}
           />
         </Grid>
@@ -222,7 +160,7 @@ const z2View = ({
               value={moment(entryTime, 'HH:mm')}
               onChange={(d,v) => {
                 entryTimeSet(id,z2id,moment(d).format('HH:mm'));
-                validateField(validationFields.entryTime.name, d);
+                // validateField(validationFields.entryTime.name, d);
               }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
@@ -239,13 +177,13 @@ const z2View = ({
             value={exitPoint}
             onChange={e => {
               exitPointSet(id, z2id, e.target.value.toUpperCase());
-              validateField(e.target.name, e.target.value);
+              // validateField(e.target.name, e.target.value);
             }}
             label="Выход из ВП к. A/C"
             inputProps={{
               maxLength: 12,
               style: { textTransform: 'uppercase' },
-              name: validationFields.exitPoint.name
+              name: 'exitPoint'
             }}
           />
         </Grid>
@@ -269,7 +207,7 @@ const z2View = ({
               value={moment(exitTime, 'HH:mm')}
               onChange={(d,v) => {
                 exitTimeSet(id,z2id,moment(d).format('HH:mm'));
-                validateField(validationFields.exitTime.name, d);
+                // validateField(validationFields.exitTime.name, d);
               }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
@@ -345,4 +283,4 @@ const mdtp = dispatch => ({
   setValid:        (id, z2id, state)        => dispatch(summaryAction.z2.VALIDATION_SET({id, z2id, state}))
 });
 
-export default connect(mstp, mdtp)(z2View);
+export default /*React.memo(*/connect(mstp, mdtp)(z2View)/*)*/;

@@ -23,7 +23,7 @@ exports.save = async ({summaries, userId}) => {
 
     error = doc.validateSync();
     if (error) {
-      throw new Error('Validation wrong');
+      throw error;
     } else {
       doc.save();
     }

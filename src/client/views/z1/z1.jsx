@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { summaryAction } from '@redux/actions/';
 import { Autocomplete } from '@components';
+import { z1Validator } from '../../validators/validators';
+import replaceLayout from '../../helpers/layoutReplacer';
 
 import { makeStyles } from '@material-ui/core/styles';
 import {
@@ -37,7 +39,7 @@ const useStyles = makeStyles(theme => ({
 // let validation = 33; // default flyDate and entryTime are set, 2<<0 | 2<<<5 = 33
 const z1View = ({
   id,
-  summary,
+  curSummary,
   flyDateSet,
   acftIdentSet,
   aircraftTypeSet,
@@ -49,8 +51,8 @@ const z1View = ({
   regnoSet,
   setValid,
 }) => {
+  console.log('z1');
   const classes = useStyles();
-  const [curSummary] = summary.value.filter(v => v.id === id);
   const {
     flyDate,
     acftIdent,
@@ -63,33 +65,72 @@ const z1View = ({
     regno,
     validation
   } = curSummary.z1;
+  const [flyDateState, setFlyDateState] = React.useState(null);
+  const [entryTimeState, setEntryTimeState] = React.useState(null);
+  const [aircraftTypeState, setAircraftTypeState] = React.useState({
+    value: '',
+    valid: '',
+  });
+  const [depAirportState, setDepAirportState] = React.useState('');
+  const [destAirportState, setDestAirportState] = React.useState('');
+  const [values, setValues] = React.useState({
+    acftIdent: '',
+    entryPoint: '',
+    exitPoint: '',
+    regno: '',
+  });
 
-  const validationFields = {
-    flyDate: {
-      name: 'flyDate',
-      mask: 1<<0
-    },
-    acftIdent: {
-      name: 'acftIdent',
-      mask: 1<<1
-    },
-    aircraftType: {
-      name: 'aircraftType',
-      mask: 1<<2
-    },
-    depAirport: {
-      name: 'depAirport',
-      mask: 1<<3
-    },
-    destAirport: {
-      name: 'destAirport',
-      mask: 1<<4
-    },
-    entryTime: {
-      name: 'entryTime',
-      mask: 1<<5
+  React.useEffect(() => {
+    validateField('flyDate', moment(flyDate, 'DD/MM/YY'));
+    if(flyDate) {
+      setFlyDateState(moment(flyDate, 'DD/MM/YY'));
     }
-  };
+  }, [flyDate]);
+  React.useEffect(() => {
+    validateField('entryTime', moment(entryTime, 'HH:mm'));
+    if(entryTime) {
+      setEntryTimeState(moment(entryTime, 'HH:mm'));
+    }
+  },[entryTime]);
+  React.useEffect(() => {
+    if(aircraftTypeState.valid)
+      validateField('aircraftType', aircraftType);
+    if(aircraftType) {
+      setAircraftTypeState(aircraftType);
+    } else {
+      setAircraftTypeState('');
+    }
+  },[aircraftType]);
+  React.useEffect(() => {
+    validateField('depAirport', depAirport);
+    if(depAirport) {
+      setDepAirportState(depAirport);
+    } else {
+      setDepAirportState('');
+    }
+  },[depAirport]);
+  React.useEffect(() => {
+    validateField('destAirport', destAirport);
+    if(destAirport) {
+      setDestAirportState(destAirport);
+    } else {
+      setDestAirportState('');
+    }
+  },[destAirport]);
+  React.useEffect(() => {
+    setValues({
+      acftIdent,
+      entryPoint,
+      exitPoint,
+      regno,
+    });
+  },[
+    acftIdent,
+    entryPoint,
+    exitPoint,
+    regno,
+  ]);
+
   const [errorField, setError] = React.useState({
     flyDate: '',
     acftIdent: '',
@@ -98,67 +139,27 @@ const z1View = ({
     destAirport: '',
     entryTime: '',
   });
-  const handleValidateWrapper = (fieldName, operation) => {
+
+  const handleValidateWrapper = ({mask, operation}) => {
     let val = 0;
 
     if(operation) {
-      val = validation | validationFields[fieldName].mask;
+      val = validation | mask;
     } else {
-      val = validation & (validationFields[fieldName].mask ^ 0xFFF);
+      val = validation & (mask ^ 0xFFF);
     }
-    setValid(id,val);
+    // setValid(id,val);
   };
   const validateField = (fieldName, value) => {
-    switch (fieldName) {
-      case validationFields.flyDate.name:
-      case validationFields.entryTime.name:
-        if(value&&value._isValid) {
-          setError({
-            ...errorField,
-            [fieldName]: ''
-          });
-          handleValidateWrapper(fieldName, 1);
-        } else {
-          setError({
-            ...errorField,
-            [fieldName]: 'Некорректная дата'
-          });
-          handleValidateWrapper(fieldName, 0);
-        }
-        break;
-      case validationFields.acftIdent.name:
-        if (value.length) {
-          setError({
-            ...errorField,
-            [fieldName]: ''
-          });
-          handleValidateWrapper(fieldName, 1);
-        } else {
-          setError({
-            ...errorField,
-            [fieldName]: 'Обязательное поле'
-          });
-          handleValidateWrapper(fieldName, 0);
-        }
-        break;
-      case validationFields.aircraftType.name:
-      case validationFields.depAirport.name:
-      case validationFields.destAirport.name:
-        if (value.length === 4) {
-          setError({
-            ...errorField,
-            [fieldName]: ''
-          });
-          handleValidateWrapper(fieldName, 1);
-        } else {
-          setError({
-            ...errorField,
-            [fieldName]: 'Обязательное поле'
-          });
-          handleValidateWrapper(fieldName, 0);
-        }
-        break;
+    const v = z1Validator.validateField(fieldName, value);
+
+    if(v.error[fieldName] !== errorField[fieldName]) {
+      setError({
+        ...errorField,
+        ...v.error
+      });
     }
+    handleValidateWrapper(v);
   };
 
   return (
@@ -180,10 +181,26 @@ const z1View = ({
               format="DD/MM/YY"
               mask="__/__/__"
               margin="normal"
-              value={moment(flyDate, 'DD/MM/YY')}
+              value={flyDateState}
               onChange={v => {
-                validateField(validationFields.flyDate.name, v);
-                flyDateSet(id, moment(v).format('DD/MM/YY'));
+                validateField('flyDate', v);
+                setFlyDateState(v);
+              }}
+              onBlur={() => {
+                if(moment(flyDateState).isValid()) {
+                  if(!moment(flyDateState).isSame(moment(flyDate,'DD/MM/YY')))
+                    flyDateSet(id, moment(flyDateState).format('DD/MM/YY'));
+                } else {
+                  flyDateSet(id, null);
+                }
+              }}
+              onClose={() => {
+                if(moment(flyDateState).isValid()) {
+                  if(!moment(flyDateState).isSame(moment(flyDate,'DD/MM/YY')))
+                    flyDateSet(id, moment(flyDateState).format('DD/MM/YY'));
+                } else {
+                  flyDateSet(id, null);
+                }
               }}
               KeyboardButtonProps={{
                 'aria-label': 'change date',
@@ -196,16 +213,26 @@ const z1View = ({
           <TextField
             error={!!errorField.acftIdent}
             helperText={errorField.acftIdent}
-            value={acftIdent}
+            value={values.acftIdent}
             onChange={e => {
-              acftIdentSet(id, e.target.value.toUpperCase());
-              validateField(e.target.name, e.target.value);
+              const value = replaceLayout(e.target.value).toUpperCase();
+
+              validateField(e.target.name, value);
+              setValues({
+                ...values,
+                acftIdent: value
+              });
+            }}
+            onBlur={() => {
+              if(acftIdent !== values.acftIdent) {
+                acftIdentSet(id, values.acftIdent);
+              }
             }}
             label="Индекс ВС"
             inputProps={{
               maxLength: 7,
               style: { textTransform: 'uppercase' },
-              name: validationFields.acftIdent.name,
+              name: 'acftIdent',
               autoComplete: 'off',
             }}
           />
@@ -216,7 +243,7 @@ const z1View = ({
             autoComplete={false}
             autoHighlight={false}
             options={['ZZZZ']}
-            value={aircraftType}
+            value={aircraftTypeState.value}
             size="small"
             inputParams={{
               error: !!errorField.aircraftType,
@@ -226,20 +253,28 @@ const z1View = ({
               inputProps: {
                 maxLength: 4,
                 style: { textTransform: 'uppercase' },
-                name: validationFields.aircraftType.name,
+                name: 'aircraftType',
                 autoComplete: 'off',
               }
             }}
-            onChange={(e,v,r) => {
-              if(v) {
-                aircraftTypeSet(id, v.toUpperCase());
-                validateField(validationFields.aircraftType.name, v);
-              }
-            }}
             onInputChange={(e, v, r) => {
-              if(r!=='reset') {
-                aircraftTypeSet(id, v.toUpperCase());
-                validateField(validationFields.aircraftType.name, v);
+              if(!aircraftTypeState.valid) {
+                setAircraftTypeState({
+                  ...aircraftTypeState,
+                  valid: true
+                });
+              }
+              const value = replaceLayout(v).toUpperCase();
+
+              validateField('aircraftType', value);
+              setAircraftTypeState({
+                ...aircraftTypeState,
+                value
+              });
+            }}
+            onBlur={() => {
+              if(aircraftTypeState !== aircraftType) {
+                aircraftTypeSet(id, aircraftTypeState);
               }
             }}
             renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
@@ -252,7 +287,7 @@ const z1View = ({
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
-            value={depAirport}
+            value={depAirportState}
             size="small"
             inputParams={{
               error: !!errorField.depAirport,
@@ -262,20 +297,19 @@ const z1View = ({
               inputProps: {
                 maxLength: 4,
                 style: { textTransform: 'uppercase' },
-                name: validationFields.depAirport.name,
+                name: 'depAirport',
                 autoComplete: 'off',
               }
             }}
-            onChange={(e,v) => {
-              if(v) {
-                depAirportSet(id, v.toUpperCase());
-                validateField(validationFields.depAirport.name, v);
-              }
-            }}
             onInputChange={(e, v, r) => {
-              if(r!=='reset') {
-                depAirportSet(id, v.toUpperCase());
-                validateField(validationFields.depAirport.name, v);
+              const value = replaceLayout(v).toUpperCase();
+
+              validateField('depAirport', value);
+              setDepAirportState(value);
+            }}
+            onBlur={() => {
+              if(depAirportState !== depAirport) {
+                depAirportSet(id, depAirportState);
               }
             }}
             renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
@@ -288,7 +322,7 @@ const z1View = ({
           <Autocomplete
             autoHighlight={false}
             options={['ZZZZ']}
-            value={destAirport}
+            value={destAirportState}
             size="small"
             inputParams={{
               error: !!errorField.destAirport,
@@ -298,20 +332,19 @@ const z1View = ({
               inputProps: {
                 maxLength: 4,
                 style: { textTransform: 'uppercase' },
-                name: validationFields.destAirport.name,
+                name: 'destAirport',
                 autoComplete: 'off',
               }
             }}
-            onChange={(e,v,r) => {
-              if(v) {
-                destAirportSet(id, v.toUpperCase());
-                validateField(validationFields.destAirport.name, v);
-              }
+            onInputChange={(e, v, r) => {
+              const value = replaceLayout(v).toUpperCase();
+
+              validateField('destAirport', value);
+              setDestAirportState(value);
             }}
-            onInputChange={(e,v,r) => {
-              if(r!=='reset') {
-                destAirportSet(id, v.toUpperCase());
-                validateField(validationFields.destAirport.name, v);
+            onBlur={() => {
+              if(destAirportState !== destAirport) {
+                destAirportSet(id, destAirportState);
               }
             }}
             renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
@@ -322,13 +355,25 @@ const z1View = ({
         {/* 6  */}
         <Grid item xs className={classes.six} >
           <TextField
-            value={entryPoint}
-            onChange={e => entryPointSet(id, e.target.value.toUpperCase())}
+            value={values.entryPoint}
+            onChange={e => {
+              const value = replaceLayout(e.target.value).toUpperCase();
+
+              setValues({
+                ...values,
+                entryPoint: value
+              });
+            }}
+            onBlur={() => {
+              if(entryPoint !== values.entryPoint) {
+                entryPointSet(id, values.entryPoint);
+              }
+            }}
             label="Точка входа"
             inputProps={{
               maxLength: 5,
               style: { textTransform: 'uppercase' },
-              name: validationFields.entryPoint
+              name: 'entryPoint'
             }}
           />
         </Grid>
@@ -350,10 +395,26 @@ const z1View = ({
               margin="normal"
               placeholder="08:00"
               format="HH:mm"
-              value={moment(entryTime, 'HH:mm')}
-              onChange={(d,v) => {
-                validateField(validationFields.entryTime.name, d);
-                entryTimeSet(id,moment(d).format('HH:mm'));
+              value={entryTimeState}
+              onChange={v => {
+                validateField('entryTime', v);
+                setEntryTimeState(v);
+              }}
+              onBlur={() => {
+                if(moment(entryTimeState).isValid()) {
+                  if(!moment(entryTimeState).isSame(moment(entryTime,'HH:mm')))
+                    entryTimeSet(id, moment(entryTimeState).format('HH:mm'));
+                } else {
+                  entryTimeSet(id, null);
+                }
+              }}
+              onClose={() => {
+                if(moment(entryTimeState).isValid()) {
+                  if(!moment(entryTimeState).isSame(moment(entryTime,'HH:mm')))
+                    entryTimeSet(id, moment(entryTimeState).format('HH:mm'));
+                } else {
+                  entryTimeSet(id, null);
+                }
               }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
@@ -364,26 +425,50 @@ const z1View = ({
         {/* 8  */}
         <Grid item xs className={classes.eight} >
           <TextField
-            value={exitPoint}
-            onChange={e => exitPointSet(id, e.target.value.toUpperCase())}
+            value={values.exitPoint}
+            onChange={e => {
+              const value = replaceLayout(e.target.value).toUpperCase();
+
+              setValues({
+                ...values,
+                exitPoint: value
+              });
+            }}
+            onBlur={() => {
+              if(exitPoint !== values.exitPoint) {
+                exitPointSet(id, values.exitPoint);
+              }
+            }}
             label="Точка выхода"
             inputProps={{
               maxLength: 5,
               style: { textTransform: 'uppercase' },
-              name: validationFields.exitPoint
+              name: 'exitPoint'
             }}
           />
         </Grid>
         {/* 9     */}
         <Grid item xs className={classes.nine} >
           <TextField
-            value={regno}
-            onChange={e => regnoSet(id, e.target.value.toUpperCase())}
+            value={values.regno}
+            onChange={e => {
+              const value = replaceLayout(e.target.value).toUpperCase();
+
+              setValues({
+                ...values,
+                regno: value
+              });
+            }}
+            onBlur={() => {
+              if(regno !== values.regno) {
+                regnoSet(id, values.regno);
+              }
+            }}
             label="Рег. номер ВС"
             inputProps={{
               maxLength: 10,
               style: { textTransform: 'uppercase' },
-              name: validationFields.regno
+              name: 'regno'
             }}
           />
         </Grid>
@@ -392,9 +477,7 @@ const z1View = ({
   );
 };
 
-const mstp = state => ({
-  summary: state.summary,
-});
+const mstp = state => ({});
 const mdtp = dispatch => ({
   flyDateSet:         (id, flyDate) => dispatch(summaryAction.z1.FLYDATE_SET({id, flyDate})),
   acftIdentSet:       (id, acftIdent) => dispatch(summaryAction.z1.ACFTIDENT_SET({id, acftIdent})),
@@ -408,4 +491,4 @@ const mdtp = dispatch => ({
   setValid:           (id, state) => dispatch(summaryAction.z1.VALIDATION_SET({id, state}))
 });
 
-export default connect(mstp, mdtp)(z1View);
+export default React.memo(connect(mstp, mdtp)(z1View));

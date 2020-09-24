@@ -98,39 +98,45 @@ module.exports = server => {
 
     socket.on(events.user.register, userController.register);
 
-    socket.on(events.summary.save, async ({summary}, cb) => {
+    socket.on(events.summary.save, async ({ summary }, cb) => {
       const session = socket.request.session; // eslint-disable-line
 
       if (session.userId && session.token) {
-        const resultSummary = [];
-        const invalidSummary = [];
+        if (summary.length) {
+          const resultSummary = [];
+          const invalidSummary = [];
 
-        for (let i = 0; i < summary.length; i++) {
-          const v = summary[i];
+          for (let i = 0; i < summary.length; i++) {
+            const v = summary[i];
 
-          try {
-            await summaryController.save({summary: v, userId: session.userId});
-            console.log('saved');
-            resultSummary.push(v);
-          } catch(err) {
-            console.log('nosaved');
-            invalidSummary.push(v);
+            try {
+              await summaryController.save({ summary: v, userId: session.userId });
+              console.log('saved');
+              resultSummary.push(v);
+            } catch (err) {
+              console.log(err);
+              invalidSummary.push(v);
+            }
           }
-        }
 
-        if(invalidSummary.length) {
-          cb({eventName:events.summary.save_partial,message:'Часть сводок не сохранена', notAccepted: invalidSummary});
+          if (invalidSummary.length) {
+            cb({eventName:events.summary.save_partial,message:'Часть сводок не сохранена',notAccepted:invalidSummary});
+          } else {
+            cb({ eventName: events.summary.save_success, message: 'Все сводки сохранены' });
+          }
+          try {
+            console.log(resultSummary);
+            daySummaryController.save({ summaries: resultSummary, userId: session.userId });
+          } catch (err) {
+            console.log(err);
+          }
         } else {
-          cb({eventName:events.summary.save_success,message:'Все сводки сохранены'});
-        }
-        try {
-          daySummaryController.save({summaries: resultSummary, userId: session.userId});
-        } catch(err) {
-          console.log(err);
+          console.log('No summaries!');
+          cb({ eventName: events.summary.save_err, message: 'No summaries!' });
         }
       } else {
         console.log('No session!');
-        cb({eventName:events.summary.save_err,message:'No session!'});
+        cb({ eventName: events.summary.save_err, message: 'No session!' });
       }
     });
 

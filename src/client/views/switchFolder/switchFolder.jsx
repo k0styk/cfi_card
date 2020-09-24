@@ -27,10 +27,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const switchFolder = ({archiveSet, archieve, summary}) => {
+const switchFolder = ({archiveSet, archive, summary}) => {
   const classes = useStyles();
-  const getLengthList = () => summary.value.filter(v => v.archieve === false).length;
-  const getLengthArchieve = () => summary.value.filter(v => v.archieve === true).length;
+  const getLengthList = () => summary.value.filter(v => v.archive === false).length;
+  const getLengthArchive = () => summary.value.filter(v => v.archive === true).length;
   const [render, setRender] = React.useState(false);
   const location = useLocation();
 
@@ -40,7 +40,7 @@ const switchFolder = ({archiveSet, archieve, summary}) => {
 
   return render?(<div className={classes.root}>
     <ButtonGroup variant="text" color="primary" aria-label="text primary button group">
-      <Button color={`${!archieve?'secondary':'primary'}`}
+      <Button color={`${!archive?'secondary':'primary'}`}
         onClick={() => archiveSet(false)}
       >
         Список
@@ -48,21 +48,21 @@ const switchFolder = ({archiveSet, archieve, summary}) => {
           className={classes.marginR}
           badgeContent={getLengthList()}
           max={99}
-          color={`${!archieve?'secondary':'primary'}`}
+          color={`${!archive?'secondary':'primary'}`}
           showZero
         >
           <FontAwesomeIcon icon={faThList} className={classes.margin} />
         </Badge>
       </Button>
-      <Button color={`${archieve?'secondary':'primary'}`}
+      <Button color={`${archive?'secondary':'primary'}`}
         onClick={() => archiveSet(true)}
       >
         Для отправления
         <Badge
           className={classes.marginR}
-          badgeContent={getLengthArchieve()}
+          badgeContent={getLengthArchive()}
           max={99}
-          color={`${archieve?'secondary':'primary'}`}
+          color={`${archive?'secondary':'primary'}`}
           showZero
         >
           <FontAwesomeIcon icon={faArchive} className={classes.margin} />
@@ -73,12 +73,12 @@ const switchFolder = ({archiveSet, archieve, summary}) => {
 };
 
 const mstp = ({ui, summary}) => ({
-  archieve: ui.app.archieve,
+  archive: ui.app.archive,
   summary
 });
 
 const mdtp = dispatch => ({
-  archiveSet: archieve => dispatch(uiAction.app.setArchieve({archieve})),
+  archiveSet: archive => dispatch(uiAction.app.setArchive({archive})),
 });
 
 export default connect(mstp, mdtp)(switchFolder);

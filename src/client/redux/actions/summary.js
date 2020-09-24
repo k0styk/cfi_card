@@ -6,15 +6,15 @@ export default {
   /**
    * @param {Array} payload
    */
-  setSummary: payload => ({type: SUMMARY.ADD, payload}),
+  setSummary: payload => ({type: SUMMARY.SET, payload}),
   /**
    * @param {{ id: number}} payload
    */
   removeSummary: payload => ({type: SUMMARY.REMOVE, payload}),
   /**
-   * @param {{ id: number, archieve: boolean}} payload
+   * @param {{ id: number, archive: boolean}} payload
    */
-  archieveSet: payload => ({type: SUMMARY.ARCHIEVE, payload}),
+  archiveSet: payload => ({type: SUMMARY.ARCHIVE, payload}),
   /**
    * @param {{ id: number, fieldValidation: number, factValidation: number}} payload
    */

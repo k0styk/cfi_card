@@ -20,24 +20,27 @@ require('./models/Summary');
 require('./models/SummaryDocument');
 require('./models/DaySummaries');
 
-const server = require('./app').listen(PORT,HOST,listenCallback);
+(async () => {
+  await mongoose.connect(url, {
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+  });
 
-// MONGO ON WINDOWS LOAD SO BAD, we deal connection on start app
-async function listenCallback() {
-  try {
-    await mongoose.connect(url, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    });
-    process.send && process.send('ready');
-  } catch (err) {
-    console.log('Some error occured');
-    console.log(err);
+  async function listenCallback() {
+    try {
+      process.send && process.send('ready');
+    } catch (err) {
+      console.log('Some error occured');
+      console.log(err);
+    }
+    finally {
+      console.log(`Server started at: http://${HOST}:${PORT}`);
+    }
   }
-  finally {
-    console.log(`Server started at: http://${HOST}:${PORT}`);
-  }
-}
+
+  const server = require('./app').listen(PORT,HOST,listenCallback);
+  const io = require('./socket')(server);
+})();
 
 /* PM2 START */
 process.on('SIGINT', async () => {
@@ -55,6 +58,4 @@ process.on('message', async msg => {
 });
 /* PM2 END */
 
-// const io = require('socket.io')(server);
-const io = require('./socket')(server);
 /* eslint-enable */

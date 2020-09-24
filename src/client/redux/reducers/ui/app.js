@@ -1,7 +1,7 @@
 import { UI } from '../../types';
 const initialState = {
   connected: false,
-  archieve: false,
+  archive: false,
   uiLoader: false,
 };
 
@@ -10,7 +10,7 @@ export function app(state = initialState, action) {
 
   switch (action.type) {
     case UI.APP.CONNECTION:
-    case UI.APP.ARCHIEVE:
+    case UI.APP.ARCHIVE:
     case UI.APP.LOADER:
       return {
         ...state,
