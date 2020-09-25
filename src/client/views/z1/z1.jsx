@@ -39,7 +39,7 @@ const useStyles = makeStyles(theme => ({
 // let validation = 33; // default flyDate and entryTime are set, 2<<0 | 2<<<5 = 33
 const z1View = ({
   id,
-  curSummary,
+  z1,
   flyDateSet,
   acftIdentSet,
   aircraftTypeSet,
@@ -64,21 +64,26 @@ const z1View = ({
     exitPoint,
     regno,
     validation
-  } = curSummary.z1;
+  } = z1;
   const [flyDateState, setFlyDateState] = React.useState(null);
   const [entryTimeState, setEntryTimeState] = React.useState(null);
-  const [aircraftTypeState, setAircraftTypeState] = React.useState({
-    value: '',
-    valid: '',
-  });
+  const [aircraftTypeState, setAircraftTypeState] = React.useState('');
   const [depAirportState, setDepAirportState] = React.useState('');
   const [destAirportState, setDestAirportState] = React.useState('');
-  const [values, setValues] = React.useState({
+  const [values, setValues] = React.useState(() => ({
     acftIdent: '',
     entryPoint: '',
     exitPoint: '',
     regno: '',
-  });
+  }));
+  const [errorField, setError] = React.useState(() => ({
+    flyDate: '',
+    acftIdent: '',
+    aircraftType: '',
+    depAirport: '',
+    destAirport: '',
+    entryTime: '',
+  }));
 
   React.useEffect(() => {
     validateField('flyDate', moment(flyDate, 'DD/MM/YY'));
@@ -93,29 +98,31 @@ const z1View = ({
     }
   },[entryTime]);
   React.useEffect(() => {
-    if(aircraftTypeState.valid)
-      validateField('aircraftType', aircraftType);
-    if(aircraftType) {
-      setAircraftTypeState(aircraftType);
-    } else {
-      setAircraftTypeState('');
-    }
+    validateField('aircraftType',aircraftType);
+    setAircraftTypeState(aircraftType);
+    // if(aircraftType) {
+    //   setAircraftTypeState(aircraftType);
+    // } else {
+    //   setAircraftTypeState('');
+    // }
   },[aircraftType]);
   React.useEffect(() => {
     validateField('depAirport', depAirport);
-    if(depAirport) {
-      setDepAirportState(depAirport);
-    } else {
-      setDepAirportState('');
-    }
+    setDepAirportState(depAirport);
+    // if(depAirport) {
+    //   setDepAirportState(depAirport);
+    // } else {
+    //   setDepAirportState('');
+    // }
   },[depAirport]);
   React.useEffect(() => {
     validateField('destAirport', destAirport);
-    if(destAirport) {
-      setDestAirportState(destAirport);
-    } else {
-      setDestAirportState('');
-    }
+    setDestAirportState(destAirport);
+    // if(destAirport) {
+    //   setDestAirportState(destAirport);
+    // } else {
+    //   setDestAirportState('');
+    // }
   },[destAirport]);
   React.useEffect(() => {
     setValues({
@@ -130,15 +137,17 @@ const z1View = ({
     exitPoint,
     regno,
   ]);
-
-  const [errorField, setError] = React.useState({
-    flyDate: '',
-    acftIdent: '',
-    aircraftType: '',
-    depAirport: '',
-    destAirport: '',
-    entryTime: '',
-  });
+  React.useEffect(() => {
+    console.log('IAM work');
+    setError({
+      flyDate: '',
+      acftIdent: '',
+      aircraftType: '',
+      depAirport: '',
+      destAirport: '',
+      entryTime: '',
+    });
+  },[]);
 
   const handleValidateWrapper = ({mask, operation}) => {
     let val = 0;
@@ -258,19 +267,10 @@ const z1View = ({
               }
             }}
             onInputChange={(e, v, r) => {
-              if(!aircraftTypeState.valid) {
-                setAircraftTypeState({
-                  ...aircraftTypeState,
-                  valid: true
-                });
-              }
               const value = replaceLayout(v).toUpperCase();
 
               validateField('aircraftType', value);
-              setAircraftTypeState({
-                ...aircraftTypeState,
-                value
-              });
+              setAircraftTypeState(value);
             }}
             onBlur={() => {
               if(aircraftTypeState !== aircraftType) {

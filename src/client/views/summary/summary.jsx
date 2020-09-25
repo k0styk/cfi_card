@@ -107,7 +107,7 @@ const summaryView = ({
         </div>
         <Divider />
         <div className="summary-content">
-          <Z1View id={id} curSummary={curSummary} />
+          <Z1View id={id} curSummary={curSummary} z1={curSummary.z1} />
           {curSummary.z2.map((v,i) =>
             <Z2View
               key={'Z2View:'+i+':'+new Date().getTime().toString().substr(-6)}
