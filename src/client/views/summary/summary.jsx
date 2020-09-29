@@ -48,7 +48,6 @@ const summaryView = ({
     <FontAwesomeIcon icon={faBoxOpen} className={classes.marginRight} {...elementProps} />в список
   </React.Fragment>);
   const classes = useStyles();
-  // const [curSummary] = summary.value.filter(v => v.id === id);
 
   const handleClick = () => {
     const val = curSummary.z1.validation+
@@ -82,8 +81,6 @@ const summaryView = ({
     return retVal;
   };
 
-  console.log('SUMMARY');
-
   return (
     <div className="summary-view">
       <div className="summary-box">
@@ -107,10 +104,10 @@ const summaryView = ({
         </div>
         <Divider />
         <div className="summary-content">
-          <Z1View id={id} curSummary={curSummary} z1={curSummary.z1} />
+          <Z1View id={id} z1={curSummary.z1} />
           {curSummary.z2.map((v,i) =>
             <Z2View
-              key={'Z2View:'+i+':'+new Date().getTime().toString().substr(-6)}
+              key={'Z2View:'+i}
               id={id}
               z2id={v.id}
               curZ2={v}

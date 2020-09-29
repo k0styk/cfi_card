@@ -13,7 +13,7 @@ const mainView = ({ summary, archive }) => {
         <div className="wrapper-summary">
           {filteredSummary.map((i, idx) =>
             (<SummaryView
-              key={'SummaryView:'+idx+':'+new Date().getTime().toString().substr(-6)}
+              key={'SummaryView:'+idx}
               id={i.id}
               curSummary={i}
             />))}

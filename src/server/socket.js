@@ -107,11 +107,10 @@ module.exports = server => {
           const invalidSummary = [];
 
           for (let i = 0; i < summary.length; i++) {
-            const v = summary[i];
+            const v = {...summary[i]};
 
             try {
               await summaryController.save({ summary: v, userId: session.userId });
-              console.log('saved');
               resultSummary.push(v);
             } catch (err) {
               console.log(err);
@@ -124,11 +123,12 @@ module.exports = server => {
           } else {
             cb({ eventName: events.summary.save_success, message: 'Все сводки сохранены' });
           }
-          try {
-            console.log(resultSummary);
-            daySummaryController.save({ summaries: resultSummary, userId: session.userId });
-          } catch (err) {
-            console.log(err);
+          if(resultSummary.length) {
+            try {
+              daySummaryController.save({ summaries: resultSummary, userId: session.userId });
+            } catch (err) {
+              console.log(err);
+            }
           }
         } else {
           console.log('No summaries!');

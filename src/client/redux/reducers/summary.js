@@ -9,6 +9,14 @@ const z1State = {
   entryTime: `${('0'+(new Date().getUTCHours() + 1)).slice(-2)}:${('0'+(new Date().getUTCMinutes() + 1)).slice(-2)}`,
   exitPoint: '',
   regno: '',
+  errors: {
+    flyDate: '',
+    acftIdent: '',
+    aircraftType: '',
+    depAirport: '',
+    destAirport: '',
+    entryTime: '',
+  },
   validation:  33,
 };
 const z2State = {
@@ -17,9 +25,10 @@ const z2State = {
   entryTime: `${('0'+(new Date().getUTCHours() + 1)).slice(-2)}:${('0'+(new Date().getUTCMinutes() + 1)).slice(-2)}`,
   exitPoint: '',
   exitTime: `${('0'+(new Date().getUTCHours() + 1)).slice(-2)}:${('0'+(new Date().getUTCMinutes() + 1)).slice(-2)}`,
-  flyCtg: '',
-  countOfDep: '',
-  countOfApp: '',
+  // flyCtg: '',
+  // countOfDep: '',
+  // countOfApp: '',
+  errors: {},
   validation: 20
 };
 const z3State = {
@@ -27,7 +36,8 @@ const z3State = {
   aircraftTypeName: '',
   depAirportCoord: '',
   destAirportCoord: '',
-  airspaceTypeGTime: null,
+  // airspaceTypeGTime: null,
+  errors: {},
   validation: 0
 };
 const initialState = {
@@ -133,6 +143,25 @@ export function summary(state = initialState, action) {
               z1: {
                 ...v.z1,
                 validation: p.state
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z1.ERROR_SET:
+      return {
+        ...state,
+        value: state.value.map((v, i) => {
+          if (v.id === p.id) {
+            return {
+              ...v,
+              z1: {
+                ...v.z1,
+                errors: {
+                  ...v.z1.errors,
+                  ...p.field
+                }
               }
             };
           }
@@ -441,6 +470,30 @@ export function summary(state = initialState, action) {
                   return {
                     ...z2v,
                     validation: p.state
+                  };
+                }
+                return z2v;
+              })
+            };
+          }
+          return v;
+        })
+      };
+    case Z2.ERROR_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z2: v.z2.map(z2v => {
+                if(z2v.id === p.z2id) {
+                  return {
+                    ...z2v,
+                    errors: {
+                      ...z2v.errors,
+                      ...p.field
+                    }
                   };
                 }
                 return z2v;
@@ -798,6 +851,25 @@ export function summary(state = initialState, action) {
               z3: {
                 ...v.z3,
                 validation: p.state
+              }
+            };
+          }
+          return v;
+        })
+      };
+    case Z3.ERROR_SET:
+      return {
+        ...state,
+        value: state.value.map((v,i) => {
+          if(v.id === p.id) {
+            return {
+              ...v,
+              z3: {
+                ...v.z3,
+                errors: {
+                  ...v.z3.errors,
+                  ...p.field
+                }
               }
             };
           }

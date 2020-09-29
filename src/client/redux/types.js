@@ -39,6 +39,7 @@ module.exports.Z1 = {
   REGNO_SET:                                            'Z1_REGNO_SET',
   REGNO_REMOVE:                                         'Z1_REGNO_REMOVE',
   VALIDATION_SET:                                       'Z1_VALIDATION_SET',
+  ERROR_SET:                                            'Z1_ERROR_SET',
 };
 
 module.exports.Z2 = {
@@ -59,6 +60,7 @@ module.exports.Z2 = {
   COUNTOFAPP_SET:                                       'Z2_COUNTOFAPP_SET',
   COUNTOFAPP_REMOVE:                                    'Z2_COUNTOFAPP_REMOVE',
   VALIDATION_SET:                                       'Z2_VALIDATION_SET',
+  ERROR_SET:                                            'Z2_ERROR_SET',
 };
 
 module.exports.Z3 = {
@@ -73,6 +75,7 @@ module.exports.Z3 = {
   AIRSPACETYPEGTIME_SET:                                'Z3_AIRSPACETYPEGTIME_SET',
   AIRSPACETYPEGTIME_REMOVE:                             'Z3_AIRSPACETYPEGTIME_REMOVE',
   VALIDATION_SET:                                       'Z3_VALIDATION_SET',
+  ERROR_SET:                                            'Z3_ERROR_SET',
 };
 
 module.exports.UI = {

@@ -34,7 +34,6 @@ const z1Validator = {
       },
     };
 
-    console.log(fieldName, value);
     switch (fieldName) {
       case this.validationFields.flyDate.name:
       case this.validationFields.entryTime.name:
@@ -120,7 +119,7 @@ const z2Validator = {
 
     switch (fieldName) {
       case this.validationFields.code.name:
-        if (!value.length) {
+        if(value.length !== 4) {
           return {
             ...retVal,
             operation: 0,
@@ -129,9 +128,10 @@ const z2Validator = {
             },
           };
         }
+        break;
       case this.validationFields.exitPoint.name:
       case this.validationFields.entryPoint.name:
-        if (value.indexOf('_') !== -1) {
+        if (!value || value.indexOf('_') !== -1) {
           return {
             ...retVal,
             operation: 0,
@@ -140,9 +140,20 @@ const z2Validator = {
             },
           };
         }
+        break;
       case this.validationFields.entryTime.name:
       case this.validationFields.exitTime.name:
-        if(!value&&!value._isValid) {
+        if(value) {
+          if(!value.isValid()) {
+            return {
+              ...retVal,
+              operation: 0,
+              error: {
+                [fieldName]: 'Некорректная дата',
+              },
+            };
+          }
+        } else {
           return {
             ...retVal,
             operation: 0,
@@ -151,6 +162,7 @@ const z2Validator = {
             },
           };
         }
+        break;
     }
     return retVal;
   },
@@ -178,71 +190,85 @@ const z3Validator = {
     const retVal = {
       mask: this.validationFields[fieldName].mask,
       operation: 1,
+      error: {
+        [fieldName]: '',
+      },
     };
 
     switch (fieldName) {
       case this.validationFields.airspaceType.name:
-        if(value==='G'&&z2l) {
+        if(value) {
+          if(value==='G'&&z2l) {
+            return {
+              ...retVal,
+              operation: 0,
+              error: {
+                [fieldName]: 'Недопустимо',
+              },
+            };
+          }
+        } else {
           return {
             ...retVal,
-            operation: 0,
+            mask: 0,
+            operation: 1,
           };
         }
         break;
       case this.validationFields.aircraftTypeName.name:
         if(z1.aircraftType==='ZZZZ') {
-          if(!value.length) {
+          if(!value) {
             return {
               ...retVal,
               operation: 0,
+              error: {
+                [fieldName]: 'Необходимо заполнить',
+              },
             };
           }
         } else {
           return {
             ...retVal,
-            operation: 0,
+            mask: 0,
+            operation: 1,
           };
         }
+        break;
       case this.validationFields.depAirportCoord.name:
-        if (value.length > 0) {
-          if (z1.depAirport === 'ZZZZ') {
-            if (value.indexOf('_') !== -1) {
-              return {
-                ...retVal,
-                operation: 0,
-              };
-            }
-          } else {
+        if (z1.depAirport === 'ZZZZ') {
+          if (!value || value.indexOf('_') !== -1) {
             return {
               ...retVal,
               operation: 0,
+              error: {
+                [fieldName]: 'Необходимо заполнить',
+              },
             };
           }
         } else {
           return {
             ...retVal,
-            operation: 0,
+            mask: 0,
+            operation: 1,
           };
         }
+        break;
       case this.validationFields.destAirportCoord.name:
-        if (value.length > 0) {
-          if (z1.destAirport === 'ZZZZ') {
-            if (value.indexOf('_') !== -1) {
-              return {
-                ...retVal,
-                operation: 0,
-              };
-            }
-          } else {
+        if (z1.destAirport === 'ZZZZ') {
+          if (!value || value.indexOf('_') !== -1) {
             return {
               ...retVal,
               operation: 0,
+              error: {
+                [fieldName]: 'Необходимо заполнить',
+              },
             };
           }
         } else {
           return {
             ...retVal,
-            operation: 0,
+            mask: 0,
+            operation: 1,
           };
         }
     }

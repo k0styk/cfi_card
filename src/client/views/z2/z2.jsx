@@ -1,7 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { summaryAction } from '@redux/actions';
-import { Autocomplete, InputMask  } from '@components';
+import { InputMask  } from '@components';
+import { z2Validator } from '../../validators/validators';
+import replaceLayout from '../../helpers/layoutReplacer';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers';
@@ -40,8 +42,8 @@ const useStyles = makeStyles(theme => ({
 const z2View = ({
   id,
   z2id,
-  removeZ2,
   curZ2,
+  removeZ2,
   codeSet,
   entryPointSet,
   entryTimeSet,
@@ -50,11 +52,10 @@ const z2View = ({
   // flyCtgSet,
   // countOfDepSet,
   // countOfAppSet
-  setValid
+  setValid,
+  setError,
 }) => {
   const classes = useStyles();
-  // const [curSummary] = summary.value.filter(v => v.id === id);
-  // const curZ2 = curSummary.z2.filter(v => v.id === z2id);
   const {
     code,
     entryPoint,
@@ -64,15 +65,17 @@ const z2View = ({
     // flyCtg,
     // countOfDep,
     // countOfApp
-    validation
+    validation,
+    errors,
   } = curZ2;
-  const [errorField, setError] = React.useState({
-    code: '',
-    entryPoint: '',
-    entryTime: '',
-    exitPoint: '',
-    exitTime: '',
-  });
+  const [values, setValues] = React.useState(() => ({
+    code: code,
+    entryPoint: entryPoint,
+    exitPoint: exitPoint,
+  }));
+  const [entryTimeState, setEntryTimeState] = React.useState(entryTime);
+  const [exitTimeState, setExitTimeState] = React.useState(exitTime);
+
   const handleValidateWrapper = ({mask, operation}) => {
     let val = 0;
 
@@ -84,16 +87,35 @@ const z2View = ({
     setValid(id,z2id,val);
   };
   const validateField = (fieldName, value) => {
-    const validation = z2Validator.validateField(fieldName, value);
+    const v = z2Validator.validateField(fieldName, value);
 
-    if(validation.error[fieldName] !== errorField[fieldName]) {
-      setError({
-        ...errorField,
-        ...validation.error
-      });
+    if(v.error[fieldName] !== errors[fieldName]) {
+      setError(id, z2id, {...v.error});
     }
-    handleValidateWrapper(validation);
+    handleValidateWrapper(v);
   };
+
+  React.useEffect(() => {
+    setValues({
+      code,
+      entryPoint,
+      exitPoint,
+      entryTime,
+      exitTime,
+    });
+  },[
+    code,
+    entryPoint,
+    exitPoint,
+    entryTime,
+    exitTime,
+  ]);
+  React.useEffect(() => {
+    setEntryTimeState(moment(entryTime, 'HH:mm'));
+  },[entryTime]);
+  React.useEffect(() => {
+    setExitTimeState(moment(exitTime, 'HH:mm'));
+  },[exitTime]);
 
   return (
     <div className="z2-view">
@@ -105,12 +127,22 @@ const z2View = ({
         {/* 1 req max 4 */}
         <Grid item xs className={classes.one}>
           <TextField
-            error={!!errorField.code}
-            helperText={errorField.code}
-            value={code}
+            error={!!errors.code}
+            helperText={errors.code}
+            value={values.code}
             onChange={e => {
-              codeSet(id, z2id, e.target.value.toUpperCase());
-              // validateField(e.target.name, e.target.value);
+              const value = replaceLayout(e.target.value).toUpperCase();
+
+              validateField(e.target.name, value);
+              setValues({
+                ...values,
+                code: value
+              });
+            }}
+            onBlur={() => {
+              if(code !== values.code) {
+                codeSet(id, z2id, values.code);
+              }
             }}
             label="РЦ/МДП"
             inputProps={{
@@ -124,13 +156,23 @@ const z2View = ({
         {/* 2 req max 11 */}
         <Grid item xs className={classes.two}>
           <InputMask
-            error={!!errorField.entryPoint}
-            helperText={errorField.entryPoint}
+            error={!!errors.entryPoint}
+            helperText={errors.entryPoint}
             mask="9999N99999E"
-            value={entryPoint}
+            value={values.entryPoint}
             onChange={e => {
-              entryPointSet(id, z2id, e.target.value.toUpperCase());
-              // validateField(e.target.name, e.target.value);
+              const value = e.target.value.toUpperCase();
+
+              validateField(e.target.name, value);
+              setValues({
+                ...values,
+                entryPoint: value
+              });
+            }}
+            onBlur={() => {
+              if(entryPoint !== values.entryPoint) {
+                entryPointSet(id, z2id, values.entryPoint);
+              }
             }}
             label="Вход в ВП к. A/C"
             inputProps={{
@@ -144,8 +186,8 @@ const z2View = ({
         <Grid item xs className={classes.three}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
-              error={!!errorField.entryTime}
-              helperText={errorField.entryTime}
+              error={!!errors.entryTime}
+              helperText={errors.entryTime}
               autoOk
               mask="__:__"
               ampm={false}
@@ -157,10 +199,26 @@ const z2View = ({
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={moment(entryTime, 'HH:mm')}
-              onChange={(d,v) => {
-                entryTimeSet(id,z2id,moment(d).format('HH:mm'));
-                // validateField(validationFields.entryTime.name, d);
+              value={entryTimeState}
+              onChange={v => {
+                validateField('entryTime', v);
+                setEntryTimeState(v);
+              }}
+              onBlur={() => {
+                if(moment(entryTimeState).isValid()) {
+                  if(!moment(entryTimeState).isSame(moment(entryTime,'HH:mm')))
+                    entryTimeSet(id, z2id, moment(entryTimeState).format('HH:mm'));
+                } else {
+                  entryTimeSet(id, z2id, null);
+                }
+              }}
+              onClose={() => {
+                if(moment(entryTimeState).isValid()) {
+                  if(!moment(entryTimeState).isSame(moment(entryTime,'HH:mm')))
+                    entryTimeSet(id, z2id, moment(entryTimeState).format('HH:mm'));
+                } else {
+                  entryTimeSet(id, z2id, null);
+                }
               }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
@@ -171,13 +229,23 @@ const z2View = ({
         {/* 4 req */}
         <Grid item xs className={classes.four}>
           <InputMask
-            error={!!errorField.exitPoint}
-            helperText={errorField.exitPoint}
+            error={!!errors.exitPoint}
+            helperText={errors.exitPoint}
             mask="9999N99999E"
-            value={exitPoint}
+            value={values.exitPoint}
             onChange={e => {
-              exitPointSet(id, z2id, e.target.value.toUpperCase());
-              // validateField(e.target.name, e.target.value);
+              const value = e.target.value.toUpperCase();
+
+              validateField(e.target.name, value);
+              setValues({
+                ...values,
+                exitPoint: value
+              });
+            }}
+            onBlur={() => {
+              if(exitPoint !== values.exitPoint) {
+                exitPointSet(id, z2id, values.exitPoint);
+              }
             }}
             label="Выход из ВП к. A/C"
             inputProps={{
@@ -191,8 +259,8 @@ const z2View = ({
         <Grid item xs className={classes.five}>
           <MuiPickersUtilsProvider utils={MomentUtils}>
             <KeyboardTimePicker
-              error={!!errorField.exitTime}
-              helperText={errorField.exitTime}
+              error={!!errors.exitTime}
+              helperText={errors.exitTime}
               autoOk
               mask="__:__"
               ampm={false}
@@ -204,10 +272,26 @@ const z2View = ({
               showTodayButton
               margin="normal"
               placeholder="08:00"
-              value={moment(exitTime, 'HH:mm')}
-              onChange={(d,v) => {
-                exitTimeSet(id,z2id,moment(d).format('HH:mm'));
-                // validateField(validationFields.exitTime.name, d);
+              value={exitTimeState}
+              onChange={v => {
+                validateField('exitTime', v);
+                setExitTimeState(v);
+              }}
+              onBlur={() => {
+                if(moment(exitTimeState).isValid()) {
+                  if(!moment(exitTimeState).isSame(moment(exitTime,'HH:mm')))
+                    exitTimeSet(id, z2id, moment(exitTimeState).format('HH:mm'));
+                } else {
+                  exitTimeSet(id, z2id, null);
+                }
+              }}
+              onClose={() => {
+                if(moment(exitTimeState).isValid()) {
+                  if(!moment(exitTimeState).isSame(moment(exitTime,'HH:mm')))
+                    exitTimeSet(id, z2id, moment(exitTimeState).format('HH:mm'));
+                } else {
+                  exitTimeSet(id, z2id, null);
+                }
               }}
               KeyboardButtonProps={{
                 'aria-label': 'change time',
@@ -215,33 +299,23 @@ const z2View = ({
             />
           </MuiPickersUtilsProvider>
         </Grid>
-        {/* 6 max 3 */}
+        {/* 6 80 */}
         <Grid item xs className={classes.six}>
-          <Autocomplete
+          <TextField
             disabled
-            options={[]}
-            value={''}
-            size="small"
-            inputParams={{ label: 'Приказ 80', name: 'mdp' }}
-            renderOptionFunc={option => { return (<React.Fragment>{option}</React.Fragment>); }} // eslint-disable-line
-            clearOnEscape
-            freeSolo
+            label="Приказ 80"
+            inputProps={{ maxLength: 5, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
-        {/* 7 max 1 need SELECT */}
+        {/* 7 80 */}
         <Grid item xs className={classes.seven}>
-          <Autocomplete
+          <TextField
             disabled
-            options={[]}
-            value={''}
-            size="small"
-            inputParams={{ label: 'Приказ 80', name: 'cfd' }}
-            renderOptionFunc={option => { return (<React.Fragment>{option}</React.Fragment>); }} // eslint-disable-line
-            clearOnEscape
-            freeSolo
+            label="Приказ 80"
+            inputProps={{ maxLength: 5, style: { textTransform: 'uppercase' } }}
           />
         </Grid>
-        {/* 8  max 2*/}
+        {/* 8  80 */}
         <Grid item xs className={classes.eight}>
           <TextField
             disabled
@@ -280,7 +354,8 @@ const mdtp = dispatch => ({
   flyCtgSet:       (id, z2id, flyCtg)       => dispatch(summaryAction.z2.FLYCTG_SET({id, z2id, flyCtg})),
   countOfDepSet:   (id, z2id, countOfDep)   => dispatch(summaryAction.z2.COUNTOFDEP_SET({id, z2id, countOfDep})),
   countOfAppSet:   (id, z2id, countOfApp)   => dispatch(summaryAction.z2.COUNTOFAPP_SET({id, z2id, countOfApp})),
-  setValid:        (id, z2id, state)        => dispatch(summaryAction.z2.VALIDATION_SET({id, z2id, state}))
+  setValid:        (id, z2id, state)        => dispatch(summaryAction.z2.VALIDATION_SET({id, z2id, state})),
+  setError:        (id, z2id, field)        => dispatch(summaryAction.z2.ERROR_SET({id, z2id, field})),
 });
 
 export default /*React.memo(*/connect(mstp, mdtp)(z2View)/*)*/;

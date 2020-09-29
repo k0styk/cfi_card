@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { summaryAction } from '@redux/actions';
 import { InputMask } from '@components';
+import { z3Validator } from '../../validators/validators';
+import replaceLayout from '../../helpers/layoutReplacer';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider, KeyboardTimePicker } from '@material-ui/pickers';
@@ -33,41 +35,26 @@ const z3View = ({
   depAirportCoordSet,
   destAirportCoordSet,
   // airspaceTypeGTimeSet
-  setValid
+  setValid,
+  setError,
 }) => {
   const classes = useStyles();
-  // const [curSummary] = summary.value.filter(v => v.id === id);
   const {
     airspaceType,
     aircraftTypeName,
     depAirportCoord,
     destAirportCoord,
     // airspaceTypeGTime,
-    validation
+    validation,
+    errors,
   } = curSummary.z3;
-  const z2l = curSummary.z2.length;
+  const [values, setValues] = React.useState(() => ({
+    airspaceType: airspaceType,
+    aircraftTypeName: aircraftTypeName,
+    depAirportCoord: depAirportCoord,
+    destAirportCoord: destAirportCoord,
+  }));
 
-  const errorResolverG = (z2Val, val) => {
-    if(z2Val) {
-      if(val === 'G') {
-        return 'Недопустимо';
-      }
-      return '';
-    }
-    return '';
-  };
-  const errorResolverZ = (z1Val,val) => {
-    if(z1Val==='ZZZZ') {
-      if(!!!val||val.indexOf('_')!==-1) {
-        return 'Необходимо заполнить';
-      }
-      return '';
-    };
-    if(val.indexOf('_')!==-1) {
-      return 'Необходимо заполнить';
-    }
-    return '';
-  };
   const handleValidateWrapper = ({mask, operation}) => {
     let val = 0;
 
@@ -78,17 +65,40 @@ const z3View = ({
     }
     setValid(id,val);
   };
-  const validateField = (fieldName, value,z1,z2l) => {
-    const validation = z3Validator.validateField(fieldName, value,z1,z2l);
+  const validateField = (fieldName, value) => {
+    const v = z3Validator.validateField(fieldName, value, curSummary.z1, curSummary.z2.length);
 
-    // if(validation.error[fieldName] !== errorField[fieldName]) {
-    //   setError({
-    //     ...errorField,
-    //     ...validation.error
-    //   });
-    // }
-    handleValidateWrapper(validation);
+    if(v.error[fieldName] !== errors[fieldName]) {
+      setError(id, {...v.error});
+    }
+    handleValidateWrapper(v);
   };
+
+  React.useEffect(() => {
+    setValues({
+      airspaceType,
+      aircraftTypeName,
+      depAirportCoord,
+      destAirportCoord,
+    });
+  },[
+    airspaceType,
+    aircraftTypeName,
+    depAirportCoord,
+    destAirportCoord,
+  ]);
+  React.useEffect(() => {
+    validateField('airspaceType', values.airspaceType);
+  },[curSummary.z2]);
+  React.useEffect(() => {
+    validateField('aircraftTypeName', values.aircraftTypeName);
+  },[curSummary.z1.aircraftType]);
+  React.useEffect(() => {
+    validateField('depAirportCoord', values.depAirportCoord);
+  },[curSummary.z1.depAirport]);
+  React.useEffect(() => {
+    validateField('destAirportCoord', values.destAirportCoord);
+  },[curSummary.z1.destAirport]);
 
   return (
     <div className="z3-view">
@@ -100,15 +110,23 @@ const z3View = ({
         {/* 1 req filter of z2 */}
         <Grid item xs className={classes.one}>
           <TextField
-            error={!!errorResolverG(z2l,airspaceType)}
-            helperText={errorResolverG(z2l,airspaceType)}
+            error={!!errors.airspaceType}
+            helperText={errors.airspaceType}
             fullWidth
-            id="select"
+            // id="select"
             label="Класс ВП"
-            value={airspaceType?airspaceType:''}
+            value={values.airspaceType?values.airspaceType:''}
             onChange={e => {
-              airspaceTypeSet(id, e.target.value.toUpperCase());
-              // validateField(e.target.name, e.target.value);
+              validateField(e.target.name, e.target.value);
+              setValues({
+                ...values,
+                airspaceType: e.target.value
+              });
+            }}
+            onBlur={() => {
+              if(airspaceType !== values.airspaceType) {
+                airspaceTypeSet(id, values.airspaceType);
+              }
             }}
             inputProps={{
               maxLength: 2,
@@ -118,18 +136,28 @@ const z3View = ({
             select
           >
             {['A','C','G','CG'].map((v,i) =>
-              <MenuItem disabled={(v==='G' && !!z2l)} key={v} value={v}>{v}</MenuItem>)}
+              <MenuItem disabled={(v==='G' && !!curSummary.z2.length)} key={v+':'+i} value={v}>{v}</MenuItem>)}
           </TextField>
         </Grid>
         {/* 2 req if z1 3 stay ZZZZ*/}
         <Grid item xs className={classes.two}>
           <TextField
-            error={!!errorResolverZ(curSummary.z1.aircraftType, aircraftTypeName)}
-            helperText={errorResolverZ(curSummary.z1.aircraftType, aircraftTypeName)}
-            value={aircraftTypeName}
+            error={!!errors.aircraftTypeName}
+            helperText={errors.aircraftTypeName}
+            value={values.aircraftTypeName}
             onChange={e => {
-              aircraftTypeNameSet(id, e.target.value.toUpperCase());
-              // validateField(e.target.name, e.target.value);
+              const value = replaceLayout(e.target.value).toUpperCase();
+
+              validateField(e.target.name, value);
+              setValues({
+                ...values,
+                aircraftTypeName: value
+              });
+            }}
+            onBlur={() => {
+              if(aircraftTypeName !== values.aircraftTypeName) {
+                aircraftTypeNameSet(id, values.aircraftTypeName);
+              }
             }}
             label="Наименование типа ВС"
             inputProps={{
@@ -142,13 +170,23 @@ const z3View = ({
         {/* 3 req if z1 4 ZZZZ*/}
         <Grid item xs className={classes.three}>
           <InputMask
-            error={!!errorResolverZ(curSummary.z1.depAirport, depAirportCoord)}
-            helperText={errorResolverZ(curSummary.z1.depAirport, depAirportCoord)}
+            error={!!errors.depAirportCoord}
+            helperText={errors.depAirportCoord}
             mask="9999N99999E"
-            value={depAirportCoord}
+            value={values.depAirportCoord}
             onChange={e => {
-              depAirportCoordSet(id, e.target.value.toUpperCase());
-              // validateField(e.target.name, e.target.value);
+              const value = e.target.value.toUpperCase();
+
+              validateField(e.target.name, value);
+              setValues({
+                ...values,
+                depAirportCoord: value
+              });
+            }}
+            onBlur={() => {
+              if(depAirportCoord !== values.depAirportCoord) {
+                depAirportCoordSet(id, values.depAirportCoord);
+              }
             }}
             label="Коорд А-д/П-п вылета"
             inputProps={{
@@ -161,13 +199,23 @@ const z3View = ({
         {/* 4 req if z1 5 ZZZZ*/}
         <Grid item xs className={classes.four}>
           <InputMask
-            error={!!errorResolverZ(curSummary.z1.destAirport, destAirportCoord)}
-            helperText={errorResolverZ(curSummary.z1.destAirport, destAirportCoord)}
+            error={!!errors.destAirportCoord}
+            helperText={errors.destAirportCoord}
             mask="9999N99999E"
-            value={destAirportCoord}
+            value={values.destAirportCoord}
             onChange={e => {
-              destAirportCoordSet(id, e.target.value.toUpperCase());
-              // validateField(e.target.name, e.target.value);
+              const value = e.target.value.toUpperCase();
+
+              validateField(e.target.name, value);
+              setValues({
+                ...values,
+                destAirportCoord: value
+              });
+            }}
+            onBlur={() => {
+              if(destAirportCoord !== values.destAirportCoord) {
+                destAirportCoordSet(id, values.destAirportCoord);
+              }
             }}
             label="Коорд А-д/П-п посадки"
             inputProps={{
@@ -215,14 +263,15 @@ const z3View = ({
 };
 
 /* eslint-disable */
-const mstp = state => ({ summary: state.summary });
+const mstp = state => ({});
 const mdtp = dispatch => ({
   airspaceTypeSet:      (id, airspaceType)      => dispatch(summaryAction.z3.AIRSPACETYPE_SET({id, airspaceType})),
   aircraftTypeNameSet:  (id, aircraftTypeName)  => dispatch(summaryAction.z3.AIRCRAFTTYPENAME_SET({id, aircraftTypeName})),
   depAirportCoordSet:   (id, depAirportCoord)   => dispatch(summaryAction.z3.DEPAIRPORTCOORD_SET({id, depAirportCoord})),
   destAirportCoordSet:  (id, destAirportCoord)  => dispatch(summaryAction.z3.DESTAIRPORTCOORD_SET({id, destAirportCoord})),
   airspaceTypeGTimeSet: (id, airspaceTypeGTime) => dispatch(summaryAction.z3.AIRSPACETYPEGTIME_SET({id, airspaceTypeGTime})),
-  setValid:             (id, state)             => dispatch(summaryAction.z3.VALIDATION_SET({id, state}))
+  setValid:             (id, state)             => dispatch(summaryAction.z3.VALIDATION_SET({id, state})),
+  setError:             (id, field)             => dispatch(summaryAction.z3.ERROR_SET({id, field})),
 });
 /* eslint-enable */
 

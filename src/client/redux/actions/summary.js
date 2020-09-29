@@ -33,6 +33,10 @@ export default {
      */
     VALIDATION_SET: payload => ({type: Z1.VALIDATION_SET, payload}),
     /**
+     * @param {{ id: number, field: object}} payload
+     */
+    ERROR_SET: payload => ({type: Z1.ERROR_SET, payload}),
+    /**
      * @param {{ id: number, flyDate: string}} payload
      */
     FLYDATE_SET: payload => ({type: Z1.FLYDATE_SET, payload}),
@@ -111,6 +115,10 @@ export default {
      */
     VALIDATION_SET: payload => ({type: Z2.VALIDATION_SET, payload}),
     /**
+     * @param {{ id: number, z2id: number, field: object}} payload
+     */
+    ERROR_SET: payload => ({type: Z2.ERROR_SET, payload}),
+    /**
      * @param {{ id: number, z2id: number, code: string}} payload
      */
     CODE_SET: payload => ({ type: Z2.CODE_SET, payload }),
@@ -180,6 +188,10 @@ export default {
      * @param {{ id: number, state: number}} payload
      */
     VALIDATION_SET: payload => ({type: Z3.VALIDATION_SET, payload}),
+    /**
+     * @param {{ id: number, field: object}} payload
+     */
+    ERROR_SET: payload => ({type: Z3.ERROR_SET, payload}),
     /**
      * @param {{ id: number, airspaceType: string}} payload
      */
