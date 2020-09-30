@@ -66,8 +66,8 @@ const z1View = ({
     validation,
     errors
   } = z1;
-  const [flyDateState, setFlyDateState] = React.useState(flyDate);
-  const [entryTimeState, setEntryTimeState] = React.useState(entryTime);
+  const [flyDateState, setFlyDateState] = React.useState(null);
+  const [entryTimeState, setEntryTimeState] = React.useState(null);
   const [values, setValues] = React.useState(() => ({
     acftIdent: acftIdent,
     aircraftType: aircraftType,

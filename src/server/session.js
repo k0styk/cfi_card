@@ -12,11 +12,11 @@ const sessionMiddleware = session({
     httpOnly: true,
     secure: false,
     // day*hour*minutes*seconds*millis
-    maxAge: 1*18*60*60*1000
+    maxAge: 10*24*60*60*1000
   },
   store: new MongoStore({
     mongooseConnection: mongoose.connection,
-    ttl: 1*18*60*60,
+    ttl: 10*24*60*60,
   })
 });
 

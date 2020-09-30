@@ -1,7 +1,6 @@
 const config = require('../../../../config/config');
 
 module.exports = async (req, res) => {
-  console.log('### LOGIN');
   try {
     const uuid = require('uuid/v1');
     const dbName = process.env.DB_NAME || config.getValue('db').connection.table || 'Questions';

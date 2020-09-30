@@ -18,7 +18,6 @@ app.use(cookieParser());
 app.use(session);
 
 //Bring in the routes
-// app.use('/user', require('./routes/user')); // remove after socket ends
 app.use('/', express.static(path.join(__dirname, '../../dist')));
 app.use('/login', express.static(path.join(__dirname, '../../dist')));
 app.use('/register', express.static(path.join(__dirname, '../../dist')));

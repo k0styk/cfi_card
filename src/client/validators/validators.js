@@ -108,7 +108,7 @@ const z2Validator = {
       mask: 1<<4
     }
   },
-  validateField: function(fieldName, value) {
+  validateField: function(fieldName, value, compass) {
     const retVal = {
       mask: this.validationFields[fieldName].mask,
       operation: 1,
@@ -131,14 +131,26 @@ const z2Validator = {
         break;
       case this.validationFields.exitPoint.name:
       case this.validationFields.entryPoint.name:
-        if (!value || value.indexOf('_') !== -1) {
-          return {
-            ...retVal,
-            operation: 0,
-            error: {
-              [fieldName]: 'Необходимо заполнить',
-            },
-          };
+        if(compass) {
+          if (!value || value.indexOf('_') !== -1) {
+            return {
+              ...retVal,
+              operation: 0,
+              error: {
+                [fieldName]: 'Необходимо заполнить',
+              },
+            };
+          }
+        } else {
+          if (!(/[\w\d]{3,5}/gi.test(value))) {
+            return {
+              ...retVal,
+              operation: 0,
+              error: {
+                [fieldName]: 'Необходимо заполнить',
+              },
+            };
+          }
         }
         break;
       case this.validationFields.entryTime.name:

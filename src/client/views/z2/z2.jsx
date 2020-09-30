@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { summaryAction } from '@redux/actions';
-import { InputMask  } from '@components';
+import { InputMask, GeoTextField  } from '@components';
 import { z2Validator } from '../../validators/validators';
 import replaceLayout from '../../helpers/layoutReplacer';
 
@@ -72,9 +72,11 @@ const z2View = ({
     code: code,
     entryPoint: entryPoint,
     exitPoint: exitPoint,
+    compassEntry: false,
+    compassExit: false
   }));
-  const [entryTimeState, setEntryTimeState] = React.useState(entryTime);
-  const [exitTimeState, setExitTimeState] = React.useState(exitTime);
+  const [entryTimeState, setEntryTimeState] = React.useState(null);
+  const [exitTimeState, setExitTimeState] = React.useState(null);
 
   const handleValidateWrapper = ({mask, operation}) => {
     let val = 0;
@@ -86,8 +88,8 @@ const z2View = ({
     }
     setValid(id,z2id,val);
   };
-  const validateField = (fieldName, value) => {
-    const v = z2Validator.validateField(fieldName, value);
+  const validateField = (fieldName, value, compass) => {
+    const v = z2Validator.validateField(fieldName, value, compass);
 
     if(v.error[fieldName] !== errors[fieldName]) {
       setError(id, z2id, {...v.error});
@@ -97,18 +99,15 @@ const z2View = ({
 
   React.useEffect(() => {
     setValues({
+      ...values,
       code,
       entryPoint,
       exitPoint,
-      entryTime,
-      exitTime,
     });
   },[
     code,
     entryPoint,
     exitPoint,
-    entryTime,
-    exitTime,
   ]);
   React.useEffect(() => {
     setEntryTimeState(moment(entryTime, 'HH:mm'));
@@ -155,15 +154,19 @@ const z2View = ({
         </Grid>
         {/* 2 req max 11 */}
         <Grid item xs className={classes.two}>
-          <InputMask
+          <GeoTextField
+            id="entryPoint-geo-text-field"
             error={!!errors.entryPoint}
             helperText={errors.entryPoint}
-            mask="9999N99999E"
+            mask={['9999N99999E','*****']}
+            maskChar={['_',' ']}
             value={values.entryPoint}
+            state={values.compassEntry}
+            handleState={compassEntry => setValues({...values, compassEntry})}
             onChange={e => {
               const value = e.target.value.toUpperCase();
 
-              validateField(e.target.name, value);
+              validateField('entryPoint', value, values.compassEntry);
               setValues({
                 ...values,
                 entryPoint: value
@@ -228,15 +231,19 @@ const z2View = ({
         </Grid>
         {/* 4 req */}
         <Grid item xs className={classes.four}>
-          <InputMask
+          <GeoTextField
+            id="exitPoint-geo-text-field"
             error={!!errors.exitPoint}
             helperText={errors.exitPoint}
-            mask="9999N99999E"
+            mask={['9999N99999E','*****']}
+            maskChar={['_',' ']}
             value={values.exitPoint}
+            state={values.compassExit}
+            handleState={compassExit => setValues({...values, compassExit})}
             onChange={e => {
               const value = e.target.value.toUpperCase();
 
-              validateField(e.target.name, value);
+              validateField('exitPoint', value, values.compassExit);
               setValues({
                 ...values,
                 exitPoint: value

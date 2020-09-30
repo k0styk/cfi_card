@@ -1,12 +1,13 @@
 import { SUMMARY, Z1, Z2, Z3 } from '../types';
+const d = new Date();
 const z1State = {
-  flyDate: `${('0'+new Date().getUTCDate()).slice(-2)}/${('0'+(new Date().getUTCMonth() + 1)).slice(-2)}/${new Date().getUTCFullYear().toString().slice(-2)}`, // eslint-disable-line
+  flyDate: `${('0'+d.getUTCDate()).slice(-2)}/${('0'+(d.getUTCMonth() + 1)).slice(-2)}/${d.getUTCFullYear().toString().slice(-2)}`, // eslint-disable-line
   acftIdent: '',
   aircraftType: '',
   depAirport: '',
   destAirport: '',
   entryPoint: '',
-  entryTime: `${('0'+(new Date().getUTCHours() + 1)).slice(-2)}:${('0'+(new Date().getUTCMinutes() + 1)).slice(-2)}`,
+  entryTime: `${('0'+(d.getUTCHours() + 1)).slice(-2)}:${('0'+(d.getUTCMinutes() + 1)).slice(-2)}`,
   exitPoint: '',
   regno: '',
   errors: {
@@ -22,9 +23,9 @@ const z1State = {
 const z2State = {
   code: '',
   entryPoint: '',
-  entryTime: `${('0'+(new Date().getUTCHours() + 1)).slice(-2)}:${('0'+(new Date().getUTCMinutes() + 1)).slice(-2)}`,
+  entryTime: `${('0'+(d.getUTCHours() + 1)).slice(-2)}:${('0'+(d.getUTCMinutes() + 1)).slice(-2)}`,
   exitPoint: '',
-  exitTime: `${('0'+(new Date().getUTCHours() + 1)).slice(-2)}:${('0'+(new Date().getUTCMinutes() + 1)).slice(-2)}`,
+  exitTime: `${('0'+(d.getUTCHours() + 1)).slice(-2)}:${('0'+(d.getUTCMinutes() + 1)).slice(-2)}`,
   // flyCtg: '',
   // countOfDep: '',
   // countOfApp: '',

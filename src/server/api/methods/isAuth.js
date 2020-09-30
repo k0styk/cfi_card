@@ -1,5 +1,4 @@
 module.exports = (req, res) => {
-  console.log('### IS AUTH');
   try {
     if (req.session) {
       if (req.session.user) {

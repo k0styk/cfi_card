@@ -16,19 +16,19 @@ const store = createStore(
   composeWithDevTools(applyMiddleware(...middleware))
 );
 
-export default store;
-
 // store.subscribe(() => saveToLocalStorage(store.getState()));
 
 // function saveToLocalStorage(state) {
 //   try {
-//     const serializedState = JSON.stringify(state);
+//     const serializedState = JSON.stringify(state.summary);
 
-//     localStorage.setItem('state', serializedState);
+//     localStorage.setItem('summary', serializedState);
 //   } catch(e) {
 //     console.log(e);
 //   }
 // }
+
+export default store;
 
 // function loadFromLocalStorage() {
 //   try {

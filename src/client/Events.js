@@ -20,22 +20,14 @@ module.exports.summary = {
   save_success: 'summary_save_success',
   save_partial: 'summary_save_partial',
   save_err: 'summary_save_err',
+  generate: 'summary_generate',
+  generate_success: 'summary_generate_success',
+  generate_err: 'summary_generate_err',
 };
 
 module.exports.store = {
   INITIAL: 'INITIAL',
   UPDATE: 'UPDATE_STORE'
-};
-
-module.exports.entities = {
-  AIRCRAFTS: {
-    ADD: 'ENTITIES_AIRCRAFTS_ADD_SERVER',
-    DELETE: 'ENTITIES_AIRCRAFTS_DELETE_SERVER',
-  },
-  ROUTES: {
-    ADD: 'ENTITIES_ROUTES_ADD_SERVER',
-    DELETE: 'ENTITIES_ROUTES_DELETE_SERVER',
-  }
 };
 
 module.exports.app = {

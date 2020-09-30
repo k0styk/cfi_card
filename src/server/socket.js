@@ -81,7 +81,6 @@ module.exports = server => {
     });
 
     socket.on(events.user.checkAuth, async ({ id }, cb) => {
-      console.log('checkAuth');
       const isLogged = false;
       const session = socket.request.session; // eslint-disable-line
 
@@ -140,6 +139,10 @@ module.exports = server => {
       }
     });
 
+    socket.on(events.summary.generate, async ({}) => {
+      console.log('generating file');
+    });
+
     socket.on(events.store.INITIAL, async (payload, action, cb) => {
       const session = socket.request.session; // eslint-disable-line
       let userObj = null;
@@ -152,19 +155,15 @@ module.exports = server => {
         }
       }
 
-      const uiDate = moment().format('DD.MM.YYYY');
+      const uiDate = moment().utc().format('DD.MM.YYYY');
       const obj = {
         ui: {
           date: uiDate
-        },
-        crypto: {
-          publicKey: 'maybe hash'
         },
         date: {
           server: new Date()
         },
         user: userObj
-        // entities: entities
       };
 
       action.payload = obj;
