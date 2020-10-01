@@ -1,7 +1,7 @@
 import './header.scss';
 import React from 'react';
 import { Logo, Time } from '@components';
-import { SwitchFolderView, ServerButtonView, UserView } from '@views';
+import { SwitchFolderView, ServerButtonView, UserMenuView } from '@views';
 
 const header = ({}) => (
   <div className='header-wrapper grid-header'>
@@ -9,7 +9,7 @@ const header = ({}) => (
       <div className='header-block-icon'>
         <Logo />
         <Time />
-        <UserView />
+        <UserMenuView />
       </div>
       <div className="center-block">
         <SwitchFolderView />

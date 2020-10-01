@@ -6,7 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { userAction, uiAction } from '@redux/actions';
 import { user as userEvents } from '../../Events';
 
-const userView = ({user, socket, notify, logout}) => {
+const userMenuView = ({user, socket, notify, logout}) => {
   const history = useHistory();
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -27,7 +27,8 @@ const userView = ({user, socket, notify, logout}) => {
     history.replace('/register');
     closeMenu();
   };
-  const handleUsersList = () => {
+  const handleSummariesList = () => {
+    history.replace('/summaries');
     closeMenu();
   };
   const handleLogout = () => {
@@ -81,7 +82,7 @@ const userView = ({user, socket, notify, logout}) => {
         }
         {
           (user.rights==='manager'||user.rights==='admin')?
-            (<MenuItem disabled onClick={handleUsersList}>Список пользователей</MenuItem>):
+            (<MenuItem onClick={handleSummariesList}>Посмотреть сводки</MenuItem>):
             null
         }
         <MenuItem onClick={handleLogout}>Выход</MenuItem>
@@ -90,15 +91,14 @@ const userView = ({user, socket, notify, logout}) => {
   );
 };
 
-const mstp = state => ({
-  user: state.user,
-  socket: state.socket,
-});
-
-const mdtp = dispatch => ({
-  logout: () => dispatch(userAction.logoutUser()),
-  removeUser: ()          => dispatch(userAction.removeUser()),
-  notify:     (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
-});
-
-export default connect(mstp, mdtp)(userView);
+export default connect(
+  ({user, socket}) => ({
+    user,
+    socket,
+  }),
+  dispatch => ({
+    logout: () => dispatch(userAction.logoutUser()),
+    removeUser: ()          => dispatch(userAction.removeUser()),
+    notify:     (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+  })
+)(userMenuView);

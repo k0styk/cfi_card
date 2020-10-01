@@ -198,7 +198,7 @@ const z3Validator = {
       mask: 1<<3
     }
   },
-  validateField: function(fieldName, value,z1,z2l) {
+  validateField: function(fieldName,value,z1,z2l) {
     const retVal = {
       mask: this.validationFields[fieldName].mask,
       operation: 1,

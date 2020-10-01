@@ -2,10 +2,10 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
-import { MainView } from '@views';
+import { SummariesView } from '@views';
 import { user as userEvents } from '@client/Events';
 
-const SummaryPage = ({socket}) => {
+const SummariesPage = ({socket}) => {
   const history = useHistory();
 
   React.useLayoutEffect(() => {
@@ -20,12 +20,12 @@ const SummaryPage = ({socket}) => {
     }
   });
 
-  return <MainView />;
+  return <SummariesView />;
 };
 
 export default connect(
   ({socket}) => ({
     socket,
   }),
-  {}
-)(SummaryPage);
+  null
+)(SummariesPage);

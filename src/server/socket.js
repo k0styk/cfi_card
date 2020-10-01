@@ -139,8 +139,26 @@ module.exports = server => {
       }
     });
 
-    socket.on(events.summary.generate, async ({}) => {
-      console.log('generating file');
+    socket.on(events.summaries.getDates, async (nullable, cb) => {
+      const session = socket.request.session; // eslint-disable-line
+
+      if (session.userId && session.token) {
+        const dates = await daySummaryController.getDates();
+
+        cb({ dates });
+      }
+    });
+
+    socket.on(events.summaries.generate, async ({date}, cb) => {
+      const session = socket.request.session; // eslint-disable-line
+
+      if (session.userId && session.token) {
+        const generated = await daySummaryController.generateSummariesByDate({date});
+
+        cb({generated});
+        // setTimeout(() => {
+        // }, 5000);
+      }
     });
 
     socket.on(events.store.INITIAL, async (payload, action, cb) => {

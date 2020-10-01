@@ -11,22 +11,22 @@ const schemaSummaryZ2 = new mongoose.Schema({
   entryPoint: {
     required: 'entryPoint req',
     type: String,
-    match: /^\d{4}N\d{5}E$/gmi
+    match: /(^\d{4}N\d{5}E$)|(^[\w\d]{3,5}$)/gi
   },
   entryTime: {
     required: 'entryTime req',
     type: String,
-    match: /^([01]\d|2[0-3]):[0-5]\d$/gmi
+    match: /^([01]\d|2[0-3]):[0-5]\d$/gi
   },
   exitPoint: {
     required: 'exitPoint req',
     type: String,
-    match: /^\d{4}N\d{5}E$/gmi
+    match: /(^\d{4}N\d{5}E$)|(^[\w\d]{3,5}$)/gi
   },
   exitTime: {
     required: 'exitTime req',
     type: String,
-    match: /^([01]\d|2[0-3]):[0-5]\d$/gmi
+    match: /^([01]\d|2[0-3]):[0-5]\d$/gi
   },
   // flyCtg: {},
   // countOfDep: {},
@@ -56,7 +56,7 @@ const summarySchema = new mongoose.Schema({
     flyDate: {
       required: 'z1.flyDate req',
       type: String,
-      match: /^\d{2}\/\d{2}\/\d{2}$/gmi
+      match: /^\d{2}\/\d{2}\/\d{2}$/gi
     },
     acftIdent: {
       required: 'z1.acftIdent req',
@@ -88,7 +88,7 @@ const summarySchema = new mongoose.Schema({
     entryTime: {
       required: 'z1.entryTime req',
       type: String,
-      match: /^([01]\d|2[0-3]):[0-5]\d$/gmi
+      match: /^([01]\d|2[0-3]):[0-5]\d$/gi
     },
     exitPoint: {
       type: String,
@@ -118,14 +118,14 @@ const summarySchema = new mongoose.Schema({
     },
     depAirportCoord: {
       type: String,
-      match: /^\d{4}N\d{5}E$/gmi,
+      match: /^\d{4}N\d{5}E$/gi,
       required: function() {
         return (this.z1.depAirport === 'ZZZZ')?'depAirportCoord req':false;
       }
     },
     destAirportCoord: {
       type: String,
-      match: /^\d{4}N\d{5}E$/gmi,
+      match: /^\d{4}N\d{5}E$/gi,
       required: function() {
         return (this.z1.destAirport === 'ZZZZ')?'destAirportCoord req':false;
       }

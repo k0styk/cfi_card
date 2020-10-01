@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const summarySchema = require('./Summary').schema;
+const moment = require('moment');
 const schemaDaySummaries = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -13,7 +14,7 @@ const schemaDaySummaries = new mongoose.Schema({
   },
   summariesDate: {
     type: String,
-    default: `${new Date().getUTCFullYear()}.${('0'+(new Date().getUTCMonth() + 1)).slice(-2)}.${('0'+new Date().getUTCDate()).slice(-2)}` // eslint-disable-line
+    default: moment().format('DD.MM.YY')
   }
 },{
   minimize: false,

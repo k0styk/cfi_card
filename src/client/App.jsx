@@ -1,7 +1,7 @@
 import 'normalize.css';
 import './app.scss';
 import { initialAction, socketAction, uiAction } from '@redux/actions';
-import { IndexPage, LoginPage, RegisterPage, SummaryPage } from '@pages';
+import { IndexPage, LoginPage, RegisterPage, SummaryPage, SummariesPage } from '@pages';
 import { Notifier } from '@components';
 import { HeaderView } from '@views';
 
@@ -13,21 +13,30 @@ import { withStyles } from '@material-ui/core/styles';
 import { CircularProgress, Backdrop } from '@material-ui/core';
 import io from 'socket.io-client';
 
-const PrivateRoute = ({ component: Component, redirect, socket, ...rest }) => (
+const PrivateRoute = ({ component: Component, redirect, socket, admin: isAdmin, ...rest }) => (
   (<Route
     {...rest}
     render={props => {
-      if(localStorage.getItem('userId')) {
+      const redi = () => (<Redirect
+        to={{
+          pathname: redirect,
+          state: {
+            from: props.location
+          }
+        }}
+      />);
+      const user = JSON.parse(localStorage.getItem('user'));
+
+      if(isAdmin && user) {
+        if(user.rights === 'admin' || user.rights === 'manager') {
+          return (<Component {...props} />);
+        } else {
+          return redi();
+        }
+      } else if(localStorage.getItem('userId')) {
         return (<Component {...props} />);
       } else {
-        return (<Redirect
-          to={{
-            pathname: redirect,
-            state: {
-              from: props.location
-            }
-          }}
-        />);
+        return redi();
       }
     }}
   />)
@@ -152,8 +161,15 @@ class App extends React.Component {
               socket={this.props.socket}
               path="/summary"
               redirect="/login"
-              condition={this.props.user}
               component={SummaryPage}
+              exact
+            />
+            <PrivateRoute
+              socket={this.props.socket}
+              path="/summaries"
+              redirect="/summary"
+              component={SummariesPage}
+              admin
               exact
             />
           </Switch>

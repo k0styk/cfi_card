@@ -20,9 +20,13 @@ module.exports.summary = {
   save_success: 'summary_save_success',
   save_partial: 'summary_save_partial',
   save_err: 'summary_save_err',
-  generate: 'summary_generate',
-  generate_success: 'summary_generate_success',
-  generate_err: 'summary_generate_err',
+};
+
+module.exports.summaries = {
+  generate: 'summaries_generate',
+  generate_success: 'summaries_generate_success',
+  generate_err: 'summaries_generate_err',
+  getDates: 'summaries_getDates'
 };
 
 module.exports.store = {

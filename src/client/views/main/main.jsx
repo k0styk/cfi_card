@@ -1,7 +1,6 @@
 import './main.scss';
 import React from 'react';
 import { connect } from 'react-redux';
-import { uiAction } from '@redux/actions';
 import { SummaryView } from '@views';
 
 const mainView = ({ summary, archive }) => {
@@ -28,5 +27,5 @@ export default connect(
     summary,
     archive: ui.app.archive,
   }),
-  dispatch => ({})
+  null
 )(mainView);
