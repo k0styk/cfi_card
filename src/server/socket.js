@@ -153,11 +153,11 @@ module.exports = server => {
       const session = socket.request.session; // eslint-disable-line
 
       if (session.userId && session.token) {
-        const generated = await daySummaryController.generateSummariesByDate({date});
+        const { generated, fileName } = await daySummaryController.generateSummariesByDate({date});
+        const message = generated?`Файл ${date} - успешно создан`:`Возникла ошибка при создании файла`;
+        const link = `/download/${fileName}`;
 
-        cb({generated});
-        // setTimeout(() => {
-        // }, 5000);
+        cb({message, generated, link});
       }
     });
 

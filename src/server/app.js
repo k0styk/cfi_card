@@ -23,6 +23,7 @@ app.use('/login', express.static(path.join(__dirname, '../../dist')));
 app.use('/register', express.static(path.join(__dirname, '../../dist')));
 app.use('/summary', express.static(path.join(__dirname, '../../dist')));
 app.use('/summaries', express.static(path.join(__dirname, '../../dist')));
+app.use(require('./routes/download'));
 
 //Setup Error Handlers -- MUST BE LAST USE DIRECTIVES
 const errorHandlers = require('./handlers/errorHandlers');

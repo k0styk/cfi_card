@@ -1,7 +1,7 @@
 import './summaries.scss';
 import React from 'react';
 import { connect } from 'react-redux';
-import { SummaryView } from '@views';
+import { uiAction } from '@redux/actions';
 import { summaries as summariesEvents } from '@client/Events';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -48,7 +48,7 @@ function sleep(delay = 0) {
   return new Promise(resolve => setTimeout(resolve, delay));
 }
 
-const summariesView = ({socket}) => {
+const summariesView = ({socket, notify}) => {
   const classes = useStyles();
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
@@ -58,6 +58,22 @@ const summariesView = ({socket}) => {
   const [dateValue, setDateValue] = React.useState('');
   const [dateInputValue, setDateInputValue] = React.useState('');
   const loadingDates = open && options.length === 0;
+  // const [timerMessage, setTimerMessage] = React.useState('');
+
+  // const setupDownloadTimer = async link => {
+  //   for (let i = 3; i > 0; i--) {
+  //     setTimerMessage(`Скачивание через ${i} сек...`);
+  //     await sleep(1e3);
+  //   }
+  //   window.open(link);
+  //   setSuccess(false);
+  // };
+  const setupDownloadTimer = async () => {
+    for (let i = 3; i > 0; i--) {
+      await sleep(1e3);
+    }
+    setSuccess(false);
+  };
 
   React.useEffect(() => {
     let active = true;
@@ -69,7 +85,7 @@ const summariesView = ({socket}) => {
     (async () => {
 
       socket.emit(summariesEvents.getDates, null, async ({ dates }) => {
-        await sleep(1e3);
+        await sleep(6e2);
         if (active) {
           setOptions(dates);
         }
@@ -91,10 +107,29 @@ const summariesView = ({socket}) => {
     if (!loading) {
       setSuccess(false);
       setLoading(true);
-      socket.emit(summariesEvents.generate, {date: dateValue}, ({generated}) => {
+      socket.emit(summariesEvents.generate, {date: dateValue}, ({generated, message, link}) => {
         if(generated) {
           setLoading(false);
           setSuccess(true);
+          window.open(link);
+          setupDownloadTimer();
+          notify({
+            message,
+            options: {
+              autoHideDuration: 1500,
+              variant: 'success',
+            }
+          });
+        } else {
+          setLoading(false);
+          setSuccess(false);
+          notify({
+            message,
+            options: {
+              autoHideDuration: 1500,
+              variant: 'error',
+            }
+          });
         }
       });
 
@@ -148,13 +183,14 @@ const summariesView = ({socket}) => {
           </div>
           <div className={classes.wrapper}>
             <Button
+              style={{ width: 300 }}
               variant="contained"
               color="primary"
               className={success ? classes.buttonSuccess : ''}
-              disabled={loading}
               onClick={handleButtonClick}
+              disabled={loading||!dateInputValue}
             >
-              {success ? 'созданы' : loading ? 'создаём' : 'Создать файлы сводки'}
+              {success?'Успешно созданы':loading?'создаём':'Создать файлы сводки'}
             </Button>
             {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
           </div>
@@ -168,5 +204,7 @@ export default connect(
   ({socket}) => ({
     socket,
   }),
-  dispatch => ({})
+  dispatch => ({
+    notify:     (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+  })
 )(summariesView);

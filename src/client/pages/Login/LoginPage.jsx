@@ -1,8 +1,8 @@
 import './login.scss';
 import React from 'react';
 import { connect } from 'react-redux';
-import { userAction, uiAction } from '../../redux/actions';
-import { user as userEvents } from '../../Events';
+import { userAction, uiAction } from '@redux/actions';
+import { user as userEvents } from '@client/Events';
 
 import {
   Button, InputLabel, InputAdornment,
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const LoginPage = ({socket,setUser,logout,notify,setLoader}) => {
+const LoginPage = ({socket,setUser,notify,setLoader}) => {
   const history = useHistory();
   const classes = useStyles();
   const [values, setValues] = React.useState({
@@ -46,33 +46,6 @@ const LoginPage = ({socket,setUser,logout,notify,setLoader}) => {
     event.preventDefault();
   };
 
-  const logoutUser = () => {
-    socket.emit(userEvents.logout, {}, ({ eventName, message }) => {
-      if (eventName === userEvents.logout_err) {
-        console.error(message);
-        notify({
-          message,
-          options: {
-            autoHideDuration: 1500,
-            variant: 'error',
-          }
-        });
-      }
-      if (eventName === userEvents.logout_success) {
-        console.log(message);
-
-        localStorage.clear();
-        logout();
-        notify({
-          message,
-          options: {
-            autoHideDuration: 1500,
-            variant: 'success',
-          }
-        });
-      }
-    });
-  };
   const loginUser = e => {
     e.preventDefault();
     setLoader(true);
@@ -176,14 +149,6 @@ const LoginPage = ({socket,setUser,logout,notify,setLoader}) => {
             >
               ВОЙТИ
             </Button>
-            <Button
-              className={classes.button}
-              color="primary"
-              variant="contained"
-              onClick={logoutUser}
-            >
-              ВЫЙТИ
-            </Button>
           </div>
         </div>
       </form>
@@ -197,7 +162,6 @@ export default connect(
   }),
   dispatch => ({
     setUser:    (...args)   => dispatch(userAction.setUser(...args)),
-    logout:     ()          => dispatch(userAction.logoutUser()),
     notify:     (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
     setLoader:  state       => dispatch(uiAction.app.setLoader({uiLoader: state})),
   })

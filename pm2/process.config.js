@@ -9,6 +9,7 @@ module.exports = {
         ".git",
         ".logs",
         "dist",
+        "temp",
         "config",
         "pm2",
         "./*.js",

@@ -155,7 +155,7 @@ const z2View = ({
         {/* 2 req max 11 */}
         <Grid item xs className={classes.two}>
           <GeoTextField
-            id="entryPoint-geo-text-field"
+            id={'entryPoint-geo-text-field:'+moment().toDate().getTime().toString().substring(-6)}
             error={!!errors.entryPoint}
             helperText={errors.entryPoint}
             mask={['9999N99999E','*****']}
@@ -232,7 +232,7 @@ const z2View = ({
         {/* 4 req */}
         <Grid item xs className={classes.four}>
           <GeoTextField
-            id="exitPoint-geo-text-field"
+            id={'exitPoint-geo-text-field:'+moment().toDate().getTime().toString().substring(-6)}
             error={!!errors.exitPoint}
             helperText={errors.exitPoint}
             mask={['9999N99999E','*****']}
