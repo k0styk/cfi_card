@@ -23,7 +23,8 @@ const common = merge([
     output: {
       path: build(),
       publicPath: '/',
-      filename: '[name].[hash:3].js',
+      filename: '[name].[chunkhash].js',
+      chunkFilename: '[name].[chunkhash].js',
     },
     resolve: {
       extensions: ['.js', '.jsx'],
@@ -84,21 +85,21 @@ module.exports = function(env, argv) {
         ]
       },
       extractCSS(),
-      {
-        optimization: {
-          minimizer: [
-            new UglifyJsPlugin({
-              cache: true,
-              parallel: true,
-              uglifyOptions: {
-                output: {
-                  comments: false
-                }
-              }
-            }),
-          ]
-        }
-      }
+      // {
+      //   optimization: {
+      //     minimizer: [
+      //       new UglifyJsPlugin({
+      //         // cache: true,
+      //         // parallel: true,
+      //         // uglifyOptions: {
+      //         //   output: {
+      //         //     comments: false
+      //         //   }
+      //         // }
+      //       }),
+      //     ]
+      //   }
+      // }
     ]);
   }
   if (argv.mode === 'development') {
