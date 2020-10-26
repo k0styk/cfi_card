@@ -6,7 +6,7 @@ const { config } = global;
 const checkFileExist = location => fs.existsSync(location);
 
 exports.download = async (req, res) => {
-  const file = path.join(__dirname, `\\..\\..\\..\\temp\\${req.params.document}`);
+  const file = path.join(__dirname, `../../../temp/${req.params.document}`);
   const session = req.session; // eslint-disable-line
 
   if(session.userId && session.token) {

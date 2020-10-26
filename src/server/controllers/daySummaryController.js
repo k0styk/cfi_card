@@ -60,7 +60,7 @@ exports.getDates = async () => {
 /* -----         GENERATING SUMMARIES             ----- */
 /* ---------------------------------------------------- */
 /* eslint-disable */
-const location = path.join(__dirname, '\\..\\..\\..\\temp\\');
+const location = path.join(__dirname, '../../../temp/');
 let pathLocation;
 
 const setPath = date => {
