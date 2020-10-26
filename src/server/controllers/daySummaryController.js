@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const DaySummaries = mongoose.model('DaySummaries');
 const moment = require('moment');
 const fs = require('fs');
+const path = require('path');
 
 exports.save = async ({summaries, userId}) => {
   const startDay = moment().utcOffset(0).set({hour:0,minute:0,second:0,millisecond:0}).toDate();
@@ -41,7 +42,7 @@ exports.save = async ({summaries, userId}) => {
 };
 
 exports.getDates = async () => {
-  const startDay = moment().utcOffset(0).subtract(10, 'days').set({hour:0,minute:0,second:0,millisecond:0}).toDate();
+  const startDay = moment().utcOffset(0).subtract(2, 'months').set({hour:0,minute:0,second:0,millisecond:0}).toDate();
   const endDay = moment().utcOffset(0).set({hour:23,minute:59,second:59,millisecond:0}).toDate();
 
   const query = {
@@ -59,21 +60,21 @@ exports.getDates = async () => {
 /* -----         GENERATING SUMMARIES             ----- */
 /* ---------------------------------------------------- */
 /* eslint-disable */
-const location = __dirname + '\\..\\..\\..\\temp\\';
-let path;
+const location = path.join(__dirname, '\\..\\..\\..\\temp\\');
+let pathLocation;
 
 const setPath = date => {
   const fileName = date + '.txt';
-  path = location + fileName;
+  pathLocation = location + fileName;
   return fileName;
 }
 const writeToFile = text => {
-  fs.appendFileSync(path, text + '\n');
+  fs.appendFileSync(pathLocation, text + '\n');
 };
-const checkFileExist = () => fs.existsSync(path);
+const checkFileExist = () => fs.existsSync(pathLocation);
 const checkDirectory = () => fs.existsSync(location);
 const createDirectory = () => fs.mkdirSync(location);
-const removeFile = () => fs.unlinkSync(path);
+const removeFile = () => fs.unlinkSync(pathLocation);
 const nonRequired = field => field ? field : '-';
 const timeWithoutColon = timeStr => timeStr.replace(':', '');
 

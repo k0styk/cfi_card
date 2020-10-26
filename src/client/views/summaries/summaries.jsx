@@ -52,12 +52,12 @@ const summariesView = ({socket, notify}) => {
   const classes = useStyles();
   const [loading, setLoading] = React.useState(false);
   const [success, setSuccess] = React.useState(false);
-
   const [open, setOpen] = React.useState(false);
   const [options, setOptions] = React.useState([]);
   const [dateValue, setDateValue] = React.useState('');
   const [dateInputValue, setDateInputValue] = React.useState('');
   const loadingDates = open && options.length === 0;
+  const notFound = 'ничего нет';
   // const [timerMessage, setTimerMessage] = React.useState('');
 
   // const setupDownloadTimer = async link => {
@@ -87,7 +87,11 @@ const summariesView = ({socket, notify}) => {
       socket.emit(summariesEvents.getDates, null, async ({ dates }) => {
         await sleep(6e2);
         if (active) {
-          setOptions(dates);
+          if(dates.length) {
+            setOptions(dates);
+          } else {
+            setOptions([notFound]);
+          }
         }
       });
     })();
@@ -107,7 +111,7 @@ const summariesView = ({socket, notify}) => {
     if (!loading) {
       setSuccess(false);
       setLoading(true);
-      socket.emit(summariesEvents.generate, {date: dateValue}, ({generated, message, link}) => {
+      socket.emit(summariesEvents.generate, {date:dateValue}, ({generated,message,link}) => {
         if(generated) {
           setLoading(false);
           setSuccess(true);
@@ -151,6 +155,7 @@ const summariesView = ({socket, notify}) => {
                 setOpen(false);
               }}
               getOptionSelected={(option, value) => option === value}
+              getOptionDisabled={option => option === notFound}
               getOptionLabel={option => option}
               options={options}
               loading={loadingDates}

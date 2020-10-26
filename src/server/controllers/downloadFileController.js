@@ -1,11 +1,12 @@
 const fs = require('fs');
+const path = require('path');
 const jwt = require('jwt-then');
 const { config } = global;
 
-const checkFileExist = path => fs.existsSync(path);
+const checkFileExist = location => fs.existsSync(location);
 
 exports.download = async (req, res) => {
-  const file = `${__dirname}\\..\\..\\..\\temp\\${req.params.document}`;
+  const file = path.join(__dirname, `\\..\\..\\..\\temp\\${req.params.document}`);
   const session = req.session; // eslint-disable-line
 
   if(session.userId && session.token) {
