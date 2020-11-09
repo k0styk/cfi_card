@@ -112,6 +112,7 @@ const LoginPage = ({socket,setUser,notify,setLoader}) => {
                   id="login"
                   value={values.login}
                   onChange={handleChange('login')}
+                  autoComplete="off"
                 />
               </FormControl>
             </div>
