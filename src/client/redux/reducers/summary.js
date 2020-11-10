@@ -1,13 +1,10 @@
 import { SUMMARY, Z1, Z2, Z3 } from '../types';
-const d = new Date();
 const z1State = {
-  flyDate: `${('0'+d.getUTCDate()).slice(-2)}/${('0'+(d.getUTCMonth() + 1)).slice(-2)}/${d.getUTCFullYear().toString().slice(-2)}`, // eslint-disable-line
   acftIdent: '',
   aircraftType: '',
   depAirport: '',
   destAirport: '',
   entryPoint: '',
-  entryTime: `${('0'+(d.getUTCHours() + 1)).slice(-2)}:${('0'+(d.getUTCMinutes() + 1)).slice(-2)}`,
   exitPoint: '',
   regno: '',
   errors: {
@@ -23,9 +20,7 @@ const z1State = {
 const z2State = {
   code: '',
   entryPoint: '',
-  entryTime: `${('0'+(d.getUTCHours() + 1)).slice(-2)}:${('0'+(d.getUTCMinutes() + 1)).slice(-2)}`,
   exitPoint: '',
-  exitTime: `${('0'+(d.getUTCHours() + 1)).slice(-2)}:${('0'+(d.getUTCMinutes() + 1)).slice(-2)}`,
   // flyCtg: '',
   // countOfDep: '',
   // countOfApp: '',
@@ -63,7 +58,11 @@ export function summary(state = initialState, action) {
         counter: 1,
         fieldValidation: 0, // значение валидатора по полям
         factValidation: 0, // какое значение валидации необходимо
-        z1: z1State,
+        z1: {
+          ...z1State,
+          flyDate: `${('0'+new Date().getUTCDate()).slice(-2)}/${('0'+(new Date().getUTCMonth() + 1)).slice(-2)}/${new Date().getUTCFullYear().toString().slice(-2)}`, // eslint-disable-line
+          entryTime: `${('0'+new Date().getUTCHours()).slice(-2)}:${('0'+new Date().getUTCMinutes()).slice(-2)}`,
+        },
         z2: [],
         z3: z3State
       };
@@ -99,7 +98,15 @@ export function summary(state = initialState, action) {
             return {
               ...v,
               counter: v.counter + 1,
-              z2: [...v.z2, { id: v.counter, ...z2State }]
+              z2: [
+                ...v.z2,
+                {
+                  ...z2State,
+                  id: v.counter,
+                  entryTime:`${('0'+new Date().getUTCHours()).slice(-2)}:${('0'+new Date().getUTCMinutes()).slice(-2)}`,
+                  exitTime:`${('0'+new Date().getUTCHours()).slice(-2)}:${('0'+new Date().getUTCMinutes()).slice(-2)}`,
+                }
+              ]
             };
           }
           return v;

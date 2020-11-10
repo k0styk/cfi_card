@@ -184,7 +184,9 @@ const z3View = ({
               });
             }}
             onBlur={() => {
-              if(depAirportCoord !== values.depAirportCoord) {
+              if(/____N_____E/.test(values.depAirportCoord)) {
+                depAirportCoordSet(id, '');
+              } else if(depAirportCoord !== values.depAirportCoord) {
                 depAirportCoordSet(id, values.depAirportCoord);
               }
             }}
@@ -213,7 +215,9 @@ const z3View = ({
               });
             }}
             onBlur={() => {
-              if(destAirportCoord !== values.destAirportCoord) {
+              if(/____N_____E/.test(values.destAirportCoord)) {
+                destAirportCoordSet(id, '');
+              } else if(destAirportCoord !== values.destAirportCoord) {
                 destAirportCoordSet(id, values.destAirportCoord);
               }
             }}

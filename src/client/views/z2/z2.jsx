@@ -173,7 +173,9 @@ const z2View = ({
               });
             }}
             onBlur={() => {
-              if(entryPoint !== values.entryPoint) {
+              if(/____N_____E/.test(values.entryPoint)) {
+                entryPointSet(id, z2id, '');
+              } else if(entryPoint !== values.entryPoint) {
                 entryPointSet(id, z2id, values.entryPoint);
               }
             }}
@@ -250,7 +252,9 @@ const z2View = ({
               });
             }}
             onBlur={() => {
-              if(exitPoint !== values.exitPoint) {
+              if(/____N_____E/.test(values.exitPoint)) {
+                exitPointSet(id, z2id, '');
+              } else if(exitPoint !== values.exitPoint) {
                 exitPointSet(id, z2id, values.exitPoint);
               }
             }}
