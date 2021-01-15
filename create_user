@@ -1,0 +1,68 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]
+    then
+        echo "No arguments supplied"
+        echo "Example."
+        echo "$ ./create_user -u <username> -p <password> [-d <description>] [-n <display-name>] [-de department] [--adm] [--prod]"
+    else
+        ENV=dev
+        POSITIONAL=()
+        while [[ $# -gt 0 ]]
+        do
+        key="$1"
+
+        case $key in
+            -u|--user)
+            user="$2"
+            shift # past argument
+            shift # past value
+            ;;
+            -p|--password)
+            password="$2"
+            shift # past argument
+            shift # past value
+            ;;
+            -d|--description)
+            description="$2"
+            shift # past argument
+            shift # past value
+            ;;
+            -n|--dispname)
+            dispname="$2"
+            shift # past argument
+            shift # past value
+            ;;
+            -de|--department)
+            department="$2"
+            shift # past argument
+            shift # past value
+            ;;
+            --adm)
+            admin=YES
+            shift # past argument
+            ;;
+            --prod)
+            ENV=prod
+            shift # past argument
+            ;;
+            *)    # unknown option
+            POSITIONAL+=("$1") # save it in an array for later
+            shift # past argument
+
+            ;;
+        esac
+        done
+        set -- "${POSITIONAL[@]}" # restore positional parameters
+
+        echo "USER          = ${user}"
+        echo "PASSWORD      = ${password}"
+        echo "DESCRIPTION   = ${description}"
+        echo "DISPLAY_NAME  = ${dispname}"
+        echo "DEPARTMENT    = ${department}"
+        echo "ADMIN         = ${admin}"
+        echo "NODE_ENV      = ${ENV}"
+        echo "Running script to create user..."
+        echo
+        NODE_ENV=$ENV USERNAME=$user PSWD=$password ADMIN=$admin DESC=$description DISPNAME=$dispname DEPARTMENT=$department node src/server/create_user.js
+fi

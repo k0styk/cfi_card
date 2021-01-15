@@ -1,3 +1,5 @@
+// src/server/config/*.json
+
 const collections = [
   {
     name: 'entities',

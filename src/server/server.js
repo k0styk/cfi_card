@@ -2,13 +2,13 @@
 const config = require('./config/config').getAll();
 const mongoose = require('mongoose');
 global.config = config;
-global.hashPass = (text, salt = '') => require('crypto').createHash(config.hash.encryptionType).update(salt + text).digest('hex');
-const PORT =      process.env.PORT      || config.app.port              || 8080,
-      HOST =      process.env.HOST      || config.app.host              || 'localhost',
-      dbClient =  process.env.DB_CLIENT || config.db.client             || 'mongodb',
-      dbHost =    process.env.DB_HOST   || config.db.connection.host    || 'localhost',
-      dbPort =    process.env.DB_PORT   || config.db.connection.port    || '27017',
-      dbName =    process.env.DB_NAME   || config.db.connection.dbName  || 'CFI_card';
+// global.hashPass = (text, salt = '') => require('crypto').createHash(config.hash.encryptionType).update(salt + text).digest('hex');
+const PORT =      process.env.PORT      || config.app.port,
+      HOST =      process.env.HOST      || config.app.host,
+      dbClient =  process.env.DB_CLIENT || config.db.client,
+      dbHost =    process.env.DB_HOST   || config.db.connection.host,
+      dbPort =    process.env.DB_PORT   || config.db.connection.port,
+      dbName =    process.env.DB_NAME   || config.db.connection.dbName;
 const url = `${dbClient}://${dbHost}:${dbPort}/${dbName}`;
 
 mongoose.connection.on('error', err => console.log('Mongoose Connection ERROR: ' + err.message));
@@ -19,6 +19,7 @@ require('./models/User');
 require('./models/Summary');
 require('./models/SummaryDocument');
 require('./models/DaySummaries');
+require('./models/File');
 
 (async () => {
   await mongoose.connect(url, {
@@ -45,14 +46,14 @@ require('./models/DaySummaries');
 /* PM2 START */
 process.on('SIGINT', async () => {
   console.log('Received SIGINT.  Press Control-D to exit.');
-  await client.close();
+  await mongoose.disconnect();
   process.exit(0);
 });
 
 process.on('message', async msg => {
   if (msg === 'shutdown') {
     console.log('Closing all connections...');
-    await client.close();
+    await mongoose.disconnect();
     process.exit(0);
   }
 });

@@ -143,7 +143,7 @@ const z2View = ({
                 codeSet(id, z2id, values.code);
               }
             }}
-            label="РЦ/МДП"
+            label="РЦ/МДП(орган ОВД)"
             inputProps={{
               maxLength: 4,
               style: { textTransform: 'uppercase' },

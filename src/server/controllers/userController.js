@@ -11,50 +11,61 @@ exports.register = async ({
   department,
   rights
 }, cb) => {
-  let message = 'Register [ ' + login + ' ] successfull';
+  try {
+    const hashPass = (text, salt = '') => require('crypto').createHash(config.hash.encryptionType).update(salt + text).digest('hex'); // eslint-disable-line
+    let message = 'Register [ ' + login + ' ] successfull';
 
-  if (login.length < 2) {
-    message = 'Login must be atleast 2 characters long.';
-    cb({ eventName: events.user.register_err, message });
-    return;
-  };
-  if (password.length < 6) {
-    message = 'Password must be atleast 6 characters long.';
-    cb({ eventName: events.user.register_err, message });
-    return;
+    if (login.length < 2) {
+      message = 'Login must be atleast 2 characters long.';
+      cb({ eventName: events.user.register_err, message });
+      return;
+    };
+    if (password.length < 6) {
+      message = 'Password must be atleast 6 characters long.';
+      cb({ eventName: events.user.register_err, message });
+      return;
+    }
+    const userExists = await User.findOne({ login });
+
+    if (userExists) {
+      message = 'User with same login already exits.';
+      cb({ eventName: events.user.register_err, message });
+      return;
+    };
+
+    const user = new User({
+      login,
+      password: global.hashPass(password, config.salt),
+      description: description ? description : undefined,
+      displayName: displayName ? displayName : undefined,
+      department: department ? department : undefined,
+      rights: rights ? rights : undefined,
+    });
+
+    await user.save();
+    message = 'User [ ' + login + ' ] registered successfully!';
+    cb({ eventName: events.user.register_success, message });
+  } catch (err) {
+    console.error(err);
+    cb({ eventName: events.user.register_err, err });
   }
-  const userExists = await User.findOne({ login });
-
-  if (userExists) {
-    message = 'User with same login already exits.';
-    cb({ eventName: events.user.register_err, message });
-    return;
-  };
-
-  const user = new User({
-    login,
-    password: global.hashPass(password, config.salt),
-    description: description ? description : undefined,
-    displayName: displayName ? displayName : undefined,
-    department: department ? department : undefined,
-    rights: rights ? rights : undefined,
-  });
-
-  await user.save();
-  message = 'User [ ' + login + ' ] registered successfully!';
-  cb({ eventName: events.user.register_success, message });
 };
 
 exports.login = async ({login,password}) => {
-  const user = await User.findOne({
-    login,
-    password: global.hashPass(password, config.salt),
-  });
+  try {
+    const user = await User.findOne({
+      login,
+      password: global.hashPass(password, config.salt),
+    });
 
-  if(user) {
-    user.lastLogin = new Date();
-    user.save();
+    if (user) {
+      user.lastLogin = new Date();
+      user.save();
+    }
+
+    return user;
+  } catch (err) {
+    console.error(err);
+    cb({ eventName: events.user.register_err, err });
   }
-
-  return user;
 };

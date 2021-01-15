@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { summaryAction } from '@redux/actions/';
-import { Autocomplete } from '@components';
 import { z1Validator } from '../../validators/validators';
 import replaceLayout from '../../helpers/layoutReplacer';
 
@@ -199,39 +198,6 @@ const z1View = ({
         </Grid>
         {/* 3 req */}
         <Grid item xs className={classes.three} >
-          {/* <Autocomplete
-            autoComplete={false}
-            autoHighlight={false}
-            options={['ZZZZ']}
-            value={aircraftTypeState.value}
-            size="small"
-            inputParams={{
-              error: !!errorField.aircraftType,
-              helperText: errorField.aircraftType,
-              label: 'Тип ВС',
-              name: 'aircraftType',
-              inputProps: {
-                maxLength: 4,
-                style: { textTransform: 'uppercase' },
-                name: 'aircraftType',
-                autoComplete: 'off',
-              }
-            }}
-            onInputChange={(e, v, r) => {
-              const value = replaceLayout(v).toUpperCase();
-
-              validateField('aircraftType', value);
-              setAircraftTypeState(value);
-            }}
-            onBlur={() => {
-              if(aircraftTypeState !== aircraftType) {
-                aircraftTypeSet(id, aircraftTypeState);
-              }
-            }}
-            renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
-            clearOnEscape
-            freeSolo
-          /> */}
           <TextField
             error={!!errors.aircraftType}
             helperText={errors.aircraftType}
@@ -261,38 +227,6 @@ const z1View = ({
         </Grid>
         {/* 4 req */}
         <Grid item xs className={classes.four} >
-          {/* <Autocomplete
-            autoHighlight={false}
-            options={['ZZZZ']}
-            value={depAirportState}
-            size="small"
-            inputParams={{
-              error: !!errorField.depAirport,
-              helperText: errorField.depAirport,
-              label: 'А-д/П-п вылета',
-              name: 'depAirport',
-              inputProps: {
-                maxLength: 4,
-                style: { textTransform: 'uppercase' },
-                name: 'depAirport',
-                autoComplete: 'off',
-              }
-            }}
-            onInputChange={(e, v, r) => {
-              const value = replaceLayout(v).toUpperCase();
-
-              validateField('depAirport', value);
-              setDepAirportState(value);
-            }}
-            onBlur={() => {
-              if(depAirportState !== depAirport) {
-                depAirportSet(id, depAirportState);
-              }
-            }}
-            renderOptionFunc={option => (<React.Fragment>{option}</React.Fragment>)} // eslint-disable-line
-            clearOnEscape
-            freeSolo
-          /> */}
           <TextField
             error={!!errors.depAirport}
             helperText={errors.depAirport}

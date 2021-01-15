@@ -67,7 +67,7 @@ const summarySchema = new mongoose.Schema({
     aircraftType: {
       required: 'z1.aircraftType req',
       type: String,
-      minlength:4,
+      minlength:2,
       maxlength:4
     },
     depAirport: {

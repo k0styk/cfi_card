@@ -176,6 +176,8 @@ class App extends React.Component {
           <Backdrop className={classes.backdrop} open={this.props.uiLoader}>
             <CircularProgress color="inherit" />
           </Backdrop>
+          {/* <div className="app-div-div">
+          </div> */}
           <Notifier />
         </div>
       </BrowserRouter>

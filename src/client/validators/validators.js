@@ -69,6 +69,16 @@ const z1Validator = {
         }
         break;
       case this.validationFields.aircraftType.name:
+        if (value.length < 2 || value.length > 4) {
+          return {
+            ...retVal,
+            operation: 0,
+            error: {
+              [fieldName]: 'Обязательное поле',
+            },
+          };
+        }
+        break;
       case this.validationFields.depAirport.name:
       case this.validationFields.destAirport.name:
         if (value.length !== 4) {

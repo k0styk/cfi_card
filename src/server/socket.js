@@ -1,22 +1,16 @@
 const moment = require('moment');
 const jwt = require('jwt-then');
 
+/**---  CONSTANTS  ---**/
 const events = require('../client/Events');
+/**---  MIDDLEWARES  ---**/
 const socketMiddleware = require('./middlewares/socket');
+/**---  CONTROLLERS  ---**/
 const userController = require('./controllers/userController');
 const summaryController = require('./controllers/summaryController');
 const daySummaryController = require('./controllers/daySummaryController');
+/**---  CONFIG  ---**/
 const { config } = global;
-
-/* usage SESSION */
-// const session = socket.request.session; // eslint-disable-line
-
-// session.connections++;
-// session.save();
-/* SESSION usage */
-
-// const payload = await jwt.verify(token, config.secret); // GET TOKEN
-// const token = await jwt.sign({ id: user.id, rights: user.rights }, config.secret); // SET TOKEN
 
 module.exports = server => {
   const io = require('socket.io').listen(server);
