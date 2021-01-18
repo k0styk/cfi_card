@@ -1,14 +1,14 @@
 /* eslint-disable */
-const config = require('./config/config').getAll();
+const config = require('../config/config').getAll();
 const mongoose = require('mongoose');
 
 global.config = config;
 global.hashPass = (text, salt = '') => require('crypto').createHash(config.hash.encryptionType).update(salt + text).digest('hex');
 
 // bring the model
-require('./models/User');
+require('../models/User');
 
-const userController = require('./controllers/userController');
+const userController = require('../controllers/userController');
 
 mongoose.connection.on('error', err => console.log('Mongoose Connection ERROR: ' + err.message));
 mongoose.connection.once('open', () => console.log('MongoDB Connected!'));

@@ -1,8 +1,6 @@
 const mongoose = require('mongoose');
 const DaySummaries = mongoose.model('DaySummaries');
 const moment = require('moment');
-const fs = require('fs');
-const path = require('path');
 
 exports.save = async ({summaries, userId}) => {
   const startDay = moment().utcOffset(0).set({hour:0,minute:0,second:0,millisecond:0}).toDate();
@@ -27,7 +25,7 @@ exports.save = async ({summaries, userId}) => {
     if (error) {
       throw new Error('Validation wrong');
     } else {
-      summariesDoc.save();
+      await summariesDoc.save();
     }
   } else {
     const doc = new DaySummaries({userId: userId, summaries: summaries});
@@ -36,7 +34,7 @@ exports.save = async ({summaries, userId}) => {
     if (error) {
       throw error;
     } else {
-      doc.save();
+      await doc.save();
     }
   }
 };

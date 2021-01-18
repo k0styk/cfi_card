@@ -3,6 +3,8 @@ const User = mongoose.model('User');
 const events = require('../../client/Events');
 const {config} = global;
 
+const hashPass = (text, salt = '') => require('crypto').createHash(config.hash.encryptionType).update(salt + text).digest('hex'); // eslint-disable-line
+
 exports.register = async ({
   login,
   password,
@@ -12,7 +14,6 @@ exports.register = async ({
   rights
 }, cb) => {
   try {
-    const hashPass = (text, salt = '') => require('crypto').createHash(config.hash.encryptionType).update(salt + text).digest('hex'); // eslint-disable-line
     let message = 'Register [ ' + login + ' ] successfull';
 
     if (login.length < 2) {
@@ -35,7 +36,7 @@ exports.register = async ({
 
     const user = new User({
       login,
-      password: global.hashPass(password, config.salt),
+      password: hashPass(password, config.salt),
       description: description ? description : undefined,
       displayName: displayName ? displayName : undefined,
       department: department ? department : undefined,
@@ -55,7 +56,7 @@ exports.login = async ({login,password}) => {
   try {
     const user = await User.findOne({
       login,
-      password: global.hashPass(password, config.salt),
+      password: hashPass(password, config.salt),
     });
 
     if (user) {

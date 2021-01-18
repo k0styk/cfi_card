@@ -64,5 +64,5 @@ if [ $# -eq 0 ]
         echo "NODE_ENV      = ${ENV}"
         echo "Running script to create user..."
         echo
-        NODE_ENV=$ENV USERNAME=$user PSWD=$password ADMIN=$admin DESC=$description DISPNAME=$dispname DEPARTMENT=$department node src/server/create_user.js
+        NODE_ENV=$ENV USERNAME=$user PSWD=$password ADMIN=$admin DESC=$description DISPNAME=$dispname DEPARTMENT=$department node src/server/helpers/create_user.js
 fi
