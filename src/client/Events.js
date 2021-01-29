@@ -26,7 +26,9 @@ module.exports.summaries = {
   generate: 'summaries_generate',
   generate_success: 'summaries_generate_success',
   generate_err: 'summaries_generate_err',
-  getDates: 'summaries_getDates'
+  getDates: 'summaries_getDates',
+  getListUsers: 'summaries_getListUsers',
+  getUserInfoById: 'summaries_getUserInfoById',
 };
 
 module.exports.store = {

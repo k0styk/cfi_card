@@ -12,9 +12,13 @@ const schemaDaySummaries = new mongoose.Schema({
     type: String,
     default: '0.0.1',
   },
-  summariesDate: {
+  summariesDateStr: {
     type: String,
     default: moment().format('DD.MM.YY')
+  },
+  summariesDate: {
+    type: Date,
+    default: moment().toDate()
   }
 },{
   minimize: false,

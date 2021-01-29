@@ -2,6 +2,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { uiAction } from '@redux/actions';
+import { user as userEvents } from '@client/Events';
 
 import { makeStyles } from '@material-ui/core/styles';
 import { Button, ButtonGroup, Badge } from '@material-ui/core';
@@ -27,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const switchFolder = ({archiveSet, archive, summary}) => {
+const switchFolder = ({archiveSet, archive, summary, socket}) => {
   const classes = useStyles();
   const getLengthList = () => summary.value.filter(v => v.archive === false).length;
   const getLengthArchive = () => summary.value.filter(v => v.archive === true).length;
@@ -38,10 +39,17 @@ const switchFolder = ({archiveSet, archive, summary}) => {
     setRender(/summary/gi.test(location.pathname));
   }, [location]);
 
+  const handleClickBtn = state => {
+    archiveSet(state);
+    const id = localStorage.getItem('userId');
+
+    socket.emit(userEvents.checkAuth, ({id}));
+  };
+
   return render?(<div className={classes.root}>
     <ButtonGroup variant="text" color="primary" aria-label="text primary button group">
       <Button color={`${!archive?'secondary':'primary'}`}
-        onClick={() => archiveSet(false)}
+        onClick={() => handleClickBtn(false)}
       >
         Список
         <Badge
@@ -55,7 +63,7 @@ const switchFolder = ({archiveSet, archive, summary}) => {
         </Badge>
       </Button>
       <Button color={`${archive?'secondary':'primary'}`}
-        onClick={() => archiveSet(true)}
+        onClick={() => handleClickBtn(true)}
       >
         Для отправления
         <Badge
@@ -72,9 +80,10 @@ const switchFolder = ({archiveSet, archive, summary}) => {
   </div>):null;
 };
 
-const mstp = ({ui, summary}) => ({
+const mstp = ({ui, summary, socket}) => ({
   archive: ui.app.archive,
-  summary
+  summary,
+  socket
 });
 
 const mdtp = dispatch => ({

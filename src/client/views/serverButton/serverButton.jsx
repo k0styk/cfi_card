@@ -9,7 +9,7 @@ import AddIcon from '@material-ui/icons/Add';
 import SaveIcon from '@material-ui/icons/Save';
 import { useLocation } from 'react-router-dom';
 
-import { summary as summaryEvents } from '../../Events';
+import { summary as summaryEvents, user as userEvents } from '../../Events';
 
 const useStyles = makeStyles(theme => ({
   margin: {
@@ -40,6 +40,11 @@ const serverButton = ({
 
   const handleSave = () => {
     console.log('IMPLEMENT');
+  };
+  const handleUpdateUserStatus = () => {
+    const id = localStorage.getItem('userId');
+
+    socket.emit(userEvents.checkAuth, ({id}));
   };
   const handleSend = () => {
     try {
@@ -84,6 +89,7 @@ const serverButton = ({
 
           setSummary(res);
           setLoader(false);
+          handleUpdateUserStatus();
           notify({
             message,
             options: {
@@ -95,6 +101,7 @@ const serverButton = ({
         if (eventName === summaryEvents.save_success) {
           setSummary(summary.value.filter(v => !v.archive));
           setLoader(false);
+          handleUpdateUserStatus();
           notify({
             message,
             options: {
@@ -148,7 +155,10 @@ const serverButton = ({
         color="primary"
         aria-label="add"
         className={classes.margin}
-        onClick={() => addSummary()}
+        onClick={() => {
+          handleUpdateUserStatus();
+          addSummary();
+        }}
       >
         <AddIcon className={classes.extendedIcon}/>
         Добавить сводку

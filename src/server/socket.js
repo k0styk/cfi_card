@@ -9,6 +9,7 @@ const socketMiddleware = require('./middlewares/socket');
 const userController = require('./controllers/userController');
 const summaryController = require('./controllers/summaryController');
 const daySummaryController = require('./controllers/daySummaryController');
+const downloadSummariesController = require('./controllers/downloadSummariesController');
 /**---  CONFIG  ---**/
 const { config } = global;
 
@@ -18,48 +19,71 @@ module.exports = server => {
   io.use(socketMiddleware);
   io.on('connection', socket => {
     // console.log('Socket connected: ', socket.id);
+    // console.log(socket.request.session.userId);
+    /**---  UPDATE STATUS AFTER REFRESH PAGE  ---**/
+    if(socket.request.session.userId) {
+      userController.updateStatus(socket.request.session.userId);
+    }
 
+    /**---  DISCONNECT  ---**/
     socket.on('disconnect', () => {
+      userController.updateStatus(socket.request.session.userId);
       // console.log('Disconnected: user[' + socket.request.session.userId + '] socket[' + socket.id + ']');
     });
 
-    socket.on(events.user.login, async (formData, cb) => {
+    const checkSession = () => {
       const session = socket.request.session; // eslint-disable-line
 
-      if (session.userId && session.token) {
-        const payload = await jwt.verify(session.token, config.secret);
+      return session.userId && session.token;
+    };
 
-        console.log('User [ ' + login + ' ] try sign in, session for [ ' + payload.login + ' ]');
-        cb({ eventName: events.user.login_err, message: 'You must logout before sign in!' });
-      } else {
-        let message = 'Login successfull';
-        const user = await userController.login(formData);
+    /**-----------------------**/
+    /**---  BLOCK OF USER  ---**/
+    /**-----------------------**/
+    /***/ /**---  LOGIN USER  ---**/
+    /***/ socket.on(events.user.login, async (formData, cb) => {
+      const session = socket.request.session; // eslint-disable-line
 
-        if (!user) {
-          message = 'Login [ ' + formData.login + ' ] and Password did not match.';
+      try {
+        if (session.userId && session.token) {
+          const payload = await jwt.verify(session.token, config.secret);
 
-          console.log(message);
-          cb({ eventName: events.user.login_err, message });
+          console.log('User [ ' + login + ' ] try sign in, session for [ ' + payload.login + ' ]');
+          cb({ eventName: events.user.login_err, message: 'You must logout before sign in!' });
         } else {
-          const tokenOpts = {
-            login: user.login,
-            id: user.id,
-            rights: user.rights,
-            description: user.description,
-            displayName: user.displayName,
-            department: user.department
-          };
-          const token = await jwt.sign(tokenOpts, config.secret);
+          let message = 'Login successfull';
+          const user = await userController.login(formData);
 
-          session.token = token;
-          session.userId = user.id;
-          session.save();
-          cb({ eventName: events.user.login_success, token, message });
+          if (!user) {
+            message = 'Login [ ' + formData.login + ' ] and Password did not match.';
+
+            console.log(message);
+            cb({ eventName: events.user.login_err, message });
+          } else {
+            const tokenOpts = {
+              login: user.login,
+              id: user.id,
+              rights: user.rights,
+              description: user.description,
+              displayName: user.displayName,
+              department: user.department
+            };
+            const token = await jwt.sign(tokenOpts, config.secret);
+
+            session.token = token;
+            session.userId = user.id;
+            session.save();
+            cb({ eventName: events.user.login_success, token, message });
+          }
         }
+      } catch (err) {
+        console.error(err);
+        cb({ eventName: events.user.login_err, message: 'Some login error occured...' });
       }
-    });
+    /***/ });
 
-    socket.on(events.user.logout, async ({}, cb) => {
+    /***/ /**---  LOGOUT USER  ---**/
+    /***/ socket.on(events.user.logout, async ({}, cb) => {
       const session = socket.request.session; // eslint-disable-line
       if (session.userId && session.token) {
         delete session.token;
@@ -72,25 +96,29 @@ module.exports = server => {
         cb({eventName:events.user.logout_err,message:'Nobody logout'});
         return;
       };
-    });
+    /***/ });
 
-    socket.on(events.user.checkAuth, async ({ id }, cb) => {
+    /***/ /**---  CHECK IS LOGGED  ---**/
+    /***/ socket.on(events.user.checkAuth, async ({ id }, cb) => {
       const isLogged = false;
       const session = socket.request.session; // eslint-disable-line
 
       if (session.userId) {
         if (session.userId === id) {
-          cb({ isLogged: true });
+          userController.updateStatus(session.userId);
+          cb && cb({ isLogged: true });
         } else {
-          cb({isLogged});
+          cb && cb({isLogged});
         }
       } else {
-        cb({isLogged});
+        cb && cb({isLogged});
       }
-    });
+    /***/ });
 
-    socket.on(events.user.register, userController.register);
+    /***/ /**---  REGISTER USER  ---**/
+    /***/ socket.on(events.user.register, userController.register);
 
+    /**---  SUMMARY - SAVE  ---**/
     socket.on(events.summary.save, async ({ summary }, cb) => {
       const session = socket.request.session; // eslint-disable-line
 
@@ -152,6 +180,27 @@ module.exports = server => {
         const link = `/download/${fileName}`;
 
         cb({message, generated, link});
+      }
+    });
+
+    /**-------------------------------------**/
+    /**---  BLOCK OF DOWNLOAD SUMMARIES  ---**/
+    /**-------------------------------------**/
+    /***/ socket.on(events.summaries.getListUsers, async (date, cb) => {
+      if(checkSession()) {
+        const usersListWithDays = await userController.listUsersBySliceOfDate(date);
+
+        cb({usersListWithDays});
+      } else {
+        console.error('[No Session] - Try to get list of users');
+      }
+    });
+
+    /***/ socket.on(events.summaries.getUserInfoById, async (id, cb) => {
+      if(checkSession()) {
+        cb(await userController.getUserInfoById(id));
+      } else {
+        console.error('[No Session] - Try to get list of users');
       }
     });
 

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-//login, password, description, displayName, rights
 const userSchema = new mongoose.Schema(
   {
     login: {
@@ -14,8 +13,8 @@ const userSchema = new mongoose.Schema(
     description: String,
     displayName: String,
     department: String,
+    lastActive: Date,
     rights: { type: String, default: 'user' },
-    lastLogin: Date
   },
   {
     versionKey: false,

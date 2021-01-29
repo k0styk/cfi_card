@@ -1,7 +1,8 @@
 import './summary.scss';
 import React from 'react';
 import { connect } from 'react-redux';
-import { summaryAction, uiAction } from '../../redux/actions';
+import { summaryAction, uiAction } from '@redux/actions';
+import { user as userEvents } from '@client/Events';
 import { Z1View, Z2View, Z3View } from '@views';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -36,7 +37,8 @@ const summaryView = ({
   archiveSet,
   notify,
   archive,
-  validationSet
+  validationSet,
+  socket
 }) => {
   const DeleteButton = ({ ...elementProps }) => (<div className="summary-button-delete" {...elementProps}>
     <CancelIcon />
@@ -48,6 +50,11 @@ const summaryView = ({
     <FontAwesomeIcon icon={faBoxOpen} className={classes.marginRight} {...elementProps} />в список
   </React.Fragment>);
   const classes = useStyles();
+  const handleUpdateStatus = () => {
+    const id = localStorage.getItem('userId');
+
+    socket.emit(userEvents.checkAuth, ({id}));
+  };
 
   const handleClick = () => {
     const val = curSummary.z1.validation+
@@ -56,6 +63,7 @@ const summaryView = ({
 
     archiveSet(id, !archive);
     validationSet(id, val, eqValidationsHandle());
+    handleUpdateStatus();
     notify({
       message: archive?'Отправлено в список':'Отправлено в папку для отправления',
       options: {
@@ -84,7 +92,10 @@ const summaryView = ({
   return (
     <div className="summary-view">
       <div className="summary-box">
-        <DeleteButton onClick={() => removeSummary(id)}/>
+        <DeleteButton onClick={() => {
+          handleUpdateStatus();
+          removeSummary(id);
+        }}/>
         <div className="summary-header">
           <div className="summary-h-l">
             <Typography variant="button" display="block" gutterBottom>
@@ -137,8 +148,9 @@ const summaryView = ({
   );
 };
 
-const mstp = state => ({
-  archive: state.ui.app.archive
+const mstp = ({ ui, socket }) => ({
+  archive: ui.app.archive,
+  socket
 });
 /* eslint-disable */
 const mdtp = dispatch => ({

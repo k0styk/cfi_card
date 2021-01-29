@@ -69,9 +69,9 @@ const userMenuView = ({user, socket, notify, logout}) => {
       <Menu
         id="simple-menu"
         anchorEl={anchorEl}
-        keepMounted
         open={Boolean(anchorEl)}
         onClose={closeMenu}
+        keepMounted
       >
         <MenuItem onClick={handleSummary}>Главная</MenuItem>
         <MenuItem disabled onClick={handleProfile}>Профиль</MenuItem>
