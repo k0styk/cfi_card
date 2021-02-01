@@ -129,7 +129,13 @@ exports.listUsersBySliceOfDate = async date => {
         const summariesIdFromDates = await daySummary.find(query,summariesExcludeFields);
         const daysArray = new Array(7).fill('');
 
-        resultArray[i] = { user: usr };
+        resultArray[i] = { id: i+1, userId: usr.id, department: usr.department};
+
+        // get today
+        if(moment(date).locale('ru').isBetween(startWeek,endWeek,undefined,'[]')) {
+          resultArray[i].today = moment(date).locale('ru').weekday();
+        }
+
         // FILL days from week
         for (let j = 0; j < summariesIdFromDates.length; j++) {
           const summaryByDate = summariesIdFromDates[j];
@@ -137,8 +143,18 @@ exports.listUsersBySliceOfDate = async date => {
 
           daysArray[summaryWeekDay] = summaryByDate['id'];
         }
-        resultArray[i].days = [...daysArray];
+        [
+          resultArray[i].monday,
+          resultArray[i].tuesday,
+          resultArray[i].wednesday,
+          resultArray[i].thursday,
+          resultArray[i].friday,
+          resultArray[i].saturday,
+          resultArray[i].sunday
+        ] = daysArray;
       }
+
+      // console.log(resultArray);
 
       return resultArray;
     } else {

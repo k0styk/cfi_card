@@ -162,20 +162,13 @@ const SummariesView = ({socket, notify}) => {
   const [users, setUsers] = React.useState([]);
   const [disableNext, setDisableNext] = React.useState(true);
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  const [orderBy, setOrderBy] = React.useState('id');
   const [selected, setSelected] = React.useState(0);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  React.useLayoutEffect(() => {
-    if(socket.emit) {
-      getListOfUsersByWeek(date);
-    }
-  }, [date]);
-
   const getListOfUsersByWeek = date => {
     socket.emit(summariesEvents.getListUsers, date, ({usersListWithDays}) => {
-      console.log(usersListWithDays);
       if(usersListWithDays)
         setUsers(usersListWithDays);
     });
@@ -188,25 +181,20 @@ const SummariesView = ({socket, notify}) => {
     setOrderBy(property);
   };
 
-  const handleSelectClick = (event, name) => {
-    // const selectedIndex = selected.indexOf(name);
-    // let newSelected = [];
-
-    // if (selectedIndex === -1) {
-    //   newSelected = newSelected.concat(selected, name);
-    // } else if (selectedIndex === 0) {
-    //   newSelected = newSelected.concat(selected.slice(1));
-    // } else if (selectedIndex === selected.length - 1) {
-    //   newSelected = newSelected.concat(selected.slice(0, -1));
-    // } else if (selectedIndex > 0) {
-    //   newSelected = newSelected.concat(
-    //     selected.slice(0, selectedIndex),
-    //     selected.slice(selectedIndex + 1),
-    //   );
-    // }
-
-    // setSelected(newSelected);
+  const handleSelectClick = index => {
+    console.log(index);
+    setSelected(!selected);
   };
+
+  // const handleSelectAllClick = ({event}) => {
+  //   if (event.target.checked) {
+  //     const newSelecteds = users.map(n => n.userId);
+
+  //     setSelected(newSelecteds);
+  //     return;
+  //   }
+  //   setSelected([]);
+  // };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -220,6 +208,9 @@ const SummariesView = ({socket, notify}) => {
   const handleNextWeekClick = () => {
     const bufDate = moment(date).add(7,'days');
 
+    if(socket.emit) {
+      getListOfUsersByWeek(bufDate);
+    }
     setDisableNext(checkCanNext(bufDate));
     setDate(bufDate);
   };
@@ -227,19 +218,20 @@ const SummariesView = ({socket, notify}) => {
   const handlePrevWeekClick = () => {
     const bufDate = moment(date).subtract(7,'days');
 
+    if(socket.emit) {
+      getListOfUsersByWeek(bufDate);
+    }
     setDisableNext(checkCanNext(bufDate));
     setDate(bufDate);
   };
 
   React.useLayoutEffect(() => {
-    console.log('SOCKET');
     if(socket.emit) {
       getListOfUsersByWeek(date);
     }
   }, [socket]);
 
-  // const isSelected = name => selected.indexOf(name) !== -1;
-  // const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
+  const isSelected = userId => selected.indexOf(userId) !== -1;
 
   return (
     <Paper className={classes.rootT}>
@@ -266,23 +258,25 @@ const SummariesView = ({socket, notify}) => {
                 headCells={headCells}
                 order={order}
                 orderBy={orderBy}
-                onSelectAllClick={null}
                 onRequestSort={handleRequestSort}
                 rowCount={users.length}
-                numSelected={selected}
-                onSelectAllClick={handleSelectClick}
+                checked={selected}
+                onSelectClick={handleSelectClick}
+                // numSelected={selected.length}
+                // onSelectAllClick={handleSelectAllClick}
               />
               <TableBody>
                 {stableSort(users, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => {
+                  .map((row, index, arr) => {
                     // const isItemSelected = isSelected(row.name);
                     const labelId = `enhanced-table-checkbox-${index}`;
 
                     return <Row
-                      key={row.index}
+                      key={index}
+                      idx={index}
+                      length={rowsPerPage}
                       row={row}
-                      id={index+1}
                       socket={socket}
                     />;
                   })}

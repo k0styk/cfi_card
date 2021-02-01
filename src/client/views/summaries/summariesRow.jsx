@@ -5,6 +5,7 @@ import { makeStyles, withStyles  } from '@material-ui/core/styles';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile, faFileExcel, faFileArchive } from '@fortawesome/free-regular-svg-icons';
+import clsx from 'clsx';
 
 import {
   Button,
@@ -42,6 +43,20 @@ const useRowStyles = makeStyles(theme => ({
   infoRow: {
     paddingBottom: 0,
     paddingTop: 0
+  },
+  borderTop: {
+    borderTop: '1px solid red',
+    borderLeft: '1px solid red',
+    borderRight: '1px solid red',
+  },
+  border: {
+    borderLeft: '1px solid red',
+    borderRight: '1px solid red',
+  },
+  borderBottom: {
+    borderBottom: '1px solid red',
+    borderLeft: '1px solid red',
+    borderRight: '1px solid red',
   }
 }));
 
@@ -76,7 +91,7 @@ const StyledMenu = withStyles({
   />
 ));
 
-const SummariesRow = ({ row, id, socket }) => {
+const SummariesRow = ({ row, idx, length, socket }) => {
   const classes = useRowStyles();
   const [open, setOpen] = React.useState(false);
   const [openMenu, setOpenMenu] = React.useState(false);
@@ -100,56 +115,101 @@ const SummariesRow = ({ row, id, socket }) => {
     }
   };
 
-  const delimiter = param => (param?
-    <React.Fragment>
-      <IconButton
-        color="primary"
-        component="span"
-        onClick={handleOpenMenu}
-      >
-        <Done />
+  const delimiter = param => (
+    param ?
+      <React.Fragment>
+        <IconButton
+          color="primary"
+          component="span"
+          onClick={handleOpenMenu}
+        >
+          <Done />
+        </IconButton>
+        <StyledMenu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleCloseMenu}
+        >
+          <StyledMenuItem>
+            <ListItemIcon>
+              <FontAwesomeIcon icon={faFile} size="lg" />
+            </ListItemIcon>
+            <ListItemText primary="Скачать TXT" />
+          </StyledMenuItem>
+          <StyledMenuItem>
+            <ListItemIcon>
+              <FontAwesomeIcon icon={faFileExcel} size="lg" />
+            </ListItemIcon>
+            <ListItemText primary="Скачать XLSX" />
+          </StyledMenuItem>
+          <StyledMenuItem>
+            <ListItemIcon>
+              <FontAwesomeIcon icon={faFileArchive} size="lg" />
+            </ListItemIcon>
+            <ListItemText primary="Скачать всё" />
+          </StyledMenuItem>
+        </StyledMenu>
+      </React.Fragment>
+      :
+      <IconButton aria-label="clear" color="secondary">
+        <Clear />
       </IconButton>
-      <StyledMenu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleCloseMenu}
-      >
-        <StyledMenuItem>
-          <ListItemIcon>
-            <FontAwesomeIcon icon={faFile} size="lg" />
-          </ListItemIcon>
-          <ListItemText primary="Скачать TXT" />
-        </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <FontAwesomeIcon icon={faFileExcel} size="lg" />
-          </ListItemIcon>
-          <ListItemText primary="Скачать XLSX" />
-        </StyledMenuItem>
-        <StyledMenuItem>
-          <ListItemIcon>
-            <FontAwesomeIcon icon={faFileArchive} size="lg" />
-          </ListItemIcon>
-          <ListItemText primary="Скачать всё" />
-        </StyledMenuItem>
-      </StyledMenu>
-    </React.Fragment>
-    :
-    <IconButton aria-label="clear" color="secondary">
-      <Clear />
-    </IconButton>);
+  );
+
+  const getClassForRowCell = (index, len, day, today) => {
+    let cl;
+
+    if (day === today) {
+      if (index) {
+        cl = classes.border;
+      } else {
+        cl = clsx(classes.border, classes.borderTop);
+      }
+      if (index === len - 1) {
+        cl = clsx(classes.border, classes.borderBottom);
+      }
+    }
+    return cl;
+  };
 
   return (
     <React.Fragment>
       <TableRow className={classes.root}>
-        <TableCell>{id}</TableCell>
+        <TableCell>{row.id}</TableCell>
         <TableCell component="th" scope="row">
-          <IconButton aria-label="expand row" size="small" onClick={() => handleInfoClick(!open, row.user.id)}>
+          <IconButton aria-label="expand row" size="small" onClick={() => handleInfoClick(!open, row.userId)}>
             {open ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
           </IconButton>
-          {row.user.department}
+          {row.department}
         </TableCell>
-        {row.days.map((v,i) => <TableCell key={i} align="center">{delimiter(v)}</TableCell>)}
+        <TableCell
+          className={getClassForRowCell(idx,length,0,row.today)} align="center">
+          {delimiter(row.monday)}
+        </TableCell>
+        <TableCell
+          className={getClassForRowCell(idx,length,1,row.today)} align="center">
+          {delimiter(row.tuesday)}
+        </TableCell>
+        <TableCell
+          className={getClassForRowCell(idx,length,2,row.today)} align="center">
+          {delimiter(row.wednesday)}
+        </TableCell>
+        <TableCell
+          className={getClassForRowCell(idx,length,3,row.today)} align="center">
+          {delimiter(row.thursday)}
+        </TableCell>
+        <TableCell
+          className={getClassForRowCell(idx,length,4,row.today)} align="center">
+          {delimiter(row.friday)}
+        </TableCell>
+        <TableCell
+          className={getClassForRowCell(idx,length,5,row.today)} align="center">
+          {delimiter(row.saturday)}
+        </TableCell>
+        <TableCell
+          className={getClassForRowCell(idx,length,6,row.today)} align="center">
+          {delimiter(row.sunday)}
+        </TableCell>
       </TableRow>
       {/* USER INFO */}
       <TableRow>

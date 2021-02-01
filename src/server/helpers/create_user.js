@@ -6,6 +6,7 @@ global.config = config;
 global.hashPass = (text, salt = '') => require('crypto').createHash(config.hash.encryptionType).update(salt + text).digest('hex');
 
 // bring the model
+require('../models/DaySummaries');
 require('../models/User');
 
 const userController = require('../controllers/userController');

@@ -17,7 +17,7 @@ const useHeadStyles = makeStyles(theme => ({
   },
 }));
 
-const SummariesTableHead = ({ order, orderBy, rowCount, onRequestSort, headCells }) => {
+const SummariesTableHead = ({ order, orderBy, rowCount, onRequestSort, headCells, checked, onSelectClick }) => {
   const classes = useHeadStyles();
   const createSortHandler = property => event => {
     onRequestSort(event, property);
@@ -34,8 +34,8 @@ const SummariesTableHead = ({ order, orderBy, rowCount, onRequestSort, headCells
           >
             { i > 1 ? (
               <Checkbox
-                checked={false}
-                // onChange={onSelectAllClick}
+                checked={!!checked}
+                onChange={() => onSelectClick(i)}
                 inputProps={{ 'aria-label': 'select all' }}
               />
             ):null}
