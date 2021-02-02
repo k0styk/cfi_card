@@ -1,7 +1,7 @@
 import React from 'react';
 import { summaries as summariesEvents } from '@client/Events';
 
-import { makeStyles, withStyles  } from '@material-ui/core/styles';
+import { makeStyles, withStyles, lighten  } from '@material-ui/core/styles';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile, faFileExcel, faFileArchive } from '@fortawesome/free-regular-svg-icons';
@@ -45,19 +45,29 @@ const useRowStyles = makeStyles(theme => ({
     paddingTop: 0
   },
   borderTop: {
-    borderTop: '1px solid red',
-    borderLeft: '1px solid red',
-    borderRight: '1px solid red',
+    borderTop: '1px solid #3f51b5',
+    borderLeft: '1px solid #3f51b5',
+    borderRight: '1px solid #3f51b5',
   },
   border: {
-    borderLeft: '1px solid red',
-    borderRight: '1px solid red',
+    borderLeft: '1px solid #3f51b5',
+    borderRight: '1px solid #3f51b5',
   },
   borderBottom: {
-    borderBottom: '1px solid red',
-    borderLeft: '1px solid red',
-    borderRight: '1px solid red',
-  }
+    borderBottom: '1px solid #3f51b5',
+    borderLeft: '1px solid #3f51b5',
+    borderRight: '1px solid #3f51b5',
+  },
+  selected:
+    theme.palette.type === 'light'
+      ? {
+        color: theme.palette.secondary.main,
+        backgroundColor: lighten(theme.palette.secondary.light, 0.85),
+      }
+      : {
+        color: theme.palette.text.primary,
+        backgroundColor: theme.palette.secondary.dark,
+      },
 }));
 
 const StyledMenuItem = withStyles(theme => ({
@@ -91,7 +101,7 @@ const StyledMenu = withStyles({
   />
 ));
 
-const SummariesRow = ({ row, idx, length, socket }) => {
+const SummariesRow = ({ row, idx, length, socket, selected }) => {
   const classes = useRowStyles();
   const [open, setOpen] = React.useState(false);
   const [openMenu, setOpenMenu] = React.useState(false);
@@ -156,20 +166,25 @@ const SummariesRow = ({ row, idx, length, socket }) => {
       </IconButton>
   );
 
-  const getClassForRowCell = (index, len, day, today) => {
-    let cl;
+  const getClassForRowCell = (index, len, day, today, dayOfWeek) => {
+    let todayClass, resultClass;
 
     if (day === today) {
       if (index) {
-        cl = classes.border;
+        todayClass = classes.border;
       } else {
-        cl = clsx(classes.border, classes.borderTop);
+        todayClass = clsx(classes.border, classes.borderTop);
       }
       if (index === len - 1) {
-        cl = clsx(classes.border, classes.borderBottom);
+        todayClass = clsx(classes.border, classes.borderBottom);
       }
     }
-    return cl;
+    resultClass = clsx(todayClass);
+    if(selected.length) {
+      if(!!~(selected.indexOf(dayOfWeek)))
+        resultClass = clsx(resultClass, classes.selected);
+    }
+    return resultClass;
   };
 
   return (
@@ -183,31 +198,31 @@ const SummariesRow = ({ row, idx, length, socket }) => {
           {row.department}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,0,row.today)} align="center">
+          className={getClassForRowCell(idx,length,0,row.today,'monday')} align="center">
           {delimiter(row.monday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,1,row.today)} align="center">
+          className={getClassForRowCell(idx,length,1,row.today,'tuesday')} align="center">
           {delimiter(row.tuesday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,2,row.today)} align="center">
+          className={getClassForRowCell(idx,length,2,row.today,'wednesday')} align="center">
           {delimiter(row.wednesday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,3,row.today)} align="center">
+          className={getClassForRowCell(idx,length,3,row.today,'thursday')} align="center">
           {delimiter(row.thursday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,4,row.today)} align="center">
+          className={getClassForRowCell(idx,length,4,row.today,'friday')} align="center">
           {delimiter(row.friday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,5,row.today)} align="center">
+          className={getClassForRowCell(idx,length,5,row.today,'saturday')} align="center">
           {delimiter(row.saturday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,6,row.today)} align="center">
+          className={getClassForRowCell(idx,length,6,row.today,'sunday')} align="center">
           {delimiter(row.sunday)}
         </TableCell>
       </TableRow>

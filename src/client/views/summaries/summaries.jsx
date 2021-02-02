@@ -163,7 +163,7 @@ const SummariesView = ({socket, notify}) => {
   const [disableNext, setDisableNext] = React.useState(true);
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('id');
-  const [selected, setSelected] = React.useState(0);
+  const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -181,20 +181,25 @@ const SummariesView = ({socket, notify}) => {
     setOrderBy(property);
   };
 
-  const handleSelectClick = index => {
-    console.log(index);
-    setSelected(!selected);
+  const handleSelectClick = dayOfWeek => {
+    const selectedIndex = selected.indexOf(dayOfWeek);
+    let newSelected = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, dayOfWeek);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1),
+      );
+    }
+
+    setSelected(newSelected);
   };
-
-  // const handleSelectAllClick = ({event}) => {
-  //   if (event.target.checked) {
-  //     const newSelecteds = users.map(n => n.userId);
-
-  //     setSelected(newSelecteds);
-  //     return;
-  //   }
-  //   setSelected([]);
-  // };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -237,7 +242,7 @@ const SummariesView = ({socket, notify}) => {
     <Paper className={classes.rootT}>
       <TableContainer className={classes.tableContainerFlex}>
         <MyToolbar
-          /*numSelected={selected.length}*/
+          numSelected={selected.length}
           className={classes.toolbar}
           date={getSliceWeekOfDateString(date)}
           handleNext={handleNextWeekClick}
@@ -260,7 +265,7 @@ const SummariesView = ({socket, notify}) => {
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
                 rowCount={users.length}
-                checked={selected}
+                selected={selected}
                 onSelectClick={handleSelectClick}
                 // numSelected={selected.length}
                 // onSelectAllClick={handleSelectAllClick}
@@ -278,6 +283,7 @@ const SummariesView = ({socket, notify}) => {
                       length={rowsPerPage}
                       row={row}
                       socket={socket}
+                      selected={selected}
                     />;
                   })}
               </TableBody>

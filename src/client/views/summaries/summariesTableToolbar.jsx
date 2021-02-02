@@ -76,7 +76,7 @@ const SummariesTableToolbar = ({
             className={classes.button}
             startIcon={<GetApp />}
             onClick={() => console.log('click')}
-            disabled
+            disabled={!numSelected}
           >
             скачать выбранные
           </Button>
