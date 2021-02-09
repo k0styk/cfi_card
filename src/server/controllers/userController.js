@@ -114,10 +114,16 @@ exports.listUsersBySliceOfDate = async date => {
       const usersDepartment = user.map(u => u.department && ({ id: u.id, department: u.department, })).filter(v => v);
       const startWeek = dateObj.startOf('week').set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).toDate();
       const endWeek = dateObj.endOf('week').set({ hour: 23, minute: 59, second: 59, millisecond: 0 }).toDate();
-      const resultArray = new Array(usersDepartment.length); // array of departments
+      const resultArray = []; // array of departments
+      let today;
 
+      // get today
+      if(moment(new Date()).locale('ru').isBetween(startWeek,endWeek,undefined,'[]')) {
+        // resultArray[i].today = moment(date).locale('ru').weekday();
+        today = moment(date).locale('ru').weekday();
+      }
       for (let i = 0; i < usersDepartment.length; i++) {
-        const usr = usersDepartment[i];
+        let usr = usersDepartment[i];
         const query = {
           userId: new ObjectId(usr.id),
           summariesDate: {
@@ -129,12 +135,8 @@ exports.listUsersBySliceOfDate = async date => {
         const summariesIdFromDates = await daySummary.find(query,summariesExcludeFields);
         const daysArray = new Array(7).fill('');
 
-        resultArray[i] = { id: i+1, userId: usr.id, department: usr.department};
-
-        // get today
-        if(moment(date).locale('ru').isBetween(startWeek,endWeek,undefined,'[]')) {
-          resultArray[i].today = moment(date).locale('ru').weekday();
-        }
+        usr = {...usr, id: i+1, userId: usr.id};
+        // resultArray[i] = { id: i+1, userId: usr.id, department: usr.department};
 
         // FILL days from week
         for (let j = 0; j < summariesIdFromDates.length; j++) {
@@ -144,19 +146,18 @@ exports.listUsersBySliceOfDate = async date => {
           daysArray[summaryWeekDay] = summaryByDate['id'];
         }
         [
-          resultArray[i].monday,
-          resultArray[i].tuesday,
-          resultArray[i].wednesday,
-          resultArray[i].thursday,
-          resultArray[i].friday,
-          resultArray[i].saturday,
-          resultArray[i].sunday
+          usr.monday,
+          usr.tuesday,
+          usr.wednesday,
+          usr.thursday,
+          usr.friday,
+          usr.saturday,
+          usr.sunday
         ] = daysArray;
+        resultArray.push(usr);
       }
 
-      // console.log(resultArray);
-
-      return resultArray;
+      return {usersListWithDays: resultArray, today};
     } else {
       throw `Can't find user`;
     }

@@ -39,6 +39,8 @@ const SummariesTableToolbar = ({
   handleNext,
   handlePrev,
   canNext,
+  selected,
+  downloadSelectedClick
 }) => {
   const classes = useToolbarStyles();
 
@@ -75,7 +77,7 @@ const SummariesTableToolbar = ({
             color="primary"
             className={classes.button}
             startIcon={<GetApp />}
-            onClick={() => console.log('click')}
+            onClick={downloadSelectedClick}
             disabled={!numSelected}
           >
             скачать выбранные

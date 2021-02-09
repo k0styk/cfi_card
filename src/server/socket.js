@@ -10,6 +10,7 @@ const userController = require('./controllers/userController');
 const summaryController = require('./controllers/summaryController');
 const daySummaryController = require('./controllers/daySummaryController');
 const downloadSummariesController = require('./controllers/downloadSummariesController');
+const fileSummariesController = require('./controllers/fileSummariesController');
 /**---  CONFIG  ---**/
 const { config } = global;
 
@@ -27,7 +28,7 @@ module.exports = server => {
 
     /**---  DISCONNECT  ---**/
     socket.on('disconnect', () => {
-      userController.updateStatus(socket.request.session.userId);
+      if(checkSession) userController.updateStatus(socket.request.session.userId);
       // console.log('Disconnected: user[' + socket.request.session.userId + '] socket[' + socket.id + ']');
     });
 
@@ -42,10 +43,9 @@ module.exports = server => {
     /**-----------------------**/
     /***/ /**---  LOGIN USER  ---**/
     /***/ socket.on(events.user.login, async (formData, cb) => {
-      const session = socket.request.session; // eslint-disable-line
-
       try {
-        if (session.userId && session.token) {
+        const session = socket.request.session; // eslint-disable-line
+        if (checkSession()) {
           const payload = await jwt.verify(session.token, config.secret);
 
           console.log('User [ ' + login + ' ] try sign in, session for [ ' + payload.login + ' ]');
@@ -84,8 +84,9 @@ module.exports = server => {
 
     /***/ /**---  LOGOUT USER  ---**/
     /***/ socket.on(events.user.logout, async ({}, cb) => {
-      const session = socket.request.session; // eslint-disable-line
-      if (session.userId && session.token) {
+      if (checkSession()) {
+        const session = socket.request.session; // eslint-disable-line
+        userController.updateStatus(socket.request.session.userId);
         delete session.token;
         delete session.userId;
         session.save();
@@ -120,10 +121,9 @@ module.exports = server => {
 
     /**---  SUMMARY - SAVE  ---**/
     socket.on(events.summary.save, async ({ summary }, cb) => {
-      const session = socket.request.session; // eslint-disable-line
-
-      if (session.userId && session.token) {
+      if (checkSession()) {
         if (summary.length) {
+          const session = socket.request.session; // eslint-disable-line
           const resultSummary = [];
           const invalidSummary = [];
 
@@ -162,9 +162,8 @@ module.exports = server => {
     });
 
     socket.on(events.summaries.getDates, async (nullable, cb) => {
-      const session = socket.request.session; // eslint-disable-line
-
-      if (session.userId && session.token) {
+      if (checkSession()) {
+        const session = socket.request.session; // eslint-disable-line
         const dates = await daySummaryController.getDates();
 
         cb({ dates });
@@ -172,9 +171,8 @@ module.exports = server => {
     });
 
     socket.on(events.summaries.generate, async ({date}, cb) => {
-      const session = socket.request.session; // eslint-disable-line
-
-      if (session.userId && session.token) {
+      if (checkSession()) {
+        // const session = socket.request.session; // eslint-disable-line
         const { generated, fileName } = await daySummaryController.generateSummariesByDate({date});
         const message = generated?`Файл ${date} - успешно создан`:`Возникла ошибка при создании файла`;
         const link = `/download/${fileName}`;
@@ -186,19 +184,25 @@ module.exports = server => {
     /**-------------------------------------**/
     /**---  BLOCK OF DOWNLOAD SUMMARIES  ---**/
     /**-------------------------------------**/
-    /***/ socket.on(events.summaries.getListUsers, async (date, cb) => {
-      if(checkSession()) {
-        const usersListWithDays = await userController.listUsersBySliceOfDate(date);
-
-        cb({usersListWithDays});
+    socket.on(events.summaries.getListUsers, async (date, cb) => {
+      if (checkSession()) {
+        cb(await userController.listUsersBySliceOfDate(date));
       } else {
         console.error('[No Session] - Try to get list of users');
       }
     });
 
-    /***/ socket.on(events.summaries.getUserInfoById, async (id, cb) => {
-      if(checkSession()) {
+    socket.on(events.summaries.getUserInfoById, async (id, cb) => {
+      if (checkSession()) {
         cb(await userController.getUserInfoById(id));
+      } else {
+        console.error('[No Session] - Try to get list of users');
+      }
+    });
+
+    socket.on(events.summaries.createTxt, async (fileId, cb) => {
+      if (checkSession()) {
+        cb(await fileSummariesController.createTxt({fileId, userId: socket.request.session.userId}));
       } else {
         console.error('[No Session] - Try to get list of users');
       }

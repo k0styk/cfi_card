@@ -23,12 +23,16 @@ module.exports.summary = {
 };
 
 module.exports.summaries = {
-  generate: 'summaries_generate',
-  generate_success: 'summaries_generate_success',
-  generate_err: 'summaries_generate_err',
-  getDates: 'summaries_getDates',
-  getListUsers: 'summaries_getListUsers',
-  getUserInfoById: 'summaries_getUserInfoById',
+  generate:                 'summaries_generate',
+  generate_success:         'summaries_generate_success',
+  generate_err:             'summaries_generate_err',
+  getDates:                 'summaries_getDates',
+  getListUsers:             'summaries_getListUsers',
+  getUserInfoById:          'summaries_getUserInfoById',
+  createTxt:                'summaries_createTxt',
+  create_success:           'summaries_create_success',
+  create_error:             'summaries_create_error',
+  downloadTxt:              'summaries_downloadTxt',
 };
 
 module.exports.store = {

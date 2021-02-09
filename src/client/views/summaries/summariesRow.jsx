@@ -23,7 +23,7 @@ import {
   ListItemText,
 } from '@material-ui/core';
 
-import { Clear, Done, GetApp, KeyboardArrowDown, KeyboardArrowUp } from '@material-ui/icons';
+import { Clear, Done, KeyboardArrowDown, KeyboardArrowUp } from '@material-ui/icons';
 
 const useRowStyles = makeStyles(theme => ({
   root: {
@@ -44,19 +44,15 @@ const useRowStyles = makeStyles(theme => ({
     paddingBottom: 0,
     paddingTop: 0
   },
-  borderTop: {
-    borderTop: '1px solid #3f51b5',
-    borderLeft: '1px solid #3f51b5',
-    borderRight: '1px solid #3f51b5',
-  },
   border: {
     borderLeft: '1px solid #3f51b5',
     borderRight: '1px solid #3f51b5',
   },
+  borderTop: {
+    borderTop: '1px solid #3f51b5',
+  },
   borderBottom: {
     borderBottom: '1px solid #3f51b5',
-    borderLeft: '1px solid #3f51b5',
-    borderRight: '1px solid #3f51b5',
   },
   selected:
     theme.palette.type === 'light'
@@ -101,7 +97,17 @@ const StyledMenu = withStyles({
   />
 ));
 
-const SummariesRow = ({ row, idx, length, socket, selected }) => {
+const SummariesRow = ({
+  row,
+  idx,
+  length,
+  socket,
+  selected,
+  today,
+  downloadTxtClick,
+  downloadExcelClick,
+  downloadAllClick,
+}) => {
   const classes = useRowStyles();
   const [open, setOpen] = React.useState(false);
   const [openMenu, setOpenMenu] = React.useState(false);
@@ -109,10 +115,11 @@ const SummariesRow = ({ row, idx, length, socket, selected }) => {
   const [userInfo, setUserInfo] = React.useState(undefined);
 
   const handleOpenMenu = event => setAnchorEl(event.currentTarget);
-  const handleCloseMenu = () => setAnchorEl(null);
+  const handleCloseMenu = (handleDownload, id) => {
+    handleDownload(id);
+    setAnchorEl(null);
+  };
   const handleInfoClick = (state, userId) => {
-    setOpen(state);
-
     if(state) {
       if (socket.emit) {
         socket.emit(summariesEvents.getUserInfoById,
@@ -121,7 +128,7 @@ const SummariesRow = ({ row, idx, length, socket, selected }) => {
           });
       }
     } else {
-      setUserInfo(undefined);
+      setOpen(false);
     }
   };
 
@@ -140,19 +147,19 @@ const SummariesRow = ({ row, idx, length, socket, selected }) => {
           open={Boolean(anchorEl)}
           onClose={handleCloseMenu}
         >
-          <StyledMenuItem>
+          <StyledMenuItem onClick={() => handleCloseMenu(downloadTxtClick,param)}>
             <ListItemIcon>
               <FontAwesomeIcon icon={faFile} size="lg" />
             </ListItemIcon>
             <ListItemText primary="Скачать TXT" />
           </StyledMenuItem>
-          <StyledMenuItem>
+          <StyledMenuItem onClick={() => handleCloseMenu(downloadExcelClick,param)}>
             <ListItemIcon>
               <FontAwesomeIcon icon={faFileExcel} size="lg" />
             </ListItemIcon>
             <ListItemText primary="Скачать XLSX" />
           </StyledMenuItem>
-          <StyledMenuItem>
+          <StyledMenuItem onClick={() => handleCloseMenu(downloadAllClick,param)}>
             <ListItemIcon>
               <FontAwesomeIcon icon={faFileArchive} size="lg" />
             </ListItemIcon>
@@ -166,7 +173,7 @@ const SummariesRow = ({ row, idx, length, socket, selected }) => {
       </IconButton>
   );
 
-  const getClassForRowCell = (index, len, day, today, dayOfWeek) => {
+  const getClassForRowCell = (index, len, day) => {
     let todayClass, resultClass;
 
     if (day === today) {
@@ -181,11 +188,23 @@ const SummariesRow = ({ row, idx, length, socket, selected }) => {
     }
     resultClass = clsx(todayClass);
     if(selected.length) {
-      if(!!~(selected.indexOf(dayOfWeek)))
+      if(!!~(selected.indexOf(day)))
         resultClass = clsx(resultClass, classes.selected);
     }
     return resultClass;
   };
+
+  React.useLayoutEffect(() => {
+    if(userInfo) {
+      setOpen(true);
+    }
+  },[userInfo]);
+
+  React.useLayoutEffect(() => {
+    if(!open) {
+      setTimeout(() => setUserInfo(undefined), 300);
+    }
+  },[open]);
 
   return (
     <React.Fragment>
@@ -198,31 +217,31 @@ const SummariesRow = ({ row, idx, length, socket, selected }) => {
           {row.department}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,0,row.today,'monday')} align="center">
+          className={getClassForRowCell(idx,length,0)} align="center">
           {delimiter(row.monday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,1,row.today,'tuesday')} align="center">
+          className={getClassForRowCell(idx,length,1)} align="center">
           {delimiter(row.tuesday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,2,row.today,'wednesday')} align="center">
+          className={getClassForRowCell(idx,length,2)} align="center">
           {delimiter(row.wednesday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,3,row.today,'thursday')} align="center">
+          className={getClassForRowCell(idx,length,3)} align="center">
           {delimiter(row.thursday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,4,row.today,'friday')} align="center">
+          className={getClassForRowCell(idx,length,4)} align="center">
           {delimiter(row.friday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,5,row.today,'saturday')} align="center">
+          className={getClassForRowCell(idx,length,5)} align="center">
           {delimiter(row.saturday)}
         </TableCell>
         <TableCell
-          className={getClassForRowCell(idx,length,6,row.today,'sunday')} align="center">
+          className={getClassForRowCell(idx,length,6)} align="center">
           {delimiter(row.sunday)}
         </TableCell>
       </TableRow>

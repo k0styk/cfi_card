@@ -3,8 +3,19 @@ const mongoose = require('mongoose');
 //login, password, description, displayName, rights
 const fileSchema = new mongoose.Schema(
   {
-    path: String,
-    name: String,
+    creator: {
+      required: 'Creator is required',
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    path: {
+      required: 'Path is required',
+      type: String,
+    },
+    fileName: {
+      required: 'File name is required',
+      type: String,
+    },
   },
   {
     versionKey: false,
@@ -12,4 +23,4 @@ const fileSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('File', fileSchema);
+module.exports = mongoose.model('Files', fileSchema);

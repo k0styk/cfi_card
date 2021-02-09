@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const { catchErrors } = require('../handlers/errorHandlers');
-const downloadController = require('../controllers/downloadFileController');
+const fileSummariesController = require('../controllers/fileSummariesController');
 
-router.get('/download/:document', catchErrors(downloadController.download));
+router.get('/download/:document', catchErrors(fileSummariesController.download));
 
 module.exports = router;

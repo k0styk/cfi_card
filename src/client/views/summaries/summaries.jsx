@@ -72,13 +72,13 @@ function checkCanNext(dateObj) {
 const headCells = [
   { id: 'id',         label: '№',             minWidth: 25, maxWidth: 25 },
   { id: 'department', label: 'Подразделение', minWidth: 200 },
-  { id: 'monday',     label: 'ПН.',           minWidth: 150, align: 'center' },
-  { id: 'tuesday',    label: 'ВТ.',           minWidth: 150, align: 'center' },
-  { id: 'wednesday',  label: 'СР.',           minWidth: 150, align: 'center' },
-  { id: 'thursday',   label: 'ЧТ.',           minWidth: 150, align: 'center' },
-  { id: 'friday',     label: 'ПТ.',           minWidth: 150, align: 'center' },
-  { id: 'saturday',   label: 'СБ.',           minWidth: 150, align: 'center' },
-  { id: 'sunday',     label: 'ВС.',           minWidth: 150, align: 'center' },
+  { id: 'monday',     dayOfWeek: 0, label: 'ПН.', minWidth: 150, align: 'center' },
+  { id: 'tuesday',    dayOfWeek: 1, label: 'ВТ.', minWidth: 150, align: 'center' },
+  { id: 'wednesday',  dayOfWeek: 2, label: 'СР.', minWidth: 150, align: 'center' },
+  { id: 'thursday',   dayOfWeek: 3, label: 'ЧТ.', minWidth: 150, align: 'center' },
+  { id: 'friday',     dayOfWeek: 4, label: 'ПТ.', minWidth: 150, align: 'center' },
+  { id: 'saturday',   dayOfWeek: 5, label: 'СБ.', minWidth: 150, align: 'center' },
+  { id: 'sunday',     dayOfWeek: 6, label: 'ВС.', minWidth: 150, align: 'center' },
 ];
 
 const useStyless = makeStyles(theme => ({
@@ -157,9 +157,9 @@ const useStyless = makeStyles(theme => ({
 const SummariesView = ({socket, notify}) => {
   moment.locale('ru');
   const classes = useStyless();
-  // const classes = useStyles();
   const [date, setDate] = React.useState(moment());
   const [users, setUsers] = React.useState([]);
+  const [today, setToday] = React.useState(undefined);
   const [disableNext, setDisableNext] = React.useState(true);
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('id');
@@ -168,9 +168,11 @@ const SummariesView = ({socket, notify}) => {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const getListOfUsersByWeek = date => {
-    socket.emit(summariesEvents.getListUsers, date, ({usersListWithDays}) => {
-      if(usersListWithDays)
+    socket.emit(summariesEvents.getListUsers, date, ({usersListWithDays, today}) => {
+      if(usersListWithDays) {
         setUsers(usersListWithDays);
+      }
+      setToday(today);
     });
   };
 
@@ -230,13 +232,44 @@ const SummariesView = ({socket, notify}) => {
     setDate(bufDate);
   };
 
+  /*****/ /*** DOWNLOAD BLOCK ***/
+  const downloadTxtClick = id => {
+    if(socket.emit) {
+      socket.emit(summariesEvents.createTxt, id, ({err, message, fileId}) => {
+        if(err) {
+
+        } else {
+          console.log(fileId);
+          setTimeout(() => {
+            window.open(`/download/${fileId}`);
+          },5000);
+          notify({
+            message,
+            options: {
+              autoHideDuration: 4500,
+              variant: 'success',
+            }
+          });
+        }
+      });
+    }
+  };
+  const downloadExcelClick = id => {
+    console.log(id);
+  };
+  const downloadAllClick = id => {
+    console.log(id);
+  };
+  const downloadSelectedClick = () => {
+    console.log(selected);
+  };
+  /*****/ /*********************/
+
   React.useLayoutEffect(() => {
     if(socket.emit) {
       getListOfUsersByWeek(date);
     }
   }, [socket]);
-
-  const isSelected = userId => selected.indexOf(userId) !== -1;
 
   return (
     <Paper className={classes.rootT}>
@@ -248,6 +281,8 @@ const SummariesView = ({socket, notify}) => {
           handleNext={handleNextWeekClick}
           handlePrev={handlePrevWeekClick}
           canNext={disableNext}
+          selected={selected}
+          downloadSelectedClick={downloadSelectedClick}
         />
         <TableContainer className={classes.tableRelativeContainer}>
           <TableContainer className={classes.tableAbsoluteContainer}>
@@ -265,27 +300,26 @@ const SummariesView = ({socket, notify}) => {
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
                 rowCount={users.length}
+                today={today}
                 selected={selected}
                 onSelectClick={handleSelectClick}
-                // numSelected={selected.length}
-                // onSelectAllClick={handleSelectAllClick}
               />
               <TableBody>
-                {stableSort(users, getComparator(order, orderBy))
+                {users.length ? stableSort(users, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index, arr) => {
-                    // const isItemSelected = isSelected(row.name);
-                    const labelId = `enhanced-table-checkbox-${index}`;
-
-                    return <Row
-                      key={index}
-                      idx={index}
-                      length={rowsPerPage}
-                      row={row}
-                      socket={socket}
-                      selected={selected}
-                    />;
-                  })}
+                  .map((row, index) => (<Row
+                    key={index}
+                    idx={index}
+                    length={rowsPerPage}
+                    row={row}
+                    socket={socket}
+                    selected={selected}
+                    today={today}
+                    downloadTxtClick={downloadTxtClick}
+                    downloadExcelClick={downloadExcelClick}
+                    downloadAllClick={downloadAllClick}
+                  />
+                  )):null}
               </TableBody>
             </Table>
           </TableContainer>
@@ -304,57 +338,6 @@ const SummariesView = ({socket, notify}) => {
       />
     </Paper>
   );
-
-  // const [page, setPage] = React.useState(0);
-  // const [rowsPerPage, setRowsPerPage] = React.useState(10);
-  // const handleChangePage = (event, newPage) => {
-  //   setPage(newPage);
-  // };
-
-  // const handleChangeRowsPerPage = event => {
-  //   setRowsPerPage(+event.target.value);
-  //   setPage(0);
-  // };
-
-  // return (
-  //   <Paper className={classes.rootT}>
-  //     <TableContainer className={classes.flex1}>
-  //       <TableContainer>
-  //         <Table stickyHeader aria-label="sticky table">
-  //           <TableHead>
-  //             <TableRow>
-  //               {columns.map(column => (
-  //                 <TableCell
-  //                   key={column.id}
-  //                   align={column.align}
-  //                   style={{
-  //                     minWidth: column.minWidth,
-  //                     maxWidth: column.maxWidth,
-  //                   }}
-  //                 >
-  //                   {column.label}
-  //                 </TableCell>
-  //               ))}
-  //             </TableRow>
-  //           </TableHead>
-  //           <TableBody>
-  //             {rows.slice(page*rowsPerPage,page*rowsPerPage+rowsPerPage).map(row => <Row key={row.id} row={row} />)}
-  //           </TableBody>
-  //         </Table>
-  //       </TableContainer>
-  //     </TableContainer>
-  //     <TablePagination
-  //       className={classes.flex2}
-  //       rowsPerPageOptions={[10, 15, 30]}
-  //       component="div"
-  //       count={rows.length}
-  //       rowsPerPage={rowsPerPage}
-  //       page={page}
-  //       onChangePage={handleChangePage}
-  //       onChangeRowsPerPage={handleChangeRowsPerPage}
-  //     />
-  //   </Paper>
-  // );
 };
 
 export default connect(
