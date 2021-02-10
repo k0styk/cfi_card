@@ -30,6 +30,8 @@ module.exports.summaries = {
   getListUsers:             'summaries_getListUsers',
   getUserInfoById:          'summaries_getUserInfoById',
   createTxt:                'summaries_createTxt',
+  createExcel:              'summaries_createExcel',
+  createArcheve:            'summaries_createArcheve',
   create_success:           'summaries_create_success',
   create_error:             'summaries_create_error',
   downloadTxt:              'summaries_downloadTxt',

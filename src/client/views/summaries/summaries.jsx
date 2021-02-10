@@ -237,7 +237,14 @@ const SummariesView = ({socket, notify}) => {
     if(socket.emit) {
       socket.emit(summariesEvents.createTxt, id, ({err, message, fileId}) => {
         if(err) {
-
+          console.log(err);
+          notify({
+            message,
+            options: {
+              autoHideDuration: 3000,
+              variant: 'warning',
+            }
+          });
         } else {
           console.log(fileId);
           setTimeout(() => {
@@ -255,7 +262,32 @@ const SummariesView = ({socket, notify}) => {
     }
   };
   const downloadExcelClick = id => {
-    console.log(id);
+    if(socket.emit) {
+      socket.emit(summariesEvents.createExcel, id, ({err, message, fileId}) => {
+        if(err) {
+          console.log(err);
+          notify({
+            message,
+            options: {
+              autoHideDuration: 3000,
+              variant: 'warning',
+            }
+          });
+        } else {
+          console.log(fileId);
+          setTimeout(() => {
+            window.open(`/download/${fileId}`);
+          },5000);
+          notify({
+            message,
+            options: {
+              autoHideDuration: 4500,
+              variant: 'success',
+            }
+          });
+        }
+      });
+    }
   };
   const downloadAllClick = id => {
     console.log(id);

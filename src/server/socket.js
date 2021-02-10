@@ -208,6 +208,14 @@ module.exports = server => {
       }
     });
 
+    socket.on(events.summaries.createExcel, async (fileId, cb) => {
+      if (checkSession()) {
+        cb(await fileSummariesController.createExcel({fileId, userId: socket.request.session.userId}));
+      } else {
+        console.error('[No Session] - Try to get list of users');
+      }
+    });
+
     socket.on(events.store.INITIAL, async (payload, action, cb) => {
       const session = socket.request.session; // eslint-disable-line
       let userObj = null;

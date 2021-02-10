@@ -7,6 +7,7 @@ const { config } = global;
 const path = require('path');
 const fs = require('fs');
 const events = require('../../client/Events');
+const ExcelJS = require('exceljs');
 
 exports.createTxt = async ({fileId, userId}) => {
   try {
@@ -58,17 +59,100 @@ exports.createTxt = async ({fileId, userId}) => {
   }
 };
 
-exports.createExcel = async ({}) => {
+exports.createExcel = async ({fileId, userId}) => {
   try {
-    console.log('create excel');
-    return true;
+    await directoryPreparation();
+    const projection = {
+      version: 0,
+      __v: 0,
+      createdAt: 0,
+      updatedAt: 0,
+    };
+    const summaryById = await DaySummaries.findOne({'_id': fileId},projection).populate('userId', 'department');
+    const fileName = `${summaryById.summariesDateStr}.${summaryById.userId.department}.xlsx`;
+    const fileLoc = getFileLocation(fileName);
+
+    // if exist file remove them from disk and database - for actual information
+    if(checkFileExist(fileLoc)) {
+      await removeFile(fileLoc);
+      await FileSummaries.deleteMany({fileName: fileName});
+    }
+    // create file
+    // writeStream = fs.createWriteStream(fileLoc);
+    const file = new FileSummaries({
+      creator: userId,
+      path: fileLoc,
+      fileName: fileName
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(`СВОДКА ${summaryById.userId.department}`);
+
+    workbook.creator = summaryById.userId.department;
+    workbook.lastModifiedBy = summaryById.userId.department;
+    workbook.created = new Date();
+
+    const {summaries} = summaryById;
+    /*
+    let counter = 1;
+    const name = `Table-${i+1}`;
+      const ref = `A${counter}`;
+
+      worksheet.addTable({
+        name: name,
+        ref: ref,
+        headerRow: true,
+        style: {
+          theme: 'TableStyleLight7',
+          showRowStripes: true,
+        },
+        columns: [
+          {name: 'Summary',},
+          {name: moment(summaryById.summariesDateStr, 'DD.MM.YY').format('DDMMYY'),},
+          {name: ' ',},
+          {name: '  ',},
+          {name: '   ',},
+          {name: '    ',},
+          {name: '     ',},
+          {name: '      ',},
+          {name: '       ',},
+          {name: '        ',},
+        ],
+        rows: resultArray,
+      });
+      counter += 4+z2.length;
+    */
+
+
+    for (let i = 0; i < summaries.length; i++) {
+      const { z1, z2, z3 } = summaries[i];
+      const resultArray = [];
+
+      resultArray.push(['СВОДКА',moment(summaryById.summariesDateStr, 'DD.MM.YY').format('DDMMYY')]);
+      resultArray.push(arrayZ1(z1));
+      for (let j = 0; j < z2.length; j++) {
+        resultArray.push(arrayZ2(z2[j]));
+      }
+      resultArray.push(arrayZ3(z3));
+
+      resultArray.push([' ']);
+      worksheet.addRows(resultArray);
+    }
+
+    const { _id } = await file.save();
+
+    await workbook.xlsx.writeFile(fileLoc);
+    const message = `Файл создан [${fileName}]. Автоматическое скачивание через 5сек...`;
+
+    return { eventName: events.summaries.create_success, message, fileId: _id};
   } catch(err) {
+    console.log('Create excel error');
     console.log(err);
-    // return { message: err };
+    return {eventName: events.summaries.create_error, message: 'Ошибка при создании файла', err};
   }
 };
 
-exports.createArchived = async ({}) => {
+exports.createArchived = async ({fileId, userId}) => {
   try {
     console.log('create archived');
     return true;
@@ -156,7 +240,7 @@ const messageZ2 = z2 => {
   } = z2;
 
   return `З2 ${code} ${entryPoint} ${timeWithoutColon(entryTime)} ${exitPoint} ${timeWithoutColon(exitTime)}`;
-}
+};
 const messageZ3 = z3 => {
   const {
     airspaceType,
@@ -166,6 +250,43 @@ const messageZ3 = z3 => {
   } = z3;
 
   return `З3 ${airspaceType} ${nonRequired(aircraftTypeName)} ${nonRequired(depAirportCoord)} ${nonRequired(destAirportCoord)}`;
+};
+
+const arrayZ1 = z1 => {
+  const {
+    flyDate,
+    acftIdent,
+    aircraftType,
+    depAirport,
+    destAirport,
+    entryPoint,
+    entryTime,
+    exitPoint,
+    regno,
+  } = z1;
+
+  return ['З1',flyDate,acftIdent,aircraftType,depAirport,destAirport,nonRequired(entryPoint),timeWithoutColon(entryTime),nonRequired(exitPoint),nonRequired(regno)];
+};
+const arrayZ2 = z2 => {
+  const {
+    code,
+    entryPoint,
+    entryTime,
+    exitPoint,
+    exitTime,
+  } = z2;
+
+  return ['З2',code,entryPoint,timeWithoutColon(entryTime),exitPoint,timeWithoutColon(exitTime)];
+};
+const arrayZ3 = z3 => {
+  const {
+    airspaceType,
+    aircraftTypeName,
+    depAirportCoord,
+    destAirportCoord,
+  } = z3;
+
+  return ['З3',airspaceType,nonRequired(aircraftTypeName),nonRequired(depAirportCoord),nonRequired(destAirportCoord)];
 };
 
 let writeStream;
