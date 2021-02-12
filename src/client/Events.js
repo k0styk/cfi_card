@@ -31,10 +31,10 @@ module.exports.summaries = {
   getUserInfoById:          'summaries_getUserInfoById',
   createTxt:                'summaries_createTxt',
   createExcel:              'summaries_createExcel',
-  createArcheve:            'summaries_createArcheve',
+  createArchive:            'summaries_createArchive',
+  createSelected:           'summaries_createSelected',
   create_success:           'summaries_create_success',
   create_error:             'summaries_create_error',
-  downloadTxt:              'summaries_downloadTxt',
 };
 
 module.exports.store = {

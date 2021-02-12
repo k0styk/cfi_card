@@ -290,7 +290,32 @@ const SummariesView = ({socket, notify}) => {
     }
   };
   const downloadAllClick = id => {
-    console.log(id);
+    if(socket.emit) {
+      socket.emit(summariesEvents.createArchive, id, ({err, message, fileId}) => {
+        if(err) {
+          console.log(err);
+          notify({
+            message,
+            options: {
+              autoHideDuration: 3000,
+              variant: 'warning',
+            }
+          });
+        } else {
+          console.log(fileId);
+          setTimeout(() => {
+            window.open(`/download/${fileId}`);
+          },5000);
+          notify({
+            message,
+            options: {
+              autoHideDuration: 4500,
+              variant: 'success',
+            }
+          });
+        }
+      });
+    }
   };
   const downloadSelectedClick = () => {
     console.log(selected);

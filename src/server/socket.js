@@ -170,6 +170,7 @@ module.exports = server => {
       }
     });
 
+    /*
     socket.on(events.summaries.generate, async ({date}, cb) => {
       if (checkSession()) {
         // const session = socket.request.session; // eslint-disable-line
@@ -180,6 +181,7 @@ module.exports = server => {
         cb({message, generated, link});
       }
     });
+    */
 
     /**-------------------------------------**/
     /**---  BLOCK OF DOWNLOAD SUMMARIES  ---**/
@@ -188,7 +190,7 @@ module.exports = server => {
       if (checkSession()) {
         cb(await userController.listUsersBySliceOfDate(date));
       } else {
-        console.error('[No Session] - Try to get list of users');
+        console.error('[No Session] - Try to getListUsers');
       }
     });
 
@@ -196,7 +198,7 @@ module.exports = server => {
       if (checkSession()) {
         cb(await userController.getUserInfoById(id));
       } else {
-        console.error('[No Session] - Try to get list of users');
+        console.error('[No Session] - Try to getUserInfoById');
       }
     });
 
@@ -204,7 +206,7 @@ module.exports = server => {
       if (checkSession()) {
         cb(await fileSummariesController.createTxt({fileId, userId: socket.request.session.userId}));
       } else {
-        console.error('[No Session] - Try to get list of users');
+        console.error('[No Session] - Try to createTxt');
       }
     });
 
@@ -212,7 +214,23 @@ module.exports = server => {
       if (checkSession()) {
         cb(await fileSummariesController.createExcel({fileId, userId: socket.request.session.userId}));
       } else {
-        console.error('[No Session] - Try to get list of users');
+        console.error('[No Session] - Try to createExcel');
+      }
+    });
+
+    socket.on(events.summaries.createArchive, async (fileId, cb) => {
+      if (checkSession()) {
+        cb(await fileSummariesController.createArchived({fileId, userId: socket.request.session.userId}));
+      } else {
+        console.error('[No Session] - Try to createArchive');
+      }
+    });
+
+    socket.on(events.summaries.createSelected, async (fileId, cb) => {
+      if (checkSession()) {
+        cb(await fileSummariesController.createSelected({fileId, userId: socket.request.session.userId}));
+      } else {
+        console.error('[No Session] - Try to createSelected');
       }
     });
 
