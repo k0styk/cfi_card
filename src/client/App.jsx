@@ -1,7 +1,7 @@
 import 'normalize.css';
 import './app.scss';
 import { initialAction, socketAction, uiAction } from '@redux/actions';
-import { IndexPage, LoginPage, RegisterPage, SummaryPage, SummariesPage } from '@pages';
+import { IndexPage, LoginPage, UsersPage, SummaryPage, SummariesPage } from '@pages';
 import { Notifier } from '@components';
 import { HeaderView } from '@views';
 
@@ -11,7 +11,7 @@ import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { withStyles } from '@material-ui/core/styles';
 import { CircularProgress, Backdrop } from '@material-ui/core';
-import io from 'socket.io-client';
+import { clientSocket } from './clientSocket';
 
 const PrivateRoute = ({ component: Component, redirect, socket, admin: isAdmin, ...rest }) => (
   (<Route
@@ -51,7 +51,6 @@ const useStyles = theme => ({
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.socket = null;
   }
 
   componentDidMount() {
@@ -62,72 +61,10 @@ class App extends React.Component {
       connected,
       closeNotify
     } = this.props;
-    const socket = io({
-      reconnectionAttempts: 4,
-      reconnectionDelay: 3000,
-      reconnectionDelayMax: 10000
-    });
-
-    this.socket = socket;
-
-    socket.on('connect', () => {
-      connected(true);
-      closeNotify('connection');
-      notify({
-        message: 'Соединение установлено',
-        options: {
-          variant: 'success'
-        }
-      });
-    });
-    socket.on('connect_error', err => {
-      console.log(err);
-      notify({
-        message: 'Ошибка соединения с сервером',
-        options: {
-          variant: 'warning'
-        }
-      });
-    });
-    socket.on('connect_timeout', err => {
-      console.log(err);
-      notify({
-        message: 'Таймаут соединения с сервером',
-        options: {
-          variant: 'warning'
-        }
-      });
-    });
-    socket.on('error', err => {
-      console.log(err);
-      notify({
-        message: 'Ошибка на клиенте, посмотрите консоль',
-        options: {
-          variant: 'warning'
-        }
-      });
-    });
-    socket.on('reconnect_failed', () => {
-      connected(false);
-      notify({
-        message: 'Ошибка подключения. Попробуйте подключиться самостоятельно через некоторое время',
-        options: {
-          variant: 'info',
-          autoHideDuration: 5000
-        }
-      });
-      notify({
-        message: 'Нет соединения с сервером',
-        options: {
-          key: 'connection',
-          variant: 'error',
-          persist: true,
-          anchorOrigin: {
-            vertical: 'bottom',
-            horizontal: 'center',
-          }
-        }
-      });
+    const socket = clientSocket({
+      connected,
+      closeNotify,
+      notify,
     });
 
     setSocket(socket);
@@ -152,9 +89,12 @@ class App extends React.Component {
               component={LoginPage}
               exact
             />
-            <Route
-              path="/register"
-              component={RegisterPage}
+            <PrivateRoute
+              socket={this.props.socket}
+              path="/users"
+              redirect="/"
+              component={UsersPage}
+              admin
               exact
             />
             <PrivateRoute

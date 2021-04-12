@@ -5,6 +5,7 @@ import ServerButtonView from './serverButton/serverButton';
 import MainView from './main/main';
 import SummaryView from './summary/summary';
 import SummariesView from './summaries/summaries';
+import UsersListView from './usersList/usersList';
 import Z1View from './z1/z1';
 import Z2View from './z2/z2';
 import Z3View from './z3/z3';
@@ -17,6 +18,7 @@ export {
   SwitchFolderView,
   SummaryView,
   SummariesView,
+  UsersListView,
   Z1View,
   Z2View,
   Z3View,

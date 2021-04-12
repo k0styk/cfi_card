@@ -5,6 +5,7 @@ import { makeStyles, withStyles, lighten  } from '@material-ui/core/styles';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile, faFileExcel, faFileArchive } from '@fortawesome/free-regular-svg-icons';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import clsx from 'clsx';
 
 import {
@@ -45,14 +46,13 @@ const useRowStyles = makeStyles(theme => ({
     paddingTop: 0
   },
   border: {
-    borderLeft: '1px solid #3f51b5',
-    borderRight: '1px solid #3f51b5',
+    boxShadow: 'inset 1px 0px 0px 0px rgb(63 81 181), inset -1px 0px 0px 0px rgb(63 81 181)',
   },
   borderTop: {
-    borderTop: '1px solid #3f51b5',
+    boxShadow: 'inset 0px 1px 0px 0px rgb(63 81 181), inset 1px 0px 0px 0px rgb(63 81 181), inset -1px 0px 0px 0px rgb(63 81 181)', // eslint-disable-line
   },
   borderBottom: {
-    borderBottom: '1px solid #3f51b5',
+    boxShadow: 'inset 0px -1px 0px 0px rgb(63 81 181), inset 1px 0px 0px 0px rgb(63 81 181), inset -1px 0px 0px 0px rgb(63 81 181)', // eslint-disable-line
   },
   selected:
     theme.palette.type === 'light'
@@ -110,22 +110,19 @@ const SummariesRow = ({
 }) => {
   const classes = useRowStyles();
   const [open, setOpen] = React.useState(false);
-  const [openMenu, setOpenMenu] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [userInfo, setUserInfo] = React.useState(undefined);
+  const [departmentInfo, setDepartmentInfo] = React.useState(undefined);
 
   const handleOpenMenu = event => setAnchorEl(event.currentTarget);
-  const handleCloseMenu = (handleDownload, id) => {
-    handleDownload(id);
+  const handleCloseMenu = (handleDownload, id) => event => {
     setAnchorEl(null);
+    handleDownload && handleDownload(id);
   };
   const handleInfoClick = (state, userId) => {
+    console.log(userId);
     if(state) {
       if (socket.emit) {
-        socket.emit(summariesEvents.getUserInfoById,
-          userId, usrInfo => {
-            setUserInfo(usrInfo);
-          });
+        socket.emit(summariesEvents.getDepartmentInfoById, userId, usrInfo => setDepartmentInfo(usrInfo));
       }
     } else {
       setOpen(false);
@@ -134,43 +131,51 @@ const SummariesRow = ({
 
   const delimiter = param => (
     param ?
-      <React.Fragment>
-        <IconButton
+      (<React.Fragment>
+        <Button
+          variant="contained"
           color="primary"
-          component="span"
           onClick={handleOpenMenu}
+          startIcon={<Done />}
         >
-          <Done />
-        </IconButton>
+          {`Кол-во: ${param.summaryCount?param.summaryCount:0}`}
+        </Button>
         <StyledMenu
+          keepMounted
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
-          onClose={handleCloseMenu}
+          onClose={handleCloseMenu()}
         >
-          <StyledMenuItem onClick={() => handleCloseMenu(downloadTxtClick,param)}>
+          <StyledMenuItem onClick={handleCloseMenu(downloadTxtClick, param.dayId)}>
             <ListItemIcon>
               <FontAwesomeIcon icon={faFile} size="lg" />
             </ListItemIcon>
             <ListItemText primary="Скачать TXT" />
           </StyledMenuItem>
-          <StyledMenuItem onClick={() => handleCloseMenu(downloadExcelClick,param)}>
+          <StyledMenuItem onClick={handleCloseMenu(downloadExcelClick, param.dayId)}>
             <ListItemIcon>
               <FontAwesomeIcon icon={faFileExcel} size="lg" />
             </ListItemIcon>
             <ListItemText primary="Скачать XLSX" />
           </StyledMenuItem>
-          <StyledMenuItem onClick={() => handleCloseMenu(downloadAllClick,param)}>
+          <StyledMenuItem onClick={handleCloseMenu(downloadAllClick, param.dayId)}>
             <ListItemIcon>
               <FontAwesomeIcon icon={faFileArchive} size="lg" />
             </ListItemIcon>
             <ListItemText primary="Скачать всё" />
           </StyledMenuItem>
         </StyledMenu>
-      </React.Fragment>
+      </React.Fragment>)
       :
-      <IconButton aria-label="clear" color="secondary">
-        <Clear />
-      </IconButton>
+      (<React.Fragment>
+        <Button
+          variant="outlined"
+          color="secondary"
+          startIcon={<Clear />}
+        >
+          {`Кол-во: 0`}
+        </Button>
+      </React.Fragment>)
   );
 
   const getClassForRowCell = (index, len, day) => {
@@ -195,14 +200,14 @@ const SummariesRow = ({
   };
 
   React.useLayoutEffect(() => {
-    if(userInfo) {
+    if(departmentInfo) {
       setOpen(true);
     }
-  },[userInfo]);
+  },[departmentInfo]);
 
   React.useLayoutEffect(() => {
     if(!open) {
-      setTimeout(() => setUserInfo(undefined), 300);
+      setTimeout(() => setDepartmentInfo(undefined), 300);
     }
   },[open]);
 
@@ -251,10 +256,10 @@ const SummariesRow = ({
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box margin={1}>
               <Typography variant="h6" gutterBottom component="div">Информация о пользователе</Typography>
-              {userInfo ?
+              {departmentInfo ?
                 <Table size="small" aria-label="infos" className={classes.infoTable}>
                   <TableBody>
-                    {userInfo.map((u, i) => (
+                    {departmentInfo.map((u, i) => (
                       <TableRow key={i}>
                         <TableCell>{u[0]}</TableCell>
                         <TableCell>{u[1]}</TableCell>

@@ -9,6 +9,8 @@ import AddIcon from '@material-ui/icons/Add';
 import SaveIcon from '@material-ui/icons/Save';
 import { useLocation } from 'react-router-dom';
 
+import moment from 'moment';
+
 import { summary as summaryEvents, user as userEvents } from '../../Events';
 
 const useStyles = makeStyles(theme => ({

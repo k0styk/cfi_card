@@ -20,7 +20,7 @@ app.use(session);
 //Bring in the routes
 app.use('/', express.static(path.join(__dirname, '../../dist')));
 app.use('/login', express.static(path.join(__dirname, '../../dist')));
-app.use('/register', express.static(path.join(__dirname, '../../dist')));
+app.use('/users', express.static(path.join(__dirname, '../../dist')));
 app.use('/summary', express.static(path.join(__dirname, '../../dist')));
 app.use('/summaries', express.static(path.join(__dirname, '../../dist')));
 app.use(require('./routes/download'));

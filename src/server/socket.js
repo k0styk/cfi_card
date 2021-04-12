@@ -119,6 +119,15 @@ module.exports = server => {
     /***/ /**---  REGISTER USER  ---**/
     /***/ socket.on(events.user.register, userController.register);
 
+    /***/ /**---  EDIT USER  ---**/
+    /***/ socket.on(events.user.edit, userController.edit);
+
+    /***/ /**---  DELETE USER  ---**/
+    /***/ socket.on(events.user.delete, userController.delete);
+
+    /***/ /**---  LIST OF USERS  ---**/
+    /***/ socket.on(events.user.getListUsers, userController.getListUsers);
+
     /**---  SUMMARY - SAVE  ---**/
     socket.on(events.summary.save, async ({ summary }, cb) => {
       if (checkSession()) {
@@ -127,29 +136,34 @@ module.exports = server => {
           const resultSummary = [];
           const invalidSummary = [];
 
-          for (let i = 0; i < summary.length; i++) {
-            const v = {...summary[i]};
+          /***/
+          /***/ /** - BLOCK OF 1 SUMMARY = 1 DOCUMENT MONGO - **/
+          /***/
+          /* eslint-disable */
+          /***/ for (let i = 0; i < summary.length; i++) {
+          /***/   const v = {...summary[i]};
 
-            try {
-              await summaryController.save({ summary: v, userId: session.userId });
-              resultSummary.push(v);
-            } catch (err) {
-              console.log(err);
-              invalidSummary.push(v);
-            }
-          }
-
-          if (invalidSummary.length) {
-            cb({eventName:events.summary.save_partial,message:'Часть сводок не сохранена',notAccepted:invalidSummary});
-          } else {
-            cb({ eventName: events.summary.save_success, message: 'Все сводки сохранены' });
-          }
+          /***/   try {
+          /***/     await summaryController.save({ summary: v, userId: session.userId });
+          /***/     resultSummary.push(v);
+          /***/   } catch (err) {
+          /***/     console.log(err);
+          /***/     invalidSummary.push(v);
+          /***/   }
+          /***/ }
+          /* eslint-enable */
+          /***/
           if(resultSummary.length) {
             try {
               daySummaryController.save({ summaries: resultSummary, userId: session.userId });
             } catch (err) {
               console.log(err);
             }
+          }
+          if (invalidSummary.length) {
+            cb({eventName:events.summary.save_partial,message:'Часть сводок не сохранена',notAccepted:invalidSummary});
+          } else {
+            cb({eventName:events.summary.save_success,message:'Все сводки сохранены'});
           }
         } else {
           console.log('No summaries!');
@@ -170,33 +184,20 @@ module.exports = server => {
       }
     });
 
-    /*
-    socket.on(events.summaries.generate, async ({date}, cb) => {
-      if (checkSession()) {
-        // const session = socket.request.session; // eslint-disable-line
-        const { generated, fileName } = await daySummaryController.generateSummariesByDate({date});
-        const message = generated?`Файл ${date} - успешно создан`:`Возникла ошибка при создании файла`;
-        const link = `/download/${fileName}`;
-
-        cb({message, generated, link});
-      }
-    });
-    */
-
     /**-------------------------------------**/
     /**---  BLOCK OF DOWNLOAD SUMMARIES  ---**/
     /**-------------------------------------**/
-    socket.on(events.summaries.getListUsers, async (date, cb) => {
+    socket.on(events.summaries.getListDepartments, async (date, cb) => {
       if (checkSession()) {
-        cb(await userController.listUsersBySliceOfDate(date));
+        cb(await userController.listDepartmentsBySliceOfDate(date));
       } else {
         console.error('[No Session] - Try to getListUsers');
       }
     });
 
-    socket.on(events.summaries.getUserInfoById, async (id, cb) => {
+    socket.on(events.summaries.getDepartmentInfoById, async (id, cb) => {
       if (checkSession()) {
-        cb(await userController.getUserInfoById(id));
+        cb(await userController.getDepartmentInfoById(id));
       } else {
         console.error('[No Session] - Try to getUserInfoById');
       }

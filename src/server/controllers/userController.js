@@ -16,7 +16,7 @@ exports.register = async ({
   rights
 }, cb) => {
   try {
-    let message = 'Register [ ' + login + ' ] successfull';
+    let message = 'User [ ' + login + ' ] registered successfully!';
 
     if (login.length < 2) {
       message = 'Login must be atleast 2 characters long.';
@@ -46,11 +46,71 @@ exports.register = async ({
     });
 
     await user.save();
-    message = 'User [ ' + login + ' ] registered successfully!';
     cb({ eventName: events.user.register_success, message });
   } catch (err) {
     console.error(err);
     cb({ eventName: events.user.register_err, err });
+  }
+};
+
+exports.edit = async ({
+  _id,
+  login,
+  password,
+  description,
+  displayName,
+  department,
+  rights
+}, cb) => {
+  try {
+    let message = 'User [ ' + login + ' ] edited successfully!';
+    let pswd = undefined;
+
+    if (login.length < 2) {
+      message = 'Login must be atleast 2 characters long.';
+      cb({ eventName: events.user.edit_err, message });
+      return;
+    };
+    if(password) {
+      if (password.length < 6) {
+        message = 'Password must be atleast 6 characters long.';
+        cb({ eventName: events.user.edit_err, message });
+        return;
+      }
+      pswd = hashPass(password, config.salt);
+    }
+    if(!!!rights) {
+      message = 'Rigths must be presented.';
+      cb({ eventName: events.user.edit_err, message });
+      return;
+    }
+    const user = {
+      login,
+      rights: rights,
+      description: description,
+      displayName: displayName,
+      department: department,
+    };
+
+    if(pswd) user.password = pswd;
+
+    await User.updateOne({_id},user);
+    cb({ eventName: events.user.edit_success, message });
+  } catch (err) {
+    console.error(err);
+    cb({ eventName: events.user.edit_err, err });
+  }
+};
+
+exports.delete = async ({_id,login}, cb) => {
+  try {
+    await User.deleteOne({_id});
+    const message = 'User [ ' + login + ' ] deleted successfully!';
+
+    cb({ eventName: events.user.delete_success, message });
+  } catch (err) {
+    console.error(err);
+    cb({ eventName: events.user.delete_err, err });
   }
 };
 
@@ -81,6 +141,7 @@ exports.updateStatus = async userId => {
       user.lastActive = new Date();
       user.save();
     } else {
+      console.log('updateStatus');
       throw `Can't find user`;
     }
   } catch (err) {
@@ -95,7 +156,7 @@ const userExcludeFields = {
   'rights': 0,
 };
 
-exports.listUsersBySliceOfDate = async date => {
+exports.listDepartmentsBySliceOfDate = async date => {
   try {
     const dateObj = moment(date).locale('ru').utcOffset(0);
     const user = await User.find({},userExcludeFields);
@@ -103,7 +164,7 @@ exports.listUsersBySliceOfDate = async date => {
     if (user) {
       const summariesExcludeFields = {
         'summariesDateStr': 0,
-        'summaries': 0,
+        // 'summaries': 0,
         'createdAt': 0,
         'updatedAt': 0,
         'version': 0,
@@ -131,19 +192,21 @@ exports.listUsersBySliceOfDate = async date => {
             $lt: endWeek
           },
         };
+
         // get summaries by user and selected week
         const summariesIdFromDates = await daySummary.find(query,summariesExcludeFields);
         const daysArray = new Array(7).fill('');
 
+        // console.log(summariesIdFromDates);
+
         usr = {...usr, id: i+1, userId: usr.id};
-        // resultArray[i] = { id: i+1, userId: usr.id, department: usr.department};
 
         // FILL days from week
         for (let j = 0; j < summariesIdFromDates.length; j++) {
           const summaryByDate = summariesIdFromDates[j];
           const summaryWeekDay = moment(summaryByDate.summariesDate).locale('ru').utcOffset(0).weekday();
 
-          daysArray[summaryWeekDay] = summaryByDate['id'];
+          daysArray[summaryWeekDay] = { dayId: summaryByDate['id'], summaryCount: summaryByDate.summaries.length };
         }
         [
           usr.monday,
@@ -157,8 +220,9 @@ exports.listUsersBySliceOfDate = async date => {
         resultArray.push(usr);
       }
 
-      return {usersListWithDays: resultArray, today};
+      return {departmentsListWithDays: resultArray, today};
     } else {
+      console.log('listDepartmentsBySliceOfDate');
       throw `Can't find user`;
     }
   } catch (err) {
@@ -166,7 +230,7 @@ exports.listUsersBySliceOfDate = async date => {
   }
 };
 
-exports.getUserInfoById = async userId => {
+exports.getDepartmentInfoById = async userId => {
   try {
     const user = await User.findOne({ _id: new ObjectId(userId)},userExcludeFields);
 
@@ -184,9 +248,25 @@ exports.getUserInfoById = async userId => {
         ['Последняя активность', active],
       ];
     } else {
+      console.log('getDepartmentInfoById');
       throw `Can't find user`;
     }
   } catch (err) {
     console.error(err);
+  }
+};
+
+exports.getListUsers = async (nullable, cb) => {
+  try {
+    const {
+      rights,
+      ...otherExcludeFields
+    } = userExcludeFields;
+    const users = await User.find({},otherExcludeFields);
+
+    cb({users});
+  } catch(err) {
+    console.error(err);
+    cb({ eventName: events.user.error, err });
   }
 };

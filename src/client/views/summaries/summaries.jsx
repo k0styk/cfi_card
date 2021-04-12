@@ -158,7 +158,7 @@ const SummariesView = ({socket, notify}) => {
   moment.locale('ru');
   const classes = useStyless();
   const [date, setDate] = React.useState(moment());
-  const [users, setUsers] = React.useState([]);
+  const [departments, setDepartments] = React.useState([]);
   const [today, setToday] = React.useState(undefined);
   const [disableNext, setDisableNext] = React.useState(true);
   const [order, setOrder] = React.useState('asc');
@@ -167,10 +167,11 @@ const SummariesView = ({socket, notify}) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
-  const getListOfUsersByWeek = date => {
-    socket.emit(summariesEvents.getListUsers, date, ({usersListWithDays, today}) => {
-      if(usersListWithDays) {
-        setUsers(usersListWithDays);
+  const getListOfDepartmentsByWeek = date => {
+    socket.emit(summariesEvents.getListDepartments, date, ({departmentsListWithDays, today}) => {
+      if(departmentsListWithDays) {
+        console.log(departmentsListWithDays);
+        setDepartments(departmentsListWithDays);
       }
       setToday(today);
     });
@@ -216,7 +217,7 @@ const SummariesView = ({socket, notify}) => {
     const bufDate = moment(date).add(7,'days');
 
     if(socket.emit) {
-      getListOfUsersByWeek(bufDate);
+      getListOfDepartmentsByWeek(bufDate);
     }
     setDisableNext(checkCanNext(bufDate));
     setDate(bufDate);
@@ -226,7 +227,7 @@ const SummariesView = ({socket, notify}) => {
     const bufDate = moment(date).subtract(7,'days');
 
     if(socket.emit) {
-      getListOfUsersByWeek(bufDate);
+      getListOfDepartmentsByWeek(bufDate);
     }
     setDisableNext(checkCanNext(bufDate));
     setDate(bufDate);
@@ -324,7 +325,7 @@ const SummariesView = ({socket, notify}) => {
 
   React.useLayoutEffect(() => {
     if(socket.emit) {
-      getListOfUsersByWeek(date);
+      getListOfDepartmentsByWeek(date);
     }
   }, [socket]);
 
@@ -356,13 +357,13 @@ const SummariesView = ({socket, notify}) => {
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
-                rowCount={users.length}
+                rowCount={departments.length}
                 today={today}
                 selected={selected}
                 onSelectClick={handleSelectClick}
               />
               <TableBody>
-                {users.length ? stableSort(users, getComparator(order, orderBy))
+                {departments.length ? stableSort(departments, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (<Row
                     key={index}
@@ -387,7 +388,7 @@ const SummariesView = ({socket, notify}) => {
         className={classes.tablePaginationFlex}
         rowsPerPageOptions={[10, 20, 30]}
         component="div"
-        count={users.length}
+        count={departments.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onChangePage={handleChangePage}

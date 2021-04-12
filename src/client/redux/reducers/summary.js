@@ -58,6 +58,7 @@ export function summary(state = initialState, action) {
         counter: 1,
         fieldValidation: 0, // значение валидатора по полям
         factValidation: 0, // какое значение валидации необходимо
+        specialDate: undefined, // на сервере считать и удалить это поле
         z1: {
           ...z1State,
           flyDate: `${('0'+new Date().getUTCDate()).slice(-2)}/${('0'+(new Date().getUTCMonth() + 1)).slice(-2)}/${new Date().getUTCFullYear().toString().slice(-2)}`, // eslint-disable-line
@@ -85,6 +86,19 @@ export function summary(state = initialState, action) {
             return {
               ...v,
               archive: p.archive
+            };
+          }
+          return v;
+        })
+      };
+    case SUMMARY.SPECIAL_DATE:
+      return {
+        ...state,
+        value: state.value.map((v, i) => {
+          if (v.id === p.id) {
+            return {
+              ...v,
+              specialDate: p.specialDate
             };
           }
           return v;

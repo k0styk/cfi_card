@@ -23,8 +23,8 @@ const userMenuView = ({user, socket, notify, logout}) => {
   const handleProfile = () => {
     closeMenu();
   };
-  const handleRegister = () => {
-    history.replace('/register');
+  const handleUsers = () => {
+    history.replace('/users');
     closeMenu();
   };
   const handleSummariesList = () => {
@@ -74,10 +74,10 @@ const userMenuView = ({user, socket, notify, logout}) => {
         keepMounted
       >
         <MenuItem onClick={handleSummary}>Главная</MenuItem>
-        <MenuItem disabled onClick={handleProfile}>Профиль</MenuItem>
+        {/* <MenuItem disabled onClick={handleProfile}>Профиль</MenuItem> */}
         {
           (user.rights==='manager'||user.rights==='admin')?
-            (<MenuItem onClick={handleRegister}>Регистрация</MenuItem>):
+            (<MenuItem onClick={handleUsers}>Пользователи</MenuItem>):
             null
         }
         {

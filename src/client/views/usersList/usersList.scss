@@ -1,0 +1,15 @@
+.summaries-view-content {
+  flex: 1 0 auto;
+  display: flex;
+
+  .generate-button-block {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+}
+
+.main-footer {     
+  position: sticky; 
+  bottom: 0;
+}

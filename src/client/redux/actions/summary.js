@@ -24,6 +24,10 @@ export default {
    */
   addSummaryZ2: payload => ({type: SUMMARY.ADD_Z2,payload}),
   /**
+   * @param {{ id: number, specialDate: Date}} payload
+   */
+  specialDateSet: payload => ({type: SUMMARY.SPECIAL_DATE, payload}),
+  /**
    * @param {{ id: number, z2id: number}} payload
    */
   removeSummaryZ2: payload => ({type: SUMMARY.REMOVE_Z2,payload}),

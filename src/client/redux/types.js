@@ -16,6 +16,7 @@ module.exports.SUMMARY = {
   ADD_Z2:                                               'SUMMARY_ADD_Z2',
   REMOVE_Z2:                                            'SUMMARY_REMOVE_Z2',
   ARCHIVE:                                              'SUMMARY_ARCHIVE_SET',
+  SPECIAL_DATE:                                         'SUMMARY_SPECIAL_DATE_SET',
   VALIDATION_SET:                                       'SUMMARY_VALIDATION_SET',
 };
 

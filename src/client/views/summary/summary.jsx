@@ -9,9 +9,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Divider, Button, Typography } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import CancelIcon from '@material-ui/icons/Cancel';
-import moment from 'moment';
+import { MuiPickersUtilsProvider, DatePicker } from '@material-ui/pickers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
+import MomentUtils from '@date-io/moment';
+import moment from 'moment';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -26,6 +28,10 @@ const useStyles = makeStyles(theme => ({
   marginSides: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1)
+  },
+  datePicker: {
+    opacity: 0,
+    position: 'absolute'
   }
 }));
 
@@ -38,6 +44,7 @@ const summaryView = ({
   notify,
   archive,
   validationSet,
+  specialDateSet,
   socket
 }) => {
   const DeleteButton = ({ ...elementProps }) => (<div className="summary-button-delete" {...elementProps}>
@@ -88,6 +95,10 @@ const summaryView = ({
 
     return retVal;
   };
+  const specialDateSetClick = value => {
+    specialDateSet(id,value.toDate());
+  };
+  const [specialDateOpen, setSpecialDateOpen] = React.useState(false);
 
   return (
     <div className="summary-view">
@@ -99,7 +110,28 @@ const summaryView = ({
         <div className="summary-header">
           <div className="summary-h-l">
             <Typography variant="button" display="block" gutterBottom>
-              СВОДКА {moment().format('DDMMYY')} <span className={classes.margin}>#{id}</span>
+              СВОДКА
+              <Button
+                className={classes.marginSides}
+                onClick={() => setSpecialDateOpen(true)}
+              >
+                {moment(curSummary.specialDate).format('DDMMYY')}
+              </Button>
+              <MuiPickersUtilsProvider utils={MomentUtils}>
+                <DatePicker
+                  className={classes.datePicker}
+                  open={specialDateOpen}
+                  autoOk
+                  disableFuture
+                  disableToolbar
+                  format="DDMMYY"
+                  value={curSummary.specialDate}
+                  onChange={val => { setSpecialDateOpen(false); specialDateSetClick(val); }}
+                  onClose={() => setSpecialDateOpen(false)}
+                  animateYearScrolling
+                />
+              </MuiPickersUtilsProvider>
+              <span className={classes.margin}>#{id}</span>
             </Typography>
           </div>
           <div className="summary-h-r">
@@ -159,6 +191,7 @@ const mdtp = dispatch => ({
   addZ2:            id              => dispatch(summaryAction.addSummaryZ2({id})),
   notify:           (...args)       => dispatch(uiAction.notify.enqueueSnackbar(...args)),
   validationSet:    (id, fieldValidation, factValidation)  => dispatch(summaryAction.validationSet({id, fieldValidation, factValidation})),
+  specialDateSet:   (id, specialDate) => dispatch(summaryAction.specialDateSet({id, specialDate})),
 });
 /* eslint-enable */
 
