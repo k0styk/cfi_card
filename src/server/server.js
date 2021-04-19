@@ -39,8 +39,9 @@ require('./models/File');
     }
   }
 
-  const server = await require('./app').listen(PORT,HOST,listenCallback);
+  const server = require('./app').listen(PORT,HOST,listenCallback);
   const io = require('./socket')(server);
+  io.adapter(require('socket.io-redis')({ host: 'localhost', port: 6379 }));
 })();
 
 /* PM2 START */

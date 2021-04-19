@@ -40,7 +40,7 @@ module.exports = {
       wait_ready: true,
       shutdown_with_message: true,
       exec_mode : 'cluster',
-      instances : 2,
+      instances : 4,
     },
   ]
 };
