@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const delayTime = process.env['DELAY_TIME'];
 const timeToRemove = process.env['TIME_TO_REMOVE'];
-const message = `[${process.env.NODE_ENV==='dev'?'dev':(process.env.NODE_ENV==='prod'?'prod':'UNDEF')}]Cleaner stared`;
+const message = `[${process.env.NODE_ENV}]Cleaner stared`;
 
 /**
 * @param {{ delayTime: number, timeToRemove: string}}

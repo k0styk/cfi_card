@@ -39,7 +39,7 @@ require('./models/File');
     }
   }
 
-  const server = require('./app').listen(PORT,HOST,listenCallback);
+  const server = await require('./app').listen(PORT,HOST,listenCallback);
   const io = require('./socket')(server);
 })();
 

@@ -33,6 +33,7 @@ module.exports = {
       env_production: {
         NODE_ENV: 'production'
       },
+      shutdown_with_message : true,
       // instances : "4",
       // exec_mode : "cluster"
     },

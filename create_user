@@ -43,7 +43,7 @@ if [ $# -eq 0 ]
             shift # past argument
             ;;
             --prod)
-            ENV=prod
+            ENV=production
             shift # past argument
             ;;
             *)    # unknown option
