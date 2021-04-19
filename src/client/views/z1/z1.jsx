@@ -13,6 +13,7 @@ import {
 import { Grid, Paper, TextField } from '@material-ui/core';
 import MomentUtils from '@date-io/moment';
 import moment from 'moment';
+import 'moment/locale/ru';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -130,16 +131,16 @@ const z1View = ({
         </Grid>
         {/* 1 req */}
         <Grid item xs className={classes.one} >
-          <MuiPickersUtilsProvider utils={MomentUtils}>
+          <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} locale='ru'>
             <KeyboardDatePicker
-              error={!!errors.flyDate}
-              helperText={errors.flyDate}
-              placeholder="DD/MM/YY"
               disableToolbar
+              placeholder="DD/MM/YY"
               variant="inline"
               format="DD/MM/YY"
               mask="__/__/__"
               margin="normal"
+              helperText={errors.flyDate}
+              error={!!errors.flyDate}
               value={flyDateState}
               onChange={v => {
                 validateField('flyDate', v);
@@ -199,6 +200,7 @@ const z1View = ({
         {/* 3 req */}
         <Grid item xs className={classes.three} >
           <TextField
+            label="Тип ВС"
             error={!!errors.aircraftType}
             helperText={errors.aircraftType}
             value={values.aircraftType}
@@ -216,7 +218,6 @@ const z1View = ({
                 aircraftTypeSet(id, values.aircraftType);
               }
             }}
-            label="Тип ВС"
             inputProps={{
               maxLength: 4,
               style: { textTransform: 'uppercase' },
@@ -228,6 +229,7 @@ const z1View = ({
         {/* 4 req */}
         <Grid item xs className={classes.four} >
           <TextField
+            label="А-д/П-п вылета"
             error={!!errors.depAirport}
             helperText={errors.depAirport}
             value={values.depAirport}
@@ -245,7 +247,6 @@ const z1View = ({
                 depAirportSet(id, values.depAirport);
               }
             }}
-            label="А-д/П-п вылета"
             inputProps={{
               maxLength: 4,
               style: { textTransform: 'uppercase' },
@@ -342,19 +343,19 @@ const z1View = ({
         </Grid>
         {/* 7 req */}
         <Grid item xs className={classes.seven} >
-          <MuiPickersUtilsProvider utils={MomentUtils}>
+          <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} locale='ru'>
             <KeyboardTimePicker
+              autoOk
+              clearable
+              showTodayButton
               error={!!errors.entryTime}
               helperText={errors.entryTime}
-              autoOk
-              mask="__:__"
               ampm={false}
+              mask="__:__"
               cancelLabel="Отмена"
               clearLabel="Очистить"
               okLabel="Принять"
               todayLabel="Сейчас"
-              clearable
-              showTodayButton
               margin="normal"
               placeholder="08:00"
               format="HH:mm"

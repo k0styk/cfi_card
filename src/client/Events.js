@@ -43,6 +43,9 @@ module.exports.summaries = {
   createSelected:           'summaries_createSelected',
   create_success:           'summaries_create_success',
   create_error:             'summaries_create_error',
+  createTxtForAll:          'summaries_createTxtForAll',
+  createExcelForAll:        'summaries_createExcelForAll',
+  createArchiveForAll:      'summaries_createArchiveForAll',
 };
 
 module.exports.store = {

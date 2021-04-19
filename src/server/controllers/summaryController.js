@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const SummaryDocument = mongoose.model('SummaryDocument');
+const { config } = global;
 
 exports.save = async ({summary, userId}) => {
   const doc = new SummaryDocument({userId,summary});
@@ -8,7 +9,8 @@ exports.save = async ({summary, userId}) => {
   if(error) {
     throw error;
   } else {
-    doc.save();
+    if(config.app.saveSeparateSummary) {
+      doc.save();
+    }
   }
-
 };

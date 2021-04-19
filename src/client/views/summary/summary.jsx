@@ -14,6 +14,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import MomentUtils from '@date-io/moment';
 import moment from 'moment';
+import 'moment/locale/ru';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -117,18 +118,20 @@ const summaryView = ({
               >
                 {moment(curSummary.specialDate).format('DDMMYY')}
               </Button>
-              <MuiPickersUtilsProvider utils={MomentUtils}>
+              <MuiPickersUtilsProvider utils={MomentUtils} libInstance={moment} locale='ru'>
                 <DatePicker
-                  className={classes.datePicker}
-                  open={specialDateOpen}
                   autoOk
                   disableFuture
                   disableToolbar
+                  animateYearScrolling
+                  okLabel="Принять"
+                  cancelLabel="Отмена"
                   format="DDMMYY"
+                  className={classes.datePicker}
+                  open={specialDateOpen}
                   value={curSummary.specialDate}
                   onChange={val => { setSpecialDateOpen(false); specialDateSetClick(val); }}
                   onClose={() => setSpecialDateOpen(false)}
-                  animateYearScrolling
                 />
               </MuiPickersUtilsProvider>
               <span className={classes.margin}>#{id}</span>

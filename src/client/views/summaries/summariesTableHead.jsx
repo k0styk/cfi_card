@@ -38,7 +38,16 @@ const useHeadStyles = makeStyles(theme => ({
       },
 }));
 
-const SummariesTableHead = ({ order, orderBy, rowCount, onRequestSort, headCells, selected, onSelectClick, today }) => {
+const SummariesTableHead = ({
+  today,
+  order,
+  orderBy,
+  selected,
+  headCells,
+  onRequestSort,
+  findSelectedDay,
+  handleSelectAllClick,
+}) => {
   const classes = useHeadStyles();
   const createSortHandler = property => event => {
     onRequestSort(event, property);
@@ -52,7 +61,7 @@ const SummariesTableHead = ({ order, orderBy, rowCount, onRequestSort, headCells
       }
     }
     if(selected.length) {
-      if(!!~(selected.indexOf(dayOfWeek)))
+      if(!!~findSelectedDay(dayOfWeek))
         resultClass = clsx(classes.selected, resultClass);
     }
     return resultClass;
@@ -70,8 +79,8 @@ const SummariesTableHead = ({ order, orderBy, rowCount, onRequestSort, headCells
           >
             { i > 1 ? (
               <Checkbox
-                checked={!!(~selected.indexOf(headCell.dayOfWeek))}
-                onChange={() => onSelectClick(headCell.dayOfWeek)}
+                checked={!!~findSelectedDay(headCell.dayOfWeek)}
+                onChange={() => handleSelectAllClick(headCell.dayOfWeek)}
                 inputProps={{ 'aria-label': 'select all' }}
               />
             ):null}

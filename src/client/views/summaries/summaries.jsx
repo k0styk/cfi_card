@@ -2,7 +2,8 @@ import './summaries.scss';
 import React from 'react';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import { uiAction } from '@redux/actions';
+// import { uiAction } from '@redux/actions';
+import { uiAction } from '../../redux/actions';
 import { summaries as summariesEvents } from '@client/Events';
 
 import { makeStyles, lighten } from '@material-ui/core/styles';
@@ -154,7 +155,11 @@ const useStyless = makeStyles(theme => ({
   }
 }));
 
-const SummariesView = ({socket, notify}) => {
+const customFunc1 = () => {
+  console.log('Hello from customFunc1');
+};
+
+const SummariesView = ({socket, notify,setLoader}) => {
   moment.locale('ru');
   const classes = useStyless();
   const [date, setDate] = React.useState(moment());
@@ -170,6 +175,7 @@ const SummariesView = ({socket, notify}) => {
   const getListOfDepartmentsByWeek = date => {
     socket.emit(summariesEvents.getListDepartments, date, ({departmentsListWithDays, today}) => {
       if(departmentsListWithDays) {
+        setLoader(false);
         console.log(departmentsListWithDays);
         setDepartments(departmentsListWithDays);
       }
@@ -184,12 +190,28 @@ const SummariesView = ({socket, notify}) => {
     setOrderBy(property);
   };
 
-  const handleSelectClick = dayOfWeek => {
-    const selectedIndex = selected.indexOf(dayOfWeek);
+  const findSelectedDay = React.useCallback(dayOfWeek =>
+    selected.findIndex(s => s.dayOfWeek===dayOfWeek&&s.date===moment(date).format('DD.MM.YY')),[date,selected]);
+
+  const handleSelectAllClick = dayOfWeek => {
+    const selectedIndex = findSelectedDay(dayOfWeek);
     let newSelected = [];
 
+    // if new selected
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, dayOfWeek);
+      const departmentsWithDocuments = departments
+        .filter(d => d[moment().locale('en').day(dayOfWeek+1).format('dddd').toLowerCase()])
+        .map(d => ({
+          department: d.department,
+          userId: d.userId,
+          dayId: d[moment().locale('en').day(dayOfWeek+1).format('dddd').toLowerCase()].dayId
+        }));
+
+      newSelected = newSelected.concat(selected, {
+        date:moment(date).format('DD.MM.YY'),
+        dayOfWeek,
+        departmentsWithDocuments
+      });
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -201,7 +223,12 @@ const SummariesView = ({socket, notify}) => {
       );
     }
 
+    console.log(newSelected);
     setSelected(newSelected);
+  };
+
+  const handleDeselectAllClick = () => {
+    setSelected([]);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -218,9 +245,9 @@ const SummariesView = ({socket, notify}) => {
 
     if(socket.emit) {
       getListOfDepartmentsByWeek(bufDate);
+      setDisableNext(checkCanNext(bufDate));
+      setDate(bufDate);
     }
-    setDisableNext(checkCanNext(bufDate));
-    setDate(bufDate);
   };
 
   const handlePrevWeekClick = () => {
@@ -228,15 +255,15 @@ const SummariesView = ({socket, notify}) => {
 
     if(socket.emit) {
       getListOfDepartmentsByWeek(bufDate);
+      setDisableNext(checkCanNext(bufDate));
+      setDate(bufDate);
     }
-    setDisableNext(checkCanNext(bufDate));
-    setDate(bufDate);
   };
 
   /*****/ /*** DOWNLOAD BLOCK ***/
-  const downloadTxtClick = id => {
+  const downloadHandler = React.useCallback((socketMessage,socketArgs) => {
     if(socket.emit) {
-      socket.emit(summariesEvents.createTxt, id, ({err, message, fileId}) => {
+      socket.emit(socketMessage, socketArgs, ({err, message, fileId}) => {
         if(err) {
           console.log(err);
           notify({
@@ -247,7 +274,6 @@ const SummariesView = ({socket, notify}) => {
             }
           });
         } else {
-          console.log(fileId);
           setTimeout(() => {
             window.open(`/download/${fileId}`);
           },5000);
@@ -261,69 +287,21 @@ const SummariesView = ({socket, notify}) => {
         }
       });
     }
-  };
-  const downloadExcelClick = id => {
-    if(socket.emit) {
-      socket.emit(summariesEvents.createExcel, id, ({err, message, fileId}) => {
-        if(err) {
-          console.log(err);
-          notify({
-            message,
-            options: {
-              autoHideDuration: 3000,
-              variant: 'warning',
-            }
-          });
-        } else {
-          console.log(fileId);
-          setTimeout(() => {
-            window.open(`/download/${fileId}`);
-          },5000);
-          notify({
-            message,
-            options: {
-              autoHideDuration: 4500,
-              variant: 'success',
-            }
-          });
-        }
-      });
+  },[socket]);
+  const downloadSelectedClick = option => {
+    const filtered = selected.map(s => s.departmentsWithDocuments).filter(s => s);
+
+    console.log(filtered);
+    switch (option) {
+      case 'txt': downloadHandler(summariesEvents.createTxtForAll,filtered); break;
+      case 'excel': downloadHandler(summariesEvents.createExcelForAll,filtered); break;
+      case 'archive': downloadHandler(summariesEvents.createArchiveForAll,filtered); break;
     }
-  };
-  const downloadAllClick = id => {
-    if(socket.emit) {
-      socket.emit(summariesEvents.createArchive, id, ({err, message, fileId}) => {
-        if(err) {
-          console.log(err);
-          notify({
-            message,
-            options: {
-              autoHideDuration: 3000,
-              variant: 'warning',
-            }
-          });
-        } else {
-          console.log(fileId);
-          setTimeout(() => {
-            window.open(`/download/${fileId}`);
-          },5000);
-          notify({
-            message,
-            options: {
-              autoHideDuration: 4500,
-              variant: 'success',
-            }
-          });
-        }
-      });
-    }
-  };
-  const downloadSelectedClick = () => {
-    console.log(selected);
   };
   /*****/ /*********************/
 
   React.useLayoutEffect(() => {
+    setLoader(true);
     if(socket.emit) {
       getListOfDepartmentsByWeek(date);
     }
@@ -333,18 +311,21 @@ const SummariesView = ({socket, notify}) => {
     <Paper className={classes.rootT}>
       <TableContainer className={classes.tableContainerFlex}>
         <MyToolbar
-          numSelected={selected.length}
           className={classes.toolbar}
           date={getSliceWeekOfDateString(date)}
+          canNext={disableNext}
+          numSelected={selected.length}
           handleNext={handleNextWeekClick}
           handlePrev={handlePrevWeekClick}
-          canNext={disableNext}
-          selected={selected}
           downloadSelectedClick={downloadSelectedClick}
+          handleDeselectAllClick={handleDeselectAllClick}
+          // downloadTxtClick={downloadTxtClick}
+          // downloadExcelClick={downloadExcelClick}
+          // downloadAllClick={downloadAllClick}
         />
         <TableContainer className={classes.tableRelativeContainer}>
           <TableContainer className={classes.tableAbsoluteContainer}>
-            <Table
+            {departments.length ?<Table
               className={classes.table}
               aria-labelledby="tableTitle"
               size="medium"
@@ -357,13 +338,14 @@ const SummariesView = ({socket, notify}) => {
                 order={order}
                 orderBy={orderBy}
                 onRequestSort={handleRequestSort}
-                rowCount={departments.length}
                 today={today}
+                date={date}
                 selected={selected}
-                onSelectClick={handleSelectClick}
+                findSelectedDay={findSelectedDay}
+                handleSelectAllClick={handleSelectAllClick}
               />
               <TableBody>
-                {departments.length ? stableSort(departments, getComparator(order, orderBy))
+                {stableSort(departments, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (<Row
                     key={index}
@@ -373,13 +355,14 @@ const SummariesView = ({socket, notify}) => {
                     socket={socket}
                     selected={selected}
                     today={today}
-                    downloadTxtClick={downloadTxtClick}
-                    downloadExcelClick={downloadExcelClick}
-                    downloadAllClick={downloadAllClick}
+                    downloadTxtClick={id => downloadHandler(summariesEvents.createTxt,id)}
+                    downloadExcelClick={id => downloadHandler(summariesEvents.createExcel,id)}
+                    downloadAllClick={id => downloadHandler(summariesEvents.createArchive,id)}
+                    findSelectedDay={findSelectedDay}
                   />
-                  )):null}
+                  ))}
               </TableBody>
-            </Table>
+            </Table>:<h2>Список пользователей пуст</h2>}
           </TableContainer>
         </TableContainer>
       </TableContainer>
@@ -404,5 +387,6 @@ export default connect(
   }),
   dispatch => ({
     notify:     (...args)   => dispatch(uiAction.notify.enqueueSnackbar(...args)),
+    setLoader:  uiLoader       => dispatch(uiAction.app.setLoader({uiLoader})),
   })
 )(SummariesView);

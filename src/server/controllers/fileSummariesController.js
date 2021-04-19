@@ -22,7 +22,6 @@ exports.createTxt = async ({fileId, userId}) => {
     const result = await createTxtFile({fileLoc,fileName,summaries: summaryById});
 
     if(result.err) throw result.err;
-
     const file = new FileSummaries({
       creator: userId,
       path: result.path,
@@ -105,13 +104,232 @@ exports.createArchived = async ({fileId, userId}) => {
     return {eventName: events.summaries.create_error, message: 'Ошибка при создании архива', err};
   }
 };
-exports.createSelected = async ({}) => {
+exports.createTxtForAll = async ({departmentsWithDocs,userId}) => {
   try {
-    console.log('create all');
-    return true;
+    const oneLevelArray = departmentsWithDocs.reduce((p,c) => [...p, ...c],[]);
+    const filteredByDepartmentSummaries = oneLevelArray.reduce((o, cur) => {
+      const occurs = o.reduce((n, item, i) => (item.department === cur.department ? i : n), -1);
+
+      if (occurs >= 0) { // If the department is found,
+        o[occurs].days = o[occurs].days.concat(cur.dayId);
+      } else {
+        o = o.concat([{
+          userId: cur.userId,
+          department: cur.department,
+          days: [cur.dayId]
+        }]);
+      }
+
+      return o;
+    }, []);
+
+    await directoryPreparation();
+    const date = moment();
+    const archiveDirName = `Summaries_txt(${date.format('DD.MM.YY')}_${date.format('HH')}H${date.format('mm')}M)`;
+
+    // create dir for all summaries
+    await removeArchiveDir({dirName: archiveDirName});
+    const createDirResult = await createArchiveDir(archiveDirName);
+
+    if(createDirResult.err) throw createDirResult.err;
+    const {dirLocation} = createDirResult;
+    const archiveName = `${archiveDirName}.zip`;
+
+    for (let i = 0; i < filteredByDepartmentSummaries.length; i++) {
+      const filteredDepartment = filteredByDepartmentSummaries[i];
+      const departmentDirName = `${filteredDepartment.department}`;
+      const createResult = await createArchiveDir(path.join(archiveDirName,departmentDirName));
+
+      if(createResult.err) throw createDirResult.err;
+      const {dirLocation: departmentDirLocation} = createResult;
+
+      const summariesById = await DaySummaries.find({
+        '_id': {
+          $in: filteredDepartment.days.map(v => mongoose.Types.ObjectId(v))
+        }
+      },projectionSummaries).populate('userId','department');
+
+      for (let j = 0; j < summariesById.length; j++) {
+        const summary = summariesById[j];
+        const txtName = `${summary.summariesDateStr}.${departmentDirName}.txt`;
+        const txtLoc = getFileLocation({fileName: txtName, archiveDirLoc: departmentDirLocation});
+        const txtResult = await createTxtFile({fileLoc: txtLoc,fileName: txtName,summaries:summary});
+
+        if(txtResult.err) throw txtResult.err;
+      }
+    }
+    const archiveLoc = getFileLocation({fileName: archiveName});
+
+    const archiveResult = await createArchiveFile({fileName: archiveName, fileLoc: archiveLoc,dirLocation});
+
+    if (archiveResult.err) throw archiveResult.err;
+    const file = new FileSummaries({
+      creator: userId,
+      path: archiveResult.path,
+      fileName: archiveResult.fileName
+    });
+    const { _id } = await file.save();
+    const message = getResultMessage(archiveResult.fileName);
+
+    return { eventName: events.summaries.create_success, message, fileId: _id };
   } catch(err) {
+    console.log('createArchived error');
     console.log(err);
-    // return { message: err };
+    return {eventName: events.summaries.create_error, message: 'Ошибка при создании архива', err};
+  }
+};
+exports.createExcelForAll = async ({departmentsWithDocs,userId}) => {
+  try {
+    const oneLevelArray = departmentsWithDocs.reduce((p,c) => [...p, ...c],[]);
+    const filteredByDepartmentSummaries = oneLevelArray.reduce((o, cur) => {
+      const occurs = o.reduce((n, item, i) => (item.department === cur.department ? i : n), -1);
+
+      if (occurs >= 0) { // If the department is found,
+        o[occurs].days = o[occurs].days.concat(cur.dayId);
+      } else {
+        o = o.concat([{
+          userId: cur.userId,
+          department: cur.department,
+          days: [cur.dayId]
+        }]);
+      }
+
+      return o;
+    }, []);
+
+    await directoryPreparation();
+    const date = moment();
+    const archiveDirName = `Summaries_excel(${date.format('DD.MM.YY')}_${date.format('HH')}H${date.format('mm')}M)`;
+
+    // create dir for all summaries
+    await removeArchiveDir({dirName: archiveDirName});
+    const createDirResult = await createArchiveDir(archiveDirName);
+
+    if(createDirResult.err) throw createDirResult.err;
+    const {dirLocation} = createDirResult;
+    const archiveName = `${archiveDirName}.zip`;
+
+    for (let i = 0; i < filteredByDepartmentSummaries.length; i++) {
+      const filteredDepartment = filteredByDepartmentSummaries[i];
+      const departmentDirName = `${filteredDepartment.department}`;
+      const createResult = await createArchiveDir(path.join(archiveDirName,departmentDirName));
+
+      if(createResult.err) throw createDirResult.err;
+      const {dirLocation: departmentDirLocation} = createResult;
+
+      const summariesById = await DaySummaries.find({
+        '_id': {
+          $in: filteredDepartment.days.map(v => mongoose.Types.ObjectId(v))
+        }
+      },projectionSummaries).populate('userId','department');
+
+      for (let j = 0; j < summariesById.length; j++) {
+        const summary = summariesById[j];
+
+        const excelName = `${summary.summariesDateStr}.${departmentDirName}.xlsx`;
+        const excelLoc = getFileLocation({fileName: excelName, archiveDirLoc:departmentDirLocation});
+        const excelResult = await createExcelFile({fileLoc: excelLoc,fileName: excelName,summaries:summary});
+
+        if(excelResult.err) throw excelResult.err;
+      }
+    }
+    const archiveLoc = getFileLocation({fileName: archiveName});
+
+    const archiveResult = await createArchiveFile({fileName: archiveName, fileLoc: archiveLoc,dirLocation});
+
+    if (archiveResult.err) throw archiveResult.err;
+    const file = new FileSummaries({
+      creator: userId,
+      path: archiveResult.path,
+      fileName: archiveResult.fileName
+    });
+    const { _id } = await file.save();
+    const message = getResultMessage(archiveResult.fileName);
+
+    return { eventName: events.summaries.create_success, message, fileId: _id };
+  } catch(err) {
+    console.log('createArchived error');
+    console.log(err);
+    return {eventName: events.summaries.create_error, message: 'Ошибка при создании архива', err};
+  }
+};
+exports.createArchiveForAll = async ({departmentsWithDocs,userId}) => {
+  try {
+    const oneLevelArray = departmentsWithDocs.reduce((p,c) => [...p, ...c],[]);
+    const filteredByDepartmentSummaries = oneLevelArray.reduce((o, cur) => {
+      const occurs = o.reduce((n, item, i) => (item.department === cur.department ? i : n), -1);
+
+      if (occurs >= 0) { // If the department is found,
+        o[occurs].days = o[occurs].days.concat(cur.dayId);
+      } else {
+        o = o.concat([{
+          userId: cur.userId,
+          department: cur.department,
+          days: [cur.dayId]
+        }]);
+      }
+
+      return o;
+    }, []);
+
+    await directoryPreparation();
+    const date = moment();
+    const archiveDirName = `Summaries_all(${date.format('DD.MM.YY')}_${date.format('HH')}H${date.format('mm')}M)`;
+
+    // create dir for all summaries
+    await removeArchiveDir({dirName: archiveDirName});
+    const createDirResult = await createArchiveDir(archiveDirName);
+
+    if(createDirResult.err) throw createDirResult.err;
+    const {dirLocation} = createDirResult;
+    const archiveName = `${archiveDirName}.zip`;
+
+    for (let i = 0; i < filteredByDepartmentSummaries.length; i++) {
+      const filteredDepartment = filteredByDepartmentSummaries[i];
+      const departmentDirName = `${filteredDepartment.department}`;
+      const createResult = await createArchiveDir(path.join(archiveDirName,departmentDirName));
+
+      if(createResult.err) throw createDirResult.err;
+      const {dirLocation: departmentDirLocation} = createResult;
+
+      const summariesById = await DaySummaries.find({
+        '_id': {
+          $in: filteredDepartment.days.map(v => mongoose.Types.ObjectId(v))
+        }
+      },projectionSummaries).populate('userId','department');
+
+      for (let j = 0; j < summariesById.length; j++) {
+        const summary = summariesById[j];
+        const txtName = `${summary.summariesDateStr}.${departmentDirName}.txt`;
+        const txtLoc = getFileLocation({fileName: txtName, archiveDirLoc: departmentDirLocation});
+        const txtResult = await createTxtFile({fileLoc: txtLoc,fileName: txtName,summaries:summary});
+
+        if(txtResult.err) throw txtResult.err;
+        const excelName = `${summary.summariesDateStr}.${departmentDirName}.xlsx`;
+        const excelLoc = getFileLocation({fileName: excelName, archiveDirLoc:departmentDirLocation});
+        const excelResult = await createExcelFile({fileLoc: excelLoc,fileName: excelName,summaries:summary});
+
+        if(excelResult.err) throw excelResult.err;
+      }
+    }
+    const archiveLoc = getFileLocation({fileName: archiveName});
+
+    const archiveResult = await createArchiveFile({fileName: archiveName, fileLoc: archiveLoc,dirLocation});
+
+    if (archiveResult.err) throw archiveResult.err;
+    const file = new FileSummaries({
+      creator: userId,
+      path: archiveResult.path,
+      fileName: archiveResult.fileName
+    });
+    const { _id } = await file.save();
+    const message = getResultMessage(archiveResult.fileName);
+
+    return { eventName: events.summaries.create_success, message, fileId: _id };
+  } catch(err) {
+    console.log('createArchived error');
+    console.log(err);
+    return {eventName: events.summaries.create_error, message: 'Ошибка при создании архива', err};
   }
 };
 exports.download = async (req, res) => {
@@ -153,7 +371,6 @@ exports.download = async (req, res) => {
     throw err;
   }
 };
-exports.cleaner = async () => {};
 
 const createTxtFile = async ({fileLoc,fileName,summaries}) => {
   try {
@@ -369,8 +586,8 @@ const writeToFile   = text => writeStream.write((text?text:'')+'\n') // eslint-d
 const createTempDir = async ()          => new Promise((resolve,reject) => fs.mkdir(tempDirLocation, err => err?reject({err}):resolve({str:`${tempDirLocation}: was created`}))); // eslint-disable-line
 const createArchiveDir = async location => new Promise((resolve,reject) => { const d=path.join(tempDirLocation,location);fs.mkdir(d,err=>err?reject({err}):resolve({str:`${d}: was created`,dirLocation:d}))}); // eslint-disable-line
 const removeFile    = async file        => new Promise((resolve,reject) => fs.unlink(file, err => err?reject({err}):resolve({str:`${file}: was deleted`}))); // eslint-disable-line
-const removeArchiveDir = async ({dirName,dirLocation}) => new Promise((resolve,reject) => { const d=path.join(tempDirLocation,dirName?dirName:''); rmdir(dirLocation?dirLocation:d, err => err?reject({err}):resolve({str:`${d}: was deleted`})); }); // eslint-disable-line
-const getFileLocation = ({fileName,archiveDirName}) => path.join(tempDirLocation,archiveDirName?archiveDirName:'',fileName);
+const removeArchiveDir = async ({dirName,dirLocation}) => new Promise((resolve,reject) => { const d=path.resolve(path.join(tempDirLocation,dirName?dirName:'')); rmdir(dirLocation?dirLocation:d, err => err?reject({err}):resolve({str:`${d}: was deleted`})); }); // eslint-disable-line
+const getFileLocation = ({fileName,archiveDirName,archiveDirLoc}) => path.resolve(path.join(archiveDirLoc?archiveDirLoc:tempDirLocation,archiveDirName?archiveDirName:'',fileName));
 const nonRequired = field => field ? field : '-';
 const timeWithoutColon = timeStr => timeStr.replace(':', '');
 const getResultMessage = fileName => `Файл создан [${fileName}]. Автоматическое скачивание через 5 сек...`;

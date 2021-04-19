@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const DaySummaries = mongoose.model('DaySummaries');
 const moment = require('moment');
 
-const saveDB = async (query, summaries, specialDate, userId) => {
+const saveDB = async (query, summaries, userId, specialDate) => {
   const summariesDoc = await DaySummaries.findOne(query,{},{sort: {'created_at': -1}});
   let error;
 
@@ -21,11 +21,12 @@ const saveDB = async (query, summaries, specialDate, userId) => {
       await summariesDoc.save();
     }
   } else {
+    const date = specialDate?specialDate:moment(new Date()).format('DD.MM.YY');
     const doc = new DaySummaries({
       userId: userId,
       summaries: summaries,
-      summariesDateStr: specialDate,
-      summariesDate: moment(specialDate,'DD.MM.YY').set({ hour: 23, minute: 59, second: 58, millisecond: 0 }).toDate()
+      summariesDateStr: date,
+      summariesDate: moment(date,'DD.MM.YY').set({ hour: 23, minute: 59, second: 58, millisecond: 0 }).toDate()
     });
 
     error = doc.validateSync();
@@ -36,11 +37,13 @@ const saveDB = async (query, summaries, specialDate, userId) => {
     }
   }
 };
+
 const formatM = date => moment(date).format('DD.MM.YY');
 
 exports.save = async ({summaries, userId}) => {
   const withSpecialDateSummaries = [];
 
+  // check summaries with edited date
   for (let i = 0; i < summaries.length; i++) {
     if(summaries[i].specialDate) {
       withSpecialDateSummaries.push(...summaries.splice(i,1));
@@ -69,7 +72,7 @@ exports.save = async ({summaries, userId}) => {
   for (let i = 0; i < filteredByDateSummaries.length; i++) {
     const element = filteredByDateSummaries[i];
 
-    saveDB({summariesDateStr: element.specialDate},element.values,element.specialDate,userId);
+    await saveDB({userId: userId, summariesDateStr: element.specialDate},element.values,userId,element.specialDate);
   }
 
   if(summaries.length) {
@@ -83,7 +86,7 @@ exports.save = async ({summaries, userId}) => {
       userId: userId
     };
 
-    saveDB(query,summaries,userId);
+    await saveDB(query,summaries,userId);
   }
 };
 

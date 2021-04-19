@@ -34,6 +34,7 @@ mongoose.connection.once('open', () => console.log('MongoDB Connected!'));
         "counter": 1,
         "fieldValidation": 64,
         "factValidation": 64,
+        "specialDate": new Date().setDate(new Date().getDate() - 4),
         "z1": {
           "acftIdent": "1234567",
           "aircraftType": "1234",
@@ -102,9 +103,10 @@ mongoose.connection.once('open', () => console.log('MongoDB Connected!'));
   try {
     for (let i = 0; i < usersIds.length; i++) {
       const e = usersIds[i];
+      const arr = [...summaries];
       
       console.log(`create summaries for userID[${e}]`);
-      await daySummaryController.save({ summaries, userId: e });
+      await daySummaryController.save({ summaries: arr, userId: e });
     }
   } catch (err) {
     console.log(err);

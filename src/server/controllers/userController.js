@@ -6,6 +6,12 @@ const events = require('../../client/Events');
 const {config} = global;
 const moment = require('moment');
 const hashPass = (text, salt = '') => require('crypto').createHash(config.hash.encryptionType).update(salt + text).digest('hex'); // eslint-disable-line
+const userExcludeFields = {
+  'password': 0,
+  'createdAt': 0,
+  'updatedAt': 0,
+  'rights': 0,
+};
 
 exports.register = async ({
   login,
@@ -149,13 +155,6 @@ exports.updateStatus = async userId => {
   }
 };
 
-const userExcludeFields = {
-  'password': 0,
-  'createdAt': 0,
-  'updatedAt': 0,
-  'rights': 0,
-};
-
 exports.listDepartmentsBySliceOfDate = async date => {
   try {
     const dateObj = moment(date).locale('ru').utcOffset(0);
@@ -196,8 +195,6 @@ exports.listDepartmentsBySliceOfDate = async date => {
         // get summaries by user and selected week
         const summariesIdFromDates = await daySummary.find(query,summariesExcludeFields);
         const daysArray = new Array(7).fill('');
-
-        // console.log(summariesIdFromDates);
 
         usr = {...usr, id: i+1, userId: usr.id};
 

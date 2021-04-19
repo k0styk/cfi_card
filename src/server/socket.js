@@ -227,11 +227,27 @@ module.exports = server => {
       }
     });
 
-    socket.on(events.summaries.createSelected, async (fileId, cb) => {
+    socket.on(events.summaries.createTxtForAll, async (departmentsWithDocs, cb) => {
       if (checkSession()) {
-        cb(await fileSummariesController.createSelected({fileId, userId: socket.request.session.userId}));
+        cb(await fileSummariesController.createTxtForAll({departmentsWithDocs, userId: socket.request.session.userId}));
       } else {
-        console.error('[No Session] - Try to createSelected');
+        console.error('[No Session] - Try to createTxt');
+      }
+    });
+
+    socket.on(events.summaries.createExcelForAll, async (departmentsWithDocs, cb) => {
+      if (checkSession()) {
+        cb(await fileSummariesController.createExcelForAll({departmentsWithDocs,userId:socket.request.session.userId}));
+      } else {
+        console.error('[No Session] - Try to createTxt');
+      }
+    });
+
+    socket.on(events.summaries.createArchiveForAll, async (departmentsWithDocs, cb) => {
+      if (checkSession()) {
+        cb(await fileSummariesController.createArchiveForAll({departmentsWithDocs,userId:socket.request.session.userId}));
+      } else {
+        console.error('[No Session] - Try to createTxt');
       }
     });
 
