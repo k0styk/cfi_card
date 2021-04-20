@@ -11,8 +11,7 @@ const sessionMiddleware = session({
     path: '/',
     httpOnly: true,
     secure: false,
-    // day*hour*minutes*seconds*millis
-    maxAge: 10*24*60*60*1000
+    maxAge: 10*24*60*60*1000 // day*hour*minutes*seconds*millis
   },
   store: new MongoStore({
     mongooseConnection: mongoose.connection,

@@ -350,7 +350,7 @@ const SummariesView = ({socket, notify,setLoader}) => {
                   .map((row, index) => (<Row
                     key={index}
                     idx={index}
-                    length={rowsPerPage}
+                    length={Math.min(rowsPerPage,departments.length)}
                     row={row}
                     socket={socket}
                     selected={selected}
