@@ -9,7 +9,6 @@ const socketMiddleware = require('./middlewares/socket');
 const userController = require('./controllers/userController');
 const summaryController = require('./controllers/summaryController');
 const daySummaryController = require('./controllers/daySummaryController');
-const downloadSummariesController = require('./controllers/downloadSummariesController');
 const fileSummariesController = require('./controllers/fileSummariesController');
 /**---  CONFIG  ---**/
 const { config } = global;

@@ -7,7 +7,7 @@
     "start": "npm run pm2&&npm run webpack",
     "deploy": "npm install&&npm run build:production&&npm prune --production&&npm run production",
     "deploy:log": "npm install&&npm run build:prodlog&&npm prune --production&&npm run production",
-    "production": "pm2 start ./pm2/process.prod.config.js --env production",
+    "production": "pm2 start ./pm2/process.prod.config.js --env production&&pm2 logs",
     "build": "rimraf ./dist/ && webpack --mode development --progress --profile",
     "build:production": "rimraf ./dist/ && webpack --mode production --progress --profile",
     "build:prodlog": "rimraf ./dist/ && webpack --mode production --env.logger=logger",

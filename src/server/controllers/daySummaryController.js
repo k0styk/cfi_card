@@ -79,6 +79,7 @@ exports.save = async ({summaries, userId}) => {
     const startDay = moment().utcOffset(0).set({ hour: 0, minute: 0, second: 0, millisecond: 0 }).toDate();
     const endDay = moment().utcOffset(0).set({ hour: 23, minute: 59, second: 59, millisecond: 0 }).toDate();
     const query = {
+      summariesDateStr: moment().format('DD.MM.YY'),
       createdAt: {
         $gt: startDay,
         $lt: endDay
