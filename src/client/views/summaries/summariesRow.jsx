@@ -35,6 +35,9 @@ const useRowStyles = makeStyles(theme => ({
   borderTop: {
     boxShadow: 'inset 0px 1px 0px 0px rgb(63 81 181), inset 1px 0px 0px 0px rgb(63 81 181), inset -1px 0px 0px 0px rgb(63 81 181)', // eslint-disable-line
   },
+  borderOnlyTop: {
+    boxShadow: 'inset 0px 1px 0px 0px rgb(63 81 181), inset 1px 0px 0px 0px rgb(63 81 181), inset -1px 0px 0px 0px rgb(63 81 181), inset 0px -1px 0px 0px rgb(63 81 181)', // eslint-disable-line
+  },
   borderBottom: {
     boxShadow: 'inset 0px -1px 0px 0px rgb(63 81 181), inset 1px 0px 0px 0px rgb(63 81 181), inset -1px 0px 0px 0px rgb(63 81 181)', // eslint-disable-line
   },
@@ -77,13 +80,12 @@ const SummariesRow = ({
     let todayClass, resultClass;
 
     if (day === today) {
-      if (index) {
+      if (index===len-1) {
+        todayClass = len===1?classes.borderOnlyTop:classes.borderBottom;
+      } else if(index) {
         todayClass = classes.border;
       } else {
-        todayClass = clsx(classes.border, classes.borderTop);
-      }
-      if (index === len - 1) {
-        todayClass = clsx(classes.border, classes.borderBottom);
+        todayClass = classes.borderTop;
       }
     }
     resultClass = clsx(todayClass);

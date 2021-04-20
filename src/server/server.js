@@ -8,7 +8,9 @@ const PORT =      process.env.PORT      || config.app.port,
       dbClient =  process.env.DB_CLIENT || config.db.client,
       dbHost =    process.env.DB_HOST   || config.db.connection.host,
       dbPort =    process.env.DB_PORT   || config.db.connection.port,
-      dbName =    process.env.DB_NAME   || config.db.connection.dbName;
+      dbName =    process.env.DB_NAME   || config.db.connection.dbName,
+      redisHost = process.env.REDIS_HOST|| config.redis.host,
+      redisPort = process.env.REDIS_PORT|| config.redis.port;
 const url = `${dbClient}://${dbHost}:${dbPort}/${dbName}`;
 
 mongoose.connection.on('error', err => console.log('Mongoose Connection ERROR: ' + err.message));
@@ -41,7 +43,7 @@ require('./models/File');
 
   const server = require('./app').listen(PORT,HOST,listenCallback);
   const io = require('./socket')(server);
-  io.adapter(require('socket.io-redis')({ host: 'localhost', port: 6379 }));
+  io.adapter(require('socket.io-redis')({ host: redisHost, port: redisPort }));
 })();
 
 /* PM2 START */
