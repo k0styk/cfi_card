@@ -14,5 +14,5 @@ echo Run pm2 process
 npm run production
 
 echo -e "\033[33mDone baby!\033[0m"
-echo -e "\033[33mCheck status process\033[0m"
-pm2 status
+echo -e "\033[33mWatch logs\033[0m"
+pm2 logs
