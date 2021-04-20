@@ -15,7 +15,9 @@ const fileSummariesController = require('./controllers/fileSummariesController')
 const { config } = global;
 
 module.exports = server => {
-  const io = require('socket.io').listen(server);
+  const io = require('socket.io', {
+    transports: [ 'websocket' ]
+  }).listen(server);
 
   io.use(socketMiddleware);
   io.on('connection', socket => {

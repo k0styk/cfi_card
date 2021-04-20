@@ -10,7 +10,8 @@ const clientSocket = props => {
   const socket = io({
     reconnectionAttempts: 4,
     reconnectionDelay: 3000,
-    reconnectionDelayMax: 10000
+    reconnectionDelayMax: 10000,
+    transports: [ 'websocket' ]
   });
 
   socket.on('connect', () => {
